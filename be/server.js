@@ -5,11 +5,16 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const connectFlash = require("connect-flash");
-
+const cors = require("cors");
+const connectDB = require("./src/utils/db");
 dotenv.config();
 const apiRouter = require("./src/routes/api");
-const port = 3000;
 const app = express();
+const corsOptions = {
+    origin: "http://localhost:3000",
+    optionsSuccessStatus: 200,
+    };
+app.use(cors(corsOptions));
 console.log(__dirname);
 
 app.use(
@@ -60,6 +65,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Server running with http://localhost:${port}`);
+connectDB();
+app.listen(process.env.PORT ?? 3000, () => {
+  console.log(`Server running with http://localhost:${process.env.PORT ?? 3000}`);
 });

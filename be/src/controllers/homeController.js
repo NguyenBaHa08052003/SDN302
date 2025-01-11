@@ -1,1 +1,0 @@
-//day la home controller

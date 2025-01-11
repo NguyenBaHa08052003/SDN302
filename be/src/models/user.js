@@ -1,1 +1,0 @@
-//day la model user ket noi database

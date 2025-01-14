@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
-const Role = require('./role.model');
-//  định nghĩa schema
+// const Role = require('./role.model');
 const userSchema = new mongoose.Schema({
     fullname: {
         type: String,

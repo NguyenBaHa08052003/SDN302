@@ -1,7 +1,9 @@
 const { object, string } = require("yup");
 const User = require("../../../models/user.model");
 const { hashMake, hashCheck } = require("../../../utils/hash");
-const {createAccessToken, refreshAccessToken } = require("../../../utils/jwt");
+const {createAccessToken, refreshAccessToken, verifyToken } = require("../../../utils/jwt");
+const BlackLists = require("../../../models/blacklist.model");
+
 module.exports = {
   register: async (req, res) => {
     try {
@@ -62,7 +64,7 @@ module.exports = {
             })  
         }        
         const accessToken = await createAccessToken({
-            id: user._id,
+            userId: user._id,
         });
         const refreshToken = await refreshAccessToken();
         return res.json({
@@ -82,5 +84,46 @@ module.exports = {
             message: e.message
         })
     }
+  },
+
+  logout: async (req, res) => {
+    try {
+        const token = req.token;
+        const accessToken = token.accessToken;
+        if(!accessToken){
+            return res.json({
+                message: "Dang xuat khong thanh cong"
+            })
+        }
+        const tokenDie = await BlackLists.create({
+            token: accessToken
+        });
+        return res.json({
+            message: "Đăng xuất thanh công",
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "Dang xuat faild",
+        })
+    }
+  },
+
+  profile: async (req, res) => {
+   try {
+    const user = req.user;
+    const token = req.token;
+    return res.json({
+        success: true,
+        message: "Thong tin nguoi dung",
+        data: user, 
+        token: token
+    })
+   } catch (error) {
+    return res.json.status(500).json({
+        success: false,
+        message: "Server chết",
+    })
+   }
   }
+
 };

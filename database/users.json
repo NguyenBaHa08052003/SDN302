@@ -1,0 +1,21 @@
+[
+    {
+      "fullname": "Nguyễn Văn A",
+      "email": "nguyenvana@example.com",
+      "password": "hashedpassword123",
+      "status": true,
+      "role": "60b8d8d8d8d8d8d8d8d8d8d8", 
+      "created_at": "2025-01-11T00:00:00.000Z",
+      "updated_at": "2025-01-11T00:00:00.000Z"
+    },
+    {
+      "fullname": "Trần Thị B",
+      "email": "tranthib@example.com",
+      "password": "hashedpassword456",
+      "status": false,
+      "role": "60b8d8d8d8d8d8d8d8d8d8d8",
+      "created_at": "2025-01-11T00:00:00.000Z",
+      "updated_at": "2025-01-11T00:00:00.000Z"
+    }
+  ]
+  

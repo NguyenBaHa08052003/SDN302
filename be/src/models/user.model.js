@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-// const Role = require('./role.model');
+const Role = require('./role.model');
 const userSchema = new mongoose.Schema({
     fullname: {
         type: String,
@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role',
+        default: '60b8d8d8d8d8d8d8d8d8d8d8',
     },
     created_at: {
         type: Date,
@@ -35,8 +36,5 @@ const userSchema = new mongoose.Schema({
     }
 
 }, {collection: 'Users'});
-userSchema.pre('find', function() {
-    this.populate('role');  
-});
 const User = mongoose.model('User', userSchema);
 module.exports = User;

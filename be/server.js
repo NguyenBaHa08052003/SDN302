@@ -11,7 +11,7 @@ dotenv.config();
 const apiRouter = require("./src/routes/api");
 const app = express();
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     optionsSuccessStatus: 200,
     };
 app.use(cors(corsOptions));

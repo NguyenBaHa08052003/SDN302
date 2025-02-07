@@ -1,12 +1,12 @@
-import logo from './logo.svg';
-
+import { Route, Routes } from "react-router-dom";
+import Login from "./pages/auth/Login";
 
 function App() {
   return (
     <div className="App">
-      <h1 class="text-3xl font-bold underline">
-        Hello world With TailwindCss!
-      </h1>
+      <Routes>
+          <Route path="/dang-nhap" element={<Login />} />
+      </Routes>
     </div>
   );
 }

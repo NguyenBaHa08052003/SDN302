@@ -1,20 +1,21 @@
 import axios from "axios";
 
 
-const login = async (email, password) => {
+const login = async (data) => {
     const response = await axios.post(
         `http://localhost:3000/api/auth/login`, 
-        { email, password },
+        data,
         {
           headers: {
             'Content-Type': 'application/json',
           }
         }
       );
-  if (response.data.data) {
-    localStorage.setItem("user", JSON.stringify(response.data));
+    const datas = response.data;
+  if (datas.data) {
+    localStorage.setItem("token", JSON.stringify(datas.data.accessToken));
   }
-  return response.data;
+  return datas;
 };
 
 const logout = () => {

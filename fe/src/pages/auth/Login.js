@@ -1,21 +1,51 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { loginUser } from "../../redux/slice/authSlice";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../../services/authService/auth.service";
+import { ToastContainer, toast } from "react-toastify";
+import { useState } from "react";
 export default function Login() {
-    const dispatch = useDispatch();
-    const { isLoading, user,  error } = useSelector((state) => state.auth);
-    // const user = useSelector(state => state.auth.user);
-
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = Object.fromEntries(new FormData(e.target));
-    dispatch(loginUser(form));
+    try {
+      const form = Object.fromEntries(new FormData(e.target));
+      setLoading(true);
+      const response = await authService.login(form);
+      setLoading(false);
+      console.log(response);
+      if (response.data) {
+        toast.success(response.message);
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+        return;
+      }
+      if (response.message) {
+        toast.error(response.message, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+      if (response.message.password) {
+        toast.error(response.message.password);
+      }
+      if (response.message.email) {
+        toast.error(response.message.email);
+      }
+    } catch (error) {}
   };
   return (
     <div
       tabIndex="-1"
       className="bg-black/5 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-[999] h-full items-center justify-center popup flex"
     >
+      <ToastContainer theme="dark" position="top-right" autoClose={2000} />
       <div className="relative p-4 w-full max-w-md h-full md:h-auto">
         <div className="relative bg-white rounded-lg shadow popup-body">
           <div className="p-5">
@@ -95,10 +125,10 @@ export default function Login() {
                 </p>
                 <button
                   type="submit"
-                  disabled={!isLoading}
+                  disabled={loading}
                   className="inline-flex w-full items-center justify-center rounded-lg bg-black p-2 py-3 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-black focus:ring-offset-1 disabled:bg-gray-400"
                 >
-                {!isLoading ? "Logging in..." : "Continue"}
+                  Continue
                 </button>
               </form>
             </div>

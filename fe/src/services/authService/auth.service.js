@@ -23,11 +23,11 @@ const login = async (data) => {
 };
 
 const logout = () => {
-  localStorage.removeItem("authToken");
+  authTokenControl.removeToken();
 };
 
 const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem("authToken"));
+  return JSON.parse(authTokenControl.getToken("authToken"));
 };
 
 const googleLogin = async (data) => {

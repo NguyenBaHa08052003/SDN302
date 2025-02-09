@@ -12,40 +12,36 @@ export default function Login() {
       setLoading(true);
       const response = await authService.login(form);
       setLoading(false);
-      console.log(response);
       if (response.data) {
         toast.success(response.message);
         setTimeout(() => {
-          navigate("/");
+          navigate("/", {replace: true});
         }, 1500);
         return;
       }
       if (response.message) {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.error(response.message);
+        console.log("hello");
       }
       if (response.message.password) {
+        console.log("hello");
         toast.error(response.message.password);
       }
       if (response.message.email) {
         toast.error(response.message.email);
+        console.log("hello");
       }
-    } catch (error) {}
+    } catch (error) {
+      toast.error("Something went wrong. Please try again later.");
+      setLoading(false);
+    }
   };
   return (
     <div
       tabIndex="-1"
       className="bg-black/5 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-[999] h-full items-center justify-center popup flex"
     >
-      <ToastContainer theme="dark" position="top-right" autoClose={2000} />
+      <ToastContainer theme="dark" position="top-right" autoClose={1500} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover style={{ zIndex: 9999 }} />
       <div className="relative p-4 w-full max-w-md h-full md:h-auto">
         <div className="relative bg-white rounded-lg shadow popup-body">
           <div className="p-5">

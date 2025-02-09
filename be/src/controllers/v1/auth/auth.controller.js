@@ -11,7 +11,7 @@ const BlackLists = require("../../../models/blacklist.model");
 module.exports = {
   register: async (req, res) => {
     try {
-      const body = req.body;
+   
       let userSchema = object({
         fullname: string().required().min(6, "Ten phai toi thieu 6 ky tu"),
         email: string()
@@ -66,15 +66,19 @@ module.exports = {
       await userSchema.validate(body, {
         abortEarly: false,
       });
+      console.log(body);
+      
       const user = await User.findOne({ email: body.email });
+      
       if (!user) {
-        return res.json({
+        console.log("hello");
+        return res.status(400).json({
           message: "Email hoặc mật khẩu không chính xác",
         });
       }
       const checkPassword = await hashCheck(body.password, user.password);
       if (!checkPassword) {
-        return res.json({
+        return res.status(400).json({
           message: "Email hoặc mật khẩu không chính xác",
         });
       }
@@ -109,7 +113,7 @@ module.exports = {
       const token = req.token;
       const accessToken = token.accessToken;
       if (!accessToken) {
-        return res.json({
+        return res.status(404).json({
           message: "Dang xuat khong thanh cong",
         });
       }
@@ -128,13 +132,13 @@ module.exports = {
 
   profile: async (req, res) => {
     try {
+      console.log("đã vào profile");
+      
       const user = req.user;
-      const token = req.token;
       return res.json({
         success: true,
         message: "Thong tin nguoi dung",
         data: user,
-        token: token,
       });
     } catch (error) {
       return res.json.status(500).json({

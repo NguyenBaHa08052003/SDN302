@@ -20,7 +20,7 @@ module.exports = async (req, res, next) => {
       });
     }
     const decode = await verifyToken(accessToken);
-    console.log(decode);
+    console.log("decode", decode);
 
     if (!decode) {
       return res.status(404).json({

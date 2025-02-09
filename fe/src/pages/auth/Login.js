@@ -15,7 +15,7 @@ export default function Login() {
       if (response.data) {
         toast.success(response.message);
         setTimeout(() => {
-          navigate("/", {replace: true});
+          navigate("/", { replace: true });
         }, 1500);
         return;
       }
@@ -36,12 +36,44 @@ export default function Login() {
       setLoading(false);
     }
   };
+  const handleLoginWithGoogle = async () => {
+    try {
+      const response = await authService.googleLogin();
+      console.log(response);
+      
+      // if (response.data) {
+      //   toast.success(response.message);
+      //   setTimeout(() => {
+      //     navigate("/", { replace: true });
+      //   }, 1500);
+      //   return;
+      // }
+    } catch (error) {
+      // if (error.response.status === 404) {
+      //   toast.error(error.response.data.message);
+      // } else {
+      //   toast.error("Something went wrong. Please try again later.");
+      // }
+    }
+  };
   return (
     <div
       tabIndex="-1"
       className="bg-black/5 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-[999] h-full items-center justify-center popup flex"
     >
-      <ToastContainer theme="dark" position="top-right" autoClose={1500} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover style={{ zIndex: 9999 }} />
+      <ToastContainer
+        theme="dark"
+        position="top-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        style={{ zIndex: 9999 }}
+      />
       <div className="relative p-4 w-full max-w-md h-full md:h-auto">
         <div className="relative bg-white rounded-lg shadow popup-body">
           <div className="p-5">
@@ -57,7 +89,10 @@ export default function Login() {
             </div>
             <div>
               <div className="flex w-full flex-col gap-2">
-                <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60">
+                <a
+                  href="http://localhost:3000/api/auth/google"
+                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded border border-slate-300 bg-white p-2 text-sm font-medium text-black outline-none focus:ring-2 focus:ring-[#333] focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 90 92"
@@ -82,7 +117,7 @@ export default function Login() {
                     ></path>
                   </svg>
                   Continue with Google
-                </button>
+                </a>
               </div>
               <div className="flex w-full items-center gap-2 py-6 text-sm text-slate-600">
                 <div className="h-px w-full bg-slate-200"></div>OR

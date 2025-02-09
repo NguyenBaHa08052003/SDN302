@@ -1,20 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux"; // Sử dụng useSelector để truy xuất state từ Redux
-import { fetchUser } from "../stores/redux/slices/userSlice"; // Giả sử bạn đã có slice cho user
 import { useLoading, useUser } from "../utils/customHook";
-import Cookies from "js-cookie";
+import withAuth from "../stores/hoc/withAuth";
 function GuestMiddleware() {
-  const dispatch = useDispatch();
   const user = useUser();
   const loading = useLoading();
-  console.log(user);
-  useEffect(() => {
-    const token = Cookies.get("authToken");
-    if (token) {
-      dispatch(fetchUser(token));
-    }
-  }, [dispatch, user]);
+
   if (loading) {
     return (
       <div
@@ -32,4 +22,4 @@ function GuestMiddleware() {
   return user ? <Navigate to="/" /> : <Outlet />;
 }
 
-export default GuestMiddleware;
+export default withAuth(GuestMiddleware);

@@ -3,15 +3,15 @@ import authTokenControl from "../../utils/authToken";
 
 const login = async (data) => {
   try {
-      const response = await axios.post(
-        `http://localhost:3000/api/auth/login`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const response = await axios.post(
+      `http://localhost:3000/api/auth/login`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const datas = response.data;
     if (datas.data) {
       authTokenControl.saveToken(datas.data.accessToken);
@@ -26,31 +26,23 @@ const login = async (data) => {
 const logout = () => {
   authTokenControl.removeToken();
 };
-const getCurrentUser =async (token) => {
-   try {
-      const response = await axios.get(`http://localhost:3000/api/auth/users`, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        }
-      });
-      return response;
-   } catch (error) {
-
-   }  
+const getCurrentUser = async (token) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/auth/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    return error.response;
+  }
 };
 
-const googleLogin = async (data) => {
+const googleLogin = async () => {
   try {
-    const response = await axios.post(
-      `http://localhost:3000/api/auth/google`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-    return response;
+    await axios.get(`http://localhost:3000/api/auth/google`);
+    // return response;
   } catch (error) {}
 };
 

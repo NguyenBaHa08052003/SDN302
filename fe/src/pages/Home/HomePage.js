@@ -1,24 +1,51 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import { useLoading, useUser } from "../../utils/customHook";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import { useError, useLoading, useUser } from "../../utils/customHook";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 
 import Cookies from "js-cookie";
-import { fetchUser, logout } from "../../stores/redux/slices/userSlice";
+import { logout } from "../../stores/redux/slices/userSlice";
 import authService from "../../services/authService/auth.service";
-export default function HomePage() {
+import withAuth from "../../stores/hoc/withAuth";
+function HomePage() {
   const navigate = useNavigate();
   const user = useUser();
+  const error = useError();
   const loading = useLoading();
   const dispatch = useDispatch();
+  
   useEffect(() => {
-    const token = Cookies.get("authToken");
-    if (token) {
-      dispatch(fetchUser(token));
+    if(!Cookies.get("authToken") && ((error?.success && error?.message !== "Bạn không có quyền truy cập") || !error)){
+      toast('🦄Chào mừng bạn trở lại với Countless New Rooms!. Hãy đăng nhập để có trải nghiệm tốt nhất nhé', {
+        position: "bottom-right",
+        autoClose: 3500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+        });
+        return;
+    };
+    console.log(user?.success);
+    
+    if(!user && user?.success){
+      console.log("hello");
+      Cookies.remove("authToken");
+      toast.error("Hệ thống không nhận diện được tài khoản của bạn!. Mọi quá trình thao tác của bạn đã được ghi lại. Vui lòng đăng nhập để sử dụng hệ thống.", 
+        {
+          autoClose: 5500,
+        }
+      );
+      return;
     }
-  }, [dispatch]);
+  }, []);
+
+  // Xử lý profile
   const handleProfile = () => {
     if (!user) {
       toast.error("Bạn không có quyền truy cập");
@@ -30,6 +57,7 @@ export default function HomePage() {
     }, 1000);
   };
 
+  // Xử lý đăng xuất
   const handleLogout = () => {
     authService.logout();
     setTimeout(() => {
@@ -57,7 +85,7 @@ export default function HomePage() {
     <div className="lg:flex lg:items-center lg:justify-between">
       <ToastContainer
         theme="dark"
-        position="top-right"
+        position="bottom-right"
         autoClose={1500}
         hideProgressBar={false}
         newestOnTop={false}
@@ -219,3 +247,4 @@ export default function HomePage() {
     </div>
   );
 }
+export default withAuth(HomePage);

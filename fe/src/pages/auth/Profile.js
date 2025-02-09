@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { useUser } from "../../utils/customHook";
-import { useLoading } from "../../utils/customHook";
-
+import { useError, useUser } from "../../utils/customHook";
+import Cookies from "js-cookie";
 export default function Profile() {
-  const user = useUser(); 
+  const user = useUser();
+
   console.log("Profile:", user);
 
   return <div>Profile: {user?.data.name}</div>;

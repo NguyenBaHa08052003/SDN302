@@ -7,6 +7,7 @@ const {
   verifyToken,
 } = require("../../../utils/jwt");
 const BlackLists = require("../../../models/blacklist.model");
+const Provider = require("../../../models/provider.model");
 
 module.exports = {
   register: async (req, res) => {
@@ -67,8 +68,8 @@ module.exports = {
         abortEarly: false,
       });
       console.log(body);
-      
-      const user = await User.findOne({ email: body.email });
+      const provider = await Provider.findOne({ name: "email" });
+      const user = await User.findOne({ email: body.email, provider: provider._id });
       
       if (!user) {
         console.log("hello");

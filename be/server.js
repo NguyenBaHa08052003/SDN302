@@ -8,15 +8,21 @@ const connectFlash = require("connect-flash");
 const cors = require("cors");
 const connectDB = require("./src/utils/db");
 dotenv.config();
+
+const passport = require("passport");
+const passportGoogle = require("./src/passports/passport.google");
 const apiRouter = require("./src/routes/api");
+const User = require("./src/models/user.model");
 const app = express();
 const corsOptions = {
-    origin: "http://localhost:3001",
-    optionsSuccessStatus: 200,
-    };
-app.use(cors(corsOptions));
-console.log(__dirname);
+  origin: "*", 
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, 
+  optionsSuccessStatus: 204
+};
 
+app.use(cors(corsOptions))
+console.log(__dirname);
 app.use(
   morgan("common", {
     stream: fs.createWriteStream(__dirname + "/src/logs/access.log", {
@@ -35,7 +41,21 @@ app.use(
     name: "setting-session",
   })
 );
-app.use(connectFlash());
+app.use(connectFlash()); // lưu trữ res tạm thời cho các thông báo 
+// nhúng passport
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use("google", passportGoogle);
+passport.serializeUser(function (user, done) {
+  done(null, user.id); // lưu userId vào session
+});
+
+passport.deserializeUser(async function (id, done) {
+  const user = await User.findById(id);
+  done(null, user);
+});
+
+// mở urlencode
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 

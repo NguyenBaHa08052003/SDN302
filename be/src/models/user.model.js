@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Role = require('./role.model');
+const Provider = require('./provider.model');   
 const userSchema = new mongoose.Schema({
     fullname: {
         type: String,
@@ -14,7 +15,6 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
         trim: true,
     },
     status: {
@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role',
         default: '60b8d8d8d8d8d8d8d8d8d8d8',
+    },
+    provider: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Provider',
+        default: '67a8b65e9a36f2ef8c4f01e7',
     },
     created_at: {
         type: Date,

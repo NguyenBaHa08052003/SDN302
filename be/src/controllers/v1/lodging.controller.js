@@ -90,7 +90,9 @@ module.exports = {
         const [min, max] = areaRanges[area] || [0, Infinity];
         filter.area = { $gte: min, $lte: max };
       }
-  
+  // TEXT {
+  //   filter.type = "id"
+  // }
       // Tính skip dựa trên page
       const skip = (parseInt(page) - 1) * parseInt(limit);
       const total = await Lodging.countDocuments(filter);

@@ -138,7 +138,7 @@ module.exports = {
       const user = req.user;
       return res.json({
         success: true,
-        message: "Thong tin nguoi dung",
+        message: "Đăng nhập thành công. Chào mừng bạn trở lại!!!",
         data: user,
       });
     } catch (error) {

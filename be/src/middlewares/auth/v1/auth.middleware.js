@@ -5,7 +5,7 @@ const UserTransformer = require("../../../transformers/user.transformers");
 module.exports = async (req, res, next) => {
   try {
     const accessToken = req.get("authorization").split(" ").slice(-1).join("");
-    console.log(accessToken);
+    console.log("ddang xuat", accessToken);
     if (!accessToken) {
       return res.status(404).json({
         success: false,
@@ -20,8 +20,6 @@ module.exports = async (req, res, next) => {
       });
     }
     const decode = await verifyToken(accessToken);
-    console.log("decode", decode);
-
     if (!decode) {
       return res.status(404).json({
         success: false,

@@ -23,8 +23,19 @@ const login = async (data) => {
   }
 };
 
-const logout = () => {
-  authTokenControl.removeToken();
+const logout = async () => {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/auth/logout`, {
+      headers: {
+        Authorization: `Bearer ${authTokenControl.getToken()}`,
+    }});
+    console.log(response);
+    authTokenControl.removeToken();
+  } catch (error) {
+    console.log(error.response);
+    return error.response;
+  }
+  
 };
 const getCurrentUser = async (token) => {
   try {

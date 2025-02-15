@@ -1,6 +1,5 @@
 // userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import authService from "../../../services/authService/auth.service";
 
 const initialState = {
@@ -12,8 +11,6 @@ const initialState = {
 export const fetchUser = createAsyncThunk("user/fetchUser", async (token, { rejectWithValue }) => {
   try {
     const response = await authService.getCurrentUser(token);
-    console.log("Đang ở đây");
-
     if(response.data.success){
       return response.data;
     }

@@ -1,9 +1,2 @@
-::1 - - [11/Feb/2025:05:06:52 +0000] "GET /api/auth/users HTTP/1.1" 304 -
-::1 - - [11/Feb/2025:05:07:11 +0000] "GET /api/auth/logout HTTP/1.1" 304 -
-::1 - - [11/Feb/2025:05:07:56 +0000] "GET /api/auth/google HTTP/1.1" 302 0
-::1 - - [11/Feb/2025:05:08:04 +0000] "GET /api/auth/google/callback?code=4%2F0ASVgi3KICK6IflGHBkwkdmz7n-AX7E9z8xyCjFuBuoee8I9GGKZ7TUEAhmtZhW36XbS7ZQ&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid&authuser=0&hd=fpt.edu.vn&prompt=none HTTP/1.1" 302 50
-::1 - - [11/Feb/2025:05:08:05 +0000] "GET /api/auth/users HTTP/1.1" 304 -
-::1 - - [11/Feb/2025:05:08:24 +0000] "GET /api/auth/users HTTP/1.1" 304 -
-::1 - - [11/Feb/2025:05:08:27 +0000] "GET /api/auth/users HTTP/1.1" 304 -
-::1 - - [11/Feb/2025:05:08:28 +0000] "GET /api/auth/users HTTP/1.1" 304 -
-::1 - - [11/Feb/2025:05:08:30 +0000] "GET /api/auth/logout HTTP/1.1" 304 -
+::1 - - [15/Feb/2025:09:01:54 +0000] "GET /api/auth/users HTTP/1.1" 304 -
+::1 - - [15/Feb/2025:09:01:56 +0000] "GET /api/auth/users HTTP/1.1" 304 -

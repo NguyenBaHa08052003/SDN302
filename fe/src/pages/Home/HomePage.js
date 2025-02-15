@@ -9,6 +9,7 @@ import Cookies from "js-cookie";
 import { logout } from "../../stores/redux/slices/userSlice";
 import authService from "../../services/authService/auth.service";
 import withAuth from "../../stores/hoc/withAuth";
+import LodgingPage from "./LodgingPage";
 function HomePage() {
   const navigate = useNavigate();
   const user = useUser();
@@ -31,10 +32,7 @@ function HomePage() {
         });
         return;
     };
-    console.log(user?.success);
-    
     if(!user && user?.success){
-      console.log("hello");
       Cookies.remove("authToken");
       toast.error("Hệ thống không nhận diện được tài khoản của bạn!. Mọi quá trình thao tác của bạn đã được ghi lại. Vui lòng đăng nhập để sử dụng hệ thống.", 
         {
@@ -43,15 +41,18 @@ function HomePage() {
       );
       return;
     }
-  }, []);
+    if(user?.success && Cookies.get("authToken")){
+      toast.success(`🦄 ${user?.message} - ${(user?.data.name).toUpperCase()}`);
+    }
+  }, [dispatch]);
 
   // Xử lý profile
   const handleProfile = () => {
-    if (!user) {
+    if (!user?.success) {
       toast.error("Bạn không có quyền truy cập");
       return;
     }
-    toast.success(`Chào mừng bạn trở lại ${user.data.name}`);
+    toast.success(`Đang tải dữ liệu`);
     setTimeout(() => {
       navigate("/tai-khoan", { state: { data: user } });
     }, 1000);
@@ -244,6 +245,7 @@ function HomePage() {
           </>
         )}
       </div>
+        <LodgingPage/>
     </div>
   );
 }

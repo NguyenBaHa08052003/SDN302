@@ -1,12 +1,19 @@
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchLodgings } from "../../stores/redux/slices/lodgingSlice";
 
 export default function LodgingPage() {
-    const error = useSelector((state) => state.userRedux.error);
-    console.log("User data:", error); // Kiểm tra dữ liệu Redux
-    useEffect(() => {
-
-    }, [error]);
-    return <div>{error  }</div>;
-  }
+  const dispatch = useDispatch();
+  const lodings = useSelector((state) => state.lodgingRedux.lodgings);
+  useEffect(() => {
+    console.log("Xin chào");
+    dispatch(fetchLodgings());
+  }, [dispatch]);
+  console.log(lodings);
   
+  return (
+    <div>
+      <h1>Lodgings</h1>
+    </div>
+  );
+}

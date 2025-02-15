@@ -6,12 +6,16 @@ import GuestMiddleware from "../middlewares/GuestMiddleware";
 import Login from "../pages/auth/Login";
 import HomePage from "../pages/Home/HomePage";
 import LodgingPage from "../pages/Home/LodgingPage";
+import NotFound from "../pages/not_found/NotFound";
 export const publicRoutes = (
   <>
+  <Route path="*" element={<NotFound />} /> {/* Bắt tất cả route không khớp */}
     <Route element={<DefaultLayout/>}>
       <Route index path="/" element={<HomePage />} />
       <Route path="/lodging" element={<LodgingPage/>}/>
+      
     </Route>
+
     <Route element={<AuthLayout />}>
       <Route element={<GuestMiddleware />}>
         <Route path="/dang-nhap" element={<Login />} />

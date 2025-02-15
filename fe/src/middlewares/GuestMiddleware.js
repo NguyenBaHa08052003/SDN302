@@ -4,7 +4,8 @@ import withAuth from "../stores/hoc/withAuth";
 function GuestMiddleware() {
   const user = useUser();
   const loading = useLoading();
-
+  console.log("hello");
+  
   if (loading) {
     return (
       <div

@@ -13,7 +13,7 @@ export default function Login() {
       const response = await authService.login(form);
       setLoading(false);
       if (response.data) {
-        toast.success(response.message);
+        toast.success("Chờ một chút!!!");
         setTimeout(() => {
           navigate("/", { replace: true });
         }, 1500);
@@ -36,26 +36,7 @@ export default function Login() {
       setLoading(false);
     }
   };
-  const handleLoginWithGoogle = async () => {
-    try {
-      const response = await authService.googleLogin();
-      console.log(response);
-      
-      // if (response.data) {
-      //   toast.success(response.message);
-      //   setTimeout(() => {
-      //     navigate("/", { replace: true });
-      //   }, 1500);
-      //   return;
-      // }
-    } catch (error) {
-      // if (error.response.status === 404) {
-      //   toast.error(error.response.data.message);
-      // } else {
-      //   toast.error("Something went wrong. Please try again later.");
-      // }
-    }
-  };
+  
   return (
     <div
       tabIndex="-1"

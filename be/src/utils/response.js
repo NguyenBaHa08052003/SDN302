@@ -1,5 +1,5 @@
 module.exports = {
-  successResponse: (res, data = {},meta={}, status = 200, message = "", ) => {
+  successResponse: (res, data = {},meta={}, status = 200, message = "") => {
     console.log(status);
     return res.status(status).json({
       success: true,

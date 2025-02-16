@@ -11,10 +11,7 @@ export const fetchLodgings = createAsyncThunk(
   async (_ ,{ rejectWithValue }) => {
     try {
       const response = await lodgingService.getAllLodging();
-      if(response.error === 0){
         return response;
-      }
-      return rejectWithValue(response);
     } catch (error) {
       return rejectWithValue(error.response);
     }
@@ -32,12 +29,12 @@ const lodgingSlice = createSlice({
       })
       .addCase(fetchLodgings.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.lodgings = action.payload.data;
+        state.lodgings = action.payload;
         state.error = action.payload?.error_text;
       })
       .addCase(fetchLodgings.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload?.error;
+        state.error = action.payload;
       });
   },
 });

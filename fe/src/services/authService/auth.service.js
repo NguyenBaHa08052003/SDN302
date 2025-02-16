@@ -16,7 +16,6 @@ const login = async (data) => {
     if (datas.data) {
       authTokenControl.saveToken(datas.data.accessToken);
     }
-    console.log(datas);
     return datas;
   } catch (error) {
     return error.response.data;

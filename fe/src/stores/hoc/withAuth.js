@@ -10,6 +10,18 @@ const withAuth = (WrappedComponent) => {
   return (props) => {
     const loading = useLoading();
     const dispatch = useDispatch();
+    const user = useUser();
+    const navigate = useNavigate();
+    useEffect(() => {
+      if(user?.success){
+        if(user?.data?.role === "Admin"){
+            navigate("/dashboard");
+        }
+        if(user?.data?.role === "User"){
+          console.log("hello User");
+        }
+      }
+    }, [user]);
     useEffect(() => {
       const token = Cookies.get("authToken");
       if (token) {

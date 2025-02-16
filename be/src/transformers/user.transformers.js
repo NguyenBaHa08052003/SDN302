@@ -6,6 +6,7 @@ module.exports = class extends Transformer {
             name: instance.fullname,
             email: instance.email,
             status: instance.status,
+            role: instance.role.name,
             address: instance.address,
             createAt: instance.created_at,
             updateAt: instance.updated_at

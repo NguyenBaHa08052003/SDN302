@@ -26,7 +26,10 @@ module.exports = async (req, res, next) => {
         message: "Bạn không có quyền truy cập",
       });
     }
-    const user = await User.findById(decode.userId);
+    const user = await User.findById(decode.userId).populate({
+      path: "role",
+      select: "name -_id",
+    });
     if (!user) {
       return res.status(404).json({
         success: false,

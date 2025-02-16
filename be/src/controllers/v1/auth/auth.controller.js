@@ -69,7 +69,11 @@ module.exports = {
       });
       console.log(body);
       const provider = await Provider.findOne({ name: "email" });
-      const user = await User.findOne({ email: body.email, provider: provider._id });
+      const user = await User.findOne({ email: body.email, provider: provider._id }).populate({
+        path: "role",
+        select: "name -_id",
+      });
+      console.log(user);
       
       if (!user) {
         console.log("hello");
@@ -134,8 +138,9 @@ module.exports = {
   profile: async (req, res) => {
     try {
       console.log("đã vào profile");
-      
       const user = req.user;
+      console.log(user);
+      
       return res.json({
         success: true,
         message: "Đăng nhập thành công. Chào mừng bạn trở lại!!!",

@@ -14,7 +14,6 @@ function AuthMiddleware() {
   const error = useError();
   const loading = useLoading();
   useEffect(() => {
-    
     if (!error?.success && error?.message === "Bạn không có quyền truy cập") {
       console.log("hello");
       Cookies.remove("authToken");

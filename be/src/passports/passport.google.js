@@ -10,13 +10,11 @@ module.exports = new GoogleStrategy(
   },
   async (accessToken, refreshToken, profile, done) => {
     console.log(profile);
-    
     const {
         displayName: fullname,
         emails: [{ value: email }],
       } = profile;
       console.log(fullname, email);
-      
     const user = await createProviderAndUser(email, fullname);
     done(null, user);
   }

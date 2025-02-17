@@ -8,7 +8,6 @@ const connectFlash = require("connect-flash");
 const cors = require("cors");
 const connectDB = require("./src/utils/db");
 dotenv.config();
-
 const passport = require("passport");
 const passportGoogle = require("./src/passports/passport.google");
 const apiRouter = require("./src/routes/api");

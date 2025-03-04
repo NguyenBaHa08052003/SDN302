@@ -32,12 +32,10 @@ export default function DashBoard() {
       alert("Vui lòng nhập đủ thông tin sản phẩm!");
       return;
     }
-
     const formData = new FormData();
     images.forEach((file) => formData.append("images", file));
     formData.append("name", form.name);
     formData.append("price", form.price);
-
     try {
       const res = await axios.post(
         "http://localhost:3000/api/lodgings",
@@ -46,10 +44,8 @@ export default function DashBoard() {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-
       setProducts([...products, res.data]);
       alert("Thêm sản phẩm thành công!");
-
       // Reset form
       setImages([]);
       setPreviews([]);

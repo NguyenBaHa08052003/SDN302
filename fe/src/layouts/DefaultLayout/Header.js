@@ -51,7 +51,7 @@ const Header = () => {
             <i className="far fa-heart mr-1"></i> Yêu thích
           </a>
           {/* Test login success => Day la gốc !user?.success */}
-          {false && (
+          {!user?.success && (
             <>
               <span className="hidden sm:block">
                 <Link
@@ -95,7 +95,7 @@ const Header = () => {
 
           {/* Test login success => Day la gốc user?.success */}
           <div className="mt-5 flex lg:mt-0">
-            {true && (
+            {user?.success && (
               <>
                 <span className="ml-3 hidden sm:block">
                   <button

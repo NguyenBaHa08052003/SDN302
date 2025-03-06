@@ -18,7 +18,7 @@ const withAuth = (WrappedComponent) => {
             navigate("/dashboard");
         }
         if(user?.data?.role === "User"){
-          console.log("hello User");
+            console.log("hello User");
         }
       }
     }, [user]);

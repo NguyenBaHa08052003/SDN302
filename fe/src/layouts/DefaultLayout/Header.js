@@ -25,11 +25,11 @@ const Header = () => {
   const handleLogout = () => {
     authService.logout();
     sessionStorage.removeItem("welcomeToast");
-
     setTimeout(() => {
       dispatch(logout());
     }, 500);
     toast.info("Bạn đã đăng xuất thành công!");
+    window.location.reload();
   };
   return (
     <div>

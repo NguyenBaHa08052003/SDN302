@@ -28,7 +28,6 @@ const withAuth = (WrappedComponent) => {
         dispatch(fetchUser(token));
       }
     }, [dispatch]);
-
     if (loading) {
       return (
         <div

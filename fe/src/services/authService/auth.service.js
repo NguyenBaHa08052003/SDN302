@@ -28,8 +28,6 @@ const logout = async () => {
       headers: {
         Authorization: `Bearer ${authTokenControl.getToken()}`,
     }});
-    console.log(response);
-    authTokenControl.removeToken();
   } catch (error) {
     console.log(error.response);
     return error.response;

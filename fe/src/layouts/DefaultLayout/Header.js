@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import authService from "../../services/authService/auth.service";
 import { useDispatch } from "react-redux";
 import { logout } from "../../stores/redux/slices/userSlice";
+import authTokenControl from "../../utils/authToken";
 
 const Header = () => {
   const user = useUser();
@@ -25,6 +26,7 @@ const Header = () => {
   const handleLogout = () => {
     authService.logout();
     sessionStorage.removeItem("welcomeToast");
+    authTokenControl.removeToken();
     setTimeout(() => {
       dispatch(logout());
     }, 500);

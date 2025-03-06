@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Role = require('./role.model');
-const Provider = require('./provider.model');   
+const Provider = require('./provider.model');
+const Lodging = require('./lodging.model');
 const userSchema = new mongoose.Schema({
     fullname: {
         type: String,
@@ -31,6 +32,10 @@ const userSchema = new mongoose.Schema({
         ref: 'Provider',
         default: '67a8b65e9a36f2ef8c4f01e7',
     },
+    favLodging: {
+        type: [mongoose.Schema.Types.ObjectId],
+        required: true,
+    },
     created_at: {
         type: Date,
         default: Date.now(),
@@ -40,6 +45,6 @@ const userSchema = new mongoose.Schema({
         default: Date.now(),
     }
 
-}, {collection: 'Users'});
+}, { collection: 'Users' });
 const User = mongoose.model('User', userSchema);
 module.exports = User;

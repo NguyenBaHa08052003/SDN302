@@ -8,4 +8,4 @@ const LodgingTypeSchema = new mongoose.Schema({
     }
 }, { timestamps: true, collection: 'LodgingTypes' });
 
-module.exports = mongoose.model('LodgingType', LodgingTypeSchema);
+module.exports = mongoose.model('Lodgingtype', LodgingTypeSchema);

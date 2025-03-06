@@ -1,73 +1,152 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Select, Dropdown, Button, Checkbox, Menu, Space } from "antd";
+import { Select, Dropdown, Button, Checkbox, Menu } from "antd";
 import { DownOutlined } from "@ant-design/icons";
+import { fetchLodgings } from "../stores/redux/slices/lodgingSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
-const LocationSelector = () => {
+const LocationSelector = ({}) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const dispatch = useDispatch();
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
+  const [selectedPrices, setSelectedPrices] = useState([]);
+  const [selectedAreas, setSelectedAreas] = useState([]);
+  const [listings, setListings] = useState([]); // Danh sách kết quả tìm kiếm
 
+  // 🏙 Fetch danh sách tỉnh/thành phố (chỉ gọi 1 lần)
   useEffect(() => {
-    axios.get("https://esgoo.net/api-tinhthanh/1/0.htm").then((response) => {
-      if (response.data.error === 0) {
-        setProvinces(response.data.data);
+    const fetchProvinces = async () => {
+      try {
+        const response = await axios.get("https://esgoo.net/api-tinhthanh/1/0.htm");
+        if (response.data.error === 0) {
+          setProvinces(response.data.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách tỉnh/thành phố:", error);
       }
-    });
+    };
+    fetchProvinces();
   }, []);
 
-  useEffect(() => {
-    if (selectedProvince) {
-      axios.get(`https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`).then((response) => {
-        if (response.data.error === 0) {
-          setDistricts(response.data.data);
-          setWards([]);
-          setSelectedDistrict(null);
-          setSelectedWard(null);
-        }
-      });
+  // 🏡 Fetch danh sách quận/huyện khi chọn tỉnh
+  const fetchDistricts = useCallback(async () => {
+    if (!selectedProvince) return;
+    try {
+      const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`);
+      if (response.data.error === 0) {
+        setDistricts(response.data.data);
+
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách quận/huyện:", error);
     }
   }, [selectedProvince]);
 
   useEffect(() => {
-    if (selectedDistrict) {
-      axios.get(`https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`).then((response) => {
-        if (response.data.error === 0) {
-          setWards(response.data.data);
-          setSelectedWard(null);
-        }
-      });
+    fetchDistricts();
+  }, [fetchDistricts]);
+
+  //Fetch danh sách phường/xã khi chọn quận
+  const fetchWards = useCallback(async () => {
+    if (!selectedDistrict) return;
+
+    try {
+      const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`);
+      if (response.data.error === 0) {
+        setWards(response.data.data);
+        setSelectedWard(null); // Reset phường/xã
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách phường/xã:", error);
     }
   }, [selectedDistrict]);
 
-  const priceOptions = ["Dưới 1 triệu", "1 - 2 triệu", "2 - 3 triệu", "3 - 5 triệu", "5 - 7 triệu", "7 - 10 triệu", "10 - 15 triệu", "Trên 15 triệu"];
-  const areaOptions = ["Dưới 20 m²", "20 - 30 m²", "30 - 50 m²", "50 - 70 m²", "70 - 90 m²", "Trên 90 m²"];
+  useEffect(() => {
+    fetchWards();
+  }, [fetchWards]);
+  // Danh sách lựa chọn giá
+  const priceOptions = [
+    "Dưới 1 triệu",
+    "1 - 2 triệu",
+    "2 - 3 triệu",
+    "3 - 5 triệu",
+    "5 - 7 triệu",
+    "7 - 10 triệu",
+    "10 - 15 triệu",
+    "Trên 15 triệu",
+  ];
 
-  const [selectedPrices, setSelectedPrices] = useState([]);
-  const [selectedAreas, setSelectedAreas] = useState([]);
+  // Danh sách lựa chọn diện tích
+  const areaOptions = [
+    "Dưới 20 m²",
+    "20 - 30 m²",
+    "30 - 50 m²",
+    "50 - 70 m²",
+    "70 - 90 m²",
+    "Trên 90 m²",
+  ];
 
+  // Hiển thị dropdown
   const renderMenu = (options, selectedValues, handleChange) => (
     <Menu>
-      <Menu.Item>
-        <Checkbox.Group value={selectedValues} onChange={handleChange} className="flex flex-col">
-          {options.map((option) => (
-            <div key={option} className="py-1">
-              <Checkbox value={option}>{option}</Checkbox>
-            </div>
-          ))}
-        </Checkbox.Group>
-      </Menu.Item>
+      {options.map((option) => (
+        <Menu.Item key={option}>
+          <Checkbox
+            checked={selectedValues.includes(option)}
+            onChange={(e) => {
+              const newValue = e.target.checked
+                ? [...selectedValues, option]
+                : selectedValues.filter((v) => v !== option);
+              handleChange(newValue);
+            }}
+          >
+            {option}
+          </Checkbox>
+        </Menu.Item>
+      ))}
     </Menu>
   );
+// Hàm tìm tên theo ID từ danh sách
+const findNameById = (list, id) => {
+  const item = list.find((item) => item.id === id);
+  return item ? item.full_name : "";
+};
+// Chuyển ID thành tên
+const provinceName = findNameById(provinces, selectedProvince);
+const districtName = findNameById(districts, selectedDistrict);
+const wardName = findNameById(wards, selectedWard);
+const navigate = useNavigate();
+  // Xử lý tìm kiếm
+  const handleSearch = () => {
+    const queryParams = new URLSearchParams();
+  
+    if (provinceName) queryParams.append("province", provinceName);
+    if (districtName) queryParams.append("district", districtName);
+    if (wardName) queryParams.append("ward", wardName);
+    if (selectedPrices.length) queryParams.append("price", selectedPrices[0]);
+    if (selectedAreas.length) queryParams.append("area", selectedAreas[0]);
+    queryParams.append("page", 1);
+    queryParams.append("limit", 10);
+    navigate(`?${queryParams.toString()}`); // Cập nhật URL với query params
+    dispatch(fetchLodgings({
+      address: provinceName ? `${wardName}, ${districtName}, ${provinceName}` : null,
+      price: selectedPrices.length ? selectedPrices[0] : null,
+      area: selectedAreas.length ? selectedAreas[0] : null,
+      page: 1,
+      limit: 10,
+    }));
+  };
+  
 
   return (
     <div className="flex flex-col space-y-4">
-      {/* Khu vực chọn địa chỉ */}
       <div className="flex items-center gap-4 w-full">
         <Select
           placeholder="Tỉnh/Thành phố"
@@ -92,11 +171,12 @@ const LocationSelector = () => {
           allowClear
         >
           {districts.map((district) => (
-            <Option key={district.id} value={district.full_name}>
+            <Option key={district.id} value={district.ide}>
               {district.full_name}
             </Option>
           ))}
         </Select>
+
         <Select
           placeholder="Phường/Xã"
           value={selectedWard}
@@ -106,13 +186,14 @@ const LocationSelector = () => {
           allowClear
         >
           {wards.map((ward) => (
-            <Option key={ward.id} value={ward.full_name}>
+            <Option key={ward.id} value={ward.id}>
               {ward.full_name}
             </Option>
           ))}
         </Select>
       </div>
-      {/* Khu vực chọn giá & diện tích */}
+
+      {/* Chọn giá & diện tích */}
       <div className="flex items-center gap-4">
         <Dropdown overlay={renderMenu(priceOptions, selectedPrices, setSelectedPrices)} trigger={["click"]}>
           <Button>
@@ -126,7 +207,7 @@ const LocationSelector = () => {
           </Button>
         </Dropdown>
 
-        <Button type="primary" onClick={() => console.log({ selectedProvince, selectedDistrict, selectedWard, selectedPrices, selectedAreas })}>
+        <Button type="primary" onClick={handleSearch}>
           Tìm kiếm
         </Button>
       </div>

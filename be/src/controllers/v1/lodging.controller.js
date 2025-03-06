@@ -17,9 +17,10 @@ module.exports = {
       res.status(500).json({ message: "Lỗi server", error });
     }
   },
-  getAllLodgings: async (req, res) => {
+  getAllLodgings :async (req, res) => {
     try {
       const { search, price, address, area, page = 1, limit = 10 } = req.query;
+      console.log(req.query);
       const filter = {};
       if (search) {
         filter.$or = [
@@ -29,8 +30,10 @@ module.exports = {
         ];
       }
       if (address) {
-        filter.address = { $regex: `^${address}$`, $options: "i" }; 
+        const regexAddress = new RegExp(address.split(",").map(part => part.trim()).join(".*"), "i");
+        filter.address = { $regex: regexAddress };
       }
+      
       if (price) {
         const priceRanges = {
           "Dưới 1 triệu": [0, 1000000],
@@ -57,11 +60,15 @@ module.exports = {
         const [min, max] = areaRanges[area] || [0, Infinity];
         filter.area = { $gte: min, $lte: max };
       }
+  
       const skip = (parseInt(page) - 1) * parseInt(limit);
       const total = await Lodging.countDocuments(filter);
+  
       const listings = await Lodging.find(filter)
         .skip(skip)
-        .limit(parseInt(limit));
+        .limit(parseInt(limit))
+        .populate({ path: "type", select: "name -_id" }) // Fix lỗi populate
+        .populate({ path: "user", select: "fullname email -_id" }); 
       res.json({
         total,
         page: parseInt(page),

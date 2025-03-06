@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.1",
+    "antd": "^5.24.3",
     "axios": "^1.7.9",
     "buffer": "^6.0.3",
     "cra-template": "1.2.0",

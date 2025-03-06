@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Role = require('./role.model');
-const Provider = require('./provider.model');   
+const Provider = require('./provider.model');
+const Lodging = require('./lodging.model');
 const userSchema = new mongoose.Schema({
     fullname: {
         type: String,
@@ -40,6 +41,6 @@ const userSchema = new mongoose.Schema({
         default: Date.now(),
     }
 
-}, {collection: 'Users'});
+}, { collection: 'Users' });
 const User = mongoose.model('User', userSchema);
 module.exports = User;

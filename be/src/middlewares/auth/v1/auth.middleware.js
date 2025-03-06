@@ -20,6 +20,8 @@ module.exports = async (req, res, next) => {
       });
     }
     const decode = await verifyToken(accessToken);
+    console.log("decodeToken", decode);
+
     if (!decode) {
       return res.status(404).json({
         success: false,
@@ -30,12 +32,14 @@ module.exports = async (req, res, next) => {
       path: "role",
       select: "name -_id",
     });
+
     if (!user) {
       return res.status(404).json({
         success: false,
         message: "Bạn không có quyền truy cập",
       });
     }
+
     if (!user.status) {
       return res.status(404).json({
         success: false,
@@ -43,6 +47,14 @@ module.exports = async (req, res, next) => {
           "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên!!!",
       });
     }
+
+    if (user.role.name !== 'admin' && req.path.includes('/admin')) {
+      return res.status(404).json({
+        success: false,
+        message: "Bạn không có quyền truy cập",
+      });
+    };
+
     req.user = new UserTransformer(user);
     req.token = {
       accessToken,

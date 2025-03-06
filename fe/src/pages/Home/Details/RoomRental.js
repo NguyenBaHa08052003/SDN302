@@ -1,42 +1,7 @@
 import { useState } from 'react';
 import withAuth from '../../../stores/hoc/withAuth';
-
-const RoomRental = () => {
-const [searchQuery, setSearchQuery] = useState('');
-const [selectedPrice, setSelectedPrice] = useState('');
-const [selectedArea, setSelectedArea] = useState('');
-
-const parsePrice = (priceStr) => {
-  const number = parseFloat(priceStr.replace(/[^\d.]/g, ''));
-  return isNaN(number) ? 0 : number;
-};
-
-const parseArea = (areaStr) => {
-  const number = parseFloat(areaStr.replace(/[^\d.]/g, ''));
-  return isNaN(number) ? 0 : number;
-};
-
-const priceRanges = {
-  'Dưới 1 triệu': [0, 1],
-  '1 - 2 triệu': [1, 2],
-  '2 - 3 triệu': [2, 3],
-  '3 - 5 triệu': [3, 5],
-  '5 - 7 triệu': [5, 7],
-  '7 - 10 triệu': [7, 10],
-  '10 - 15 triệu': [10, 15],
-  'Trên 15 triệu': [15, Infinity],
-};
-
-const areaRanges = {
-  'Dưới 20 m²': [0, 20],
-  '20 - 30 m²': [20, 30],
-  '30 - 50 m²': [30, 50],
-  '50 - 70 m²': [50, 70],
-  '70 - 90 m²': [70, 90],
-  'Trên 90 m²': [90, Infinity],
-};
-
-const listings = [
+import LocationPro from '../../../components/LocationPro';
+const listingsData = [
   {
     id: 1,
     type: 'BÁC',
@@ -93,7 +58,7 @@ const listings = [
     price: '4.2 triệu',
     area: '20 m²',
     title: 'Chính chủ cần cho thuê Phòng tiện nghi- Giá 3.200.000',
-    address: 'huỳnh văn bánh, Phường 13, Phú Nhuận, Hồ Chí Minh',
+    address: 'huỳnh văn bánh,Phường 13, Phú Nhuận, Hồ Chí Minh',
     description: 'Phòng đủ tiện nghi- Nội thất lịch sự-Nơi để xe rộng rãi, gió giấc tự do. Phong thủy tốt- hướng nhà Đông- Nam...',
     images: [
       'https://storage.googleapis.com/a1aa/image/WugJWdGJZB6zmH1xwMcMfDVgFW-g4B_RoiQyYHdwCzE.jpg',
@@ -105,6 +70,43 @@ const listings = [
     posted: '1 ngày trước'
   },
 ];
+const RoomRental = () => {
+  const [listings, setListings] = useState(listingsData);
+  const [searchQuery, setSearchQuery] = useState('');
+const [selectedPrice, setSelectedPrice] = useState('');
+const [selectedArea, setSelectedArea] = useState('');
+
+const parsePrice = (priceStr) => {
+  const number = parseFloat(priceStr.replace(/[^\d.]/g, ''));
+  return isNaN(number) ? 0 : number;
+};
+
+const parseArea = (areaStr) => {
+  const number = parseFloat(areaStr.replace(/[^\d.]/g, ''));
+  return isNaN(number) ? 0 : number;
+};
+
+const priceRanges = {
+  'Dưới 1 triệu': [0, 1],
+  '1 - 2 triệu': [1, 2],
+  '2 - 3 triệu': [2, 3],
+  '3 - 5 triệu': [3, 5],
+  '5 - 7 triệu': [5, 7],
+  '7 - 10 triệu': [7, 10],
+  '10 - 15 triệu': [10, 15],
+  'Trên 15 triệu': [15, Infinity],
+};
+
+const areaRanges = {
+  'Dưới 20 m²': [0, 20],
+  '20 - 30 m²': [20, 30],
+  '30 - 50 m²': [30, 50],
+  '50 - 70 m²': [50, 70],
+  '70 - 90 m²': [70, 90],
+  'Trên 90 m²': [90, Infinity],
+};
+
+
 
 const filteredListings = listings.filter(listing => {
   const matchesSearch = listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,22 +138,8 @@ const areaOptions = [
     <div className="container mx-auto max-w-7xl px-4 py-6">
       {/* Search Bar */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Tìm kiếm phòng trọ, địa điểm..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-          </div>
-          <button className="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600">
-            Tìm kiếm
-          </button>
-        </div>
+      <LocationPro/>
       </div>
-
       {/* Main Content */}
       <div className="flex gap-6">
         {/* Listings */}

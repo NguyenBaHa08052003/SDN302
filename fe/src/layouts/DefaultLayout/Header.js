@@ -34,11 +34,11 @@ const Header = () => {
   return (
     <div>
       <nav className="flex items-center p-4 bg-white border-b border-gray-200">
-        <img
+       <Link to={'/'}> <img
           src="https://storage.googleapis.com/a1aa/image/TG6zox_QG2zNfmvJ0esdOmJp3_ttxAP0RUHhtPl4E4s.jpg"
           alt="Phongtro.vn logo"
           className="h-8 w-24 mr-5"
-        />
+        /></Link>
         <Link to={'/loging/room-rental'} className="text-black mr-5 text-sm font-bold">Phòng trọ</Link>
         <a href="#" className="text-black mr-5 text-sm font-bold">Nguyên căn</a>
         <a href="#" className="text-black mr-5 text-sm font-bold">Căn hộ</a>

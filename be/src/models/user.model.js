@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
         ref: 'Provider',
         default: '67a8b65e9a36f2ef8c4f01e7',
     },
+    favLodging: {
+        type: [mongoose.Schema.Types.ObjectId],
+        required: true,
+    },
     created_at: {
         type: Date,
         default: Date.now(),

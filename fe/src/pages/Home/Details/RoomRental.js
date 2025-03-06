@@ -96,7 +96,6 @@ const RoomRental = () => {
               <option>Diện tích lớn đến nhỏ</option>
             </select>
           </div>
-
           {filteredListings?.map((listing) => (
             <div
               key={listing._id}

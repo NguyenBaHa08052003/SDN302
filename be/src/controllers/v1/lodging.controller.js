@@ -58,8 +58,8 @@ module.exports = {
         filter.area = { $gte: min, $lte: max };
       }
       const skip = (parseInt(page) - 1) * parseInt(limit);
-      const total = await Room.countDocuments(filter);
-      const listings = await Room.find(filter)
+      const total = await Lodging.countDocuments(filter);
+      const listings = await Lodging.find(filter)
         .skip(skip)
         .limit(parseInt(limit));
       res.json({

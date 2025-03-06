@@ -70,6 +70,40 @@ const listings = [
     },
     posted: 'hôm nay'
   },
+  {
+    id: 3,
+    type: 'BÁC',
+    price: '5.6 triệu',
+    area: '20 m²',
+    title: 'Chính chủ cần cho thuê Phòng tiện nghi- Giá 3.200.000',
+    address: 'huỳnh văn bánh, Phường 13, Phú Nhuận, Hồ Chí Minh',
+    description: 'Phòng đủ tiện nghi- Nội thất lịch sự-Nơi để xe rộng rãi, gió giấc tự do. Phong thủy tốt- hướng nhà Đông- Nam...',
+    images: [
+      'https://storage.googleapis.com/a1aa/image/WugJWdGJZB6zmH1xwMcMfDVgFW-g4B_RoiQyYHdwCzE.jpg',
+    ],
+    agent: {
+      name: 'Thi Lan Thanh Le',
+      avatar: 'https://storage.googleapis.com/a1aa/image/yYucAYoCMFPh4Xfsn2fP3fLkX8sFwIzBTPYcDpeV3cs.jpg'
+    },
+    posted: '1 ngày trước'
+  },
+  {
+    id: 4,
+    type: 'BÁC',
+    price: '4.2 triệu',
+    area: '20 m²',
+    title: 'Chính chủ cần cho thuê Phòng tiện nghi- Giá 3.200.000',
+    address: 'huỳnh văn bánh, Phường 13, Phú Nhuận, Hồ Chí Minh',
+    description: 'Phòng đủ tiện nghi- Nội thất lịch sự-Nơi để xe rộng rãi, gió giấc tự do. Phong thủy tốt- hướng nhà Đông- Nam...',
+    images: [
+      'https://storage.googleapis.com/a1aa/image/WugJWdGJZB6zmH1xwMcMfDVgFW-g4B_RoiQyYHdwCzE.jpg',
+    ],
+    agent: {
+      name: 'Thi Lan Thanh Le',
+      avatar: 'https://storage.googleapis.com/a1aa/image/yYucAYoCMFPh4Xfsn2fP3fLkX8sFwIzBTPYcDpeV3cs.jpg'
+    },
+    posted: '1 ngày trước'
+  },
 ];
 
 const filteredListings = listings.filter(listing => {

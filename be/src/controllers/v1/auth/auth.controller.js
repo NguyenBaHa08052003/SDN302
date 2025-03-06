@@ -4,7 +4,6 @@ const { hashMake, hashCheck } = require("../../../utils/hash");
 const {
   createAccessToken,
   refreshAccessToken,
-  verifyToken,
 } = require("../../../utils/jwt");
 const BlackLists = require("../../../models/blacklist.model");
 const Provider = require("../../../models/provider.model");
@@ -12,7 +11,7 @@ const Provider = require("../../../models/provider.model");
 module.exports = {
   register: async (req, res) => {
     try {
-   
+      const body = req.body;
       let userSchema = object({
         fullname: string().required().min(6, "Ten phai toi thieu 6 ky tu"),
         email: string()
@@ -20,7 +19,6 @@ module.exports = {
           .email("Email không đúng định dạng")
           .test("checkEmail", "Email đã tồn tại", async (value) => {
             console.log(value);
-
             const user = await User.findOne({ email: value });
             console.log(user);
 

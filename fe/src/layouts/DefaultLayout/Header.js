@@ -39,7 +39,7 @@ const Header = () => {
           alt="Phongtro.vn logo"
           className="h-8 w-24 mr-5"
         />
-        <a href="#" className="text-black mr-5 text-sm font-bold">Phòng trọ</a>
+        <Link to={'/loging/room-rental'} className="text-black mr-5 text-sm font-bold">Phòng trọ</Link>
         <a href="#" className="text-black mr-5 text-sm font-bold">Nguyên căn</a>
         <a href="#" className="text-black mr-5 text-sm font-bold">Căn hộ</a>
         <a href="#" className="text-black mr-5 text-sm font-bold">Mặt bằng</a>

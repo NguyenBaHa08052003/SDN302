@@ -7,13 +7,14 @@ import Login from "../pages/auth/Login";
 import HomePage from "../pages/Home/HomePage";
 import LodgingPage from "../pages/Home/LodgingPage";
 import NotFound from "../pages/not_found/NotFound";
-import PermissionMiddleware from "../middlewares/PermissionMiddleware";
+import RoomRental from "../pages/Home/Details/RoomRental"
 export const publicRoutes = (
   <>
     <Route path="*" element={<NotFound />} />
     <Route element={<DefaultLayout />}>
         <Route index path="/" element={<HomePage />} />
         <Route path="/lodging" element={<LodgingPage />} />
+        <Route path="/loging/room-rental" element={<RoomRental/>}/>
     </Route>
 
     <Route element={<AuthLayout />}>

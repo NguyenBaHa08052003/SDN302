@@ -43,6 +43,8 @@ app.use(connectFlash()); // lưu trữ res tạm thời cho các thông báo
 // nhúng passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// cấu hình đăng nhập với google 
 passport.use("google", passportGoogle);
 passport.serializeUser(function (user, done) {
   done(null, user.id); // lưu userId vào session

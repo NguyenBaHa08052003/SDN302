@@ -9,6 +9,7 @@ module.exports = new GoogleStrategy(
     scope: ["profile", "email"],
   },
   async (accessToken, refreshToken, profile, done) => {
+
     console.log(profile);
     const {
         displayName: fullname,

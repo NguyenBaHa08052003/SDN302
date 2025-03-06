@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-
+import Cookies from "js-cookie";
 export default function DashBoard() {
   const [images, setImages] = useState([]); // Lưu file ảnh
   const [previews, setPreviews] = useState([]); // Xem trước ảnh
@@ -65,9 +65,13 @@ export default function DashBoard() {
       console.error("Lỗi khi xóa sản phẩm:", error);}
   }
   console.log(products);
-  
+  const handleLogout = () => {
+      Cookies.remove("authToken");
+      window.location.reload();
+  }
   return (
     <div className="p-4 border rounded-md shadow-md w-96">
+      <button onClick={handleLogout}>đăng xuất</button>
       <h2 className="text-lg font-bold mb-2">Thêm Sản Phẩm</h2>
       <form onSubmit={handleUpload}>
         <input

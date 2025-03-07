@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import authService from "../../services/authService/auth.service";
 import { useDispatch } from "react-redux";
 import { logout } from "../../stores/redux/slices/userSlice";
+import authTokenControl from "../../utils/authToken";
 
 const Header = () => {
   const user = useUser();
@@ -25,20 +26,21 @@ const Header = () => {
   const handleLogout = () => {
     authService.logout();
     sessionStorage.removeItem("welcomeToast");
-
+    authTokenControl.removeToken();
     setTimeout(() => {
       dispatch(logout());
     }, 500);
     toast.info("Bạn đã đăng xuất thành công!");
+    window.location.reload();
   };
   return (
     <div>
       <nav className="flex items-center p-4 bg-white border-b border-gray-200">
-        <img
+       <Link to={'/'}> <img
           src="https://storage.googleapis.com/a1aa/image/TG6zox_QG2zNfmvJ0esdOmJp3_ttxAP0RUHhtPl4E4s.jpg"
           alt="Phongtro.vn logo"
           className="h-8 w-24 mr-5"
-        />
+        /></Link>
         <Link to={'/loging/room-rental'} className="text-black mr-5 text-sm font-bold">Phòng trọ</Link>
         <a href="#" className="text-black mr-5 text-sm font-bold">Nguyên căn</a>
         <a href="#" className="text-black mr-5 text-sm font-bold">Căn hộ</a>

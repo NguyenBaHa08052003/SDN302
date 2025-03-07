@@ -1,17 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import lodgingService from "../../../services/lodgingService.js/lodging.service";
+
 const initialState = {
   lodgings: [],
   status: "idle",
   error: null,
+  isSearching: false, //Kiểm soát trạng thái tìm kiếm
 };
 
+//Fetch tất cả hoặc tìm kiếm theo params
 export const fetchLodgings = createAsyncThunk(
   "lodging/fetchLodgings",
-  async (_ ,{ rejectWithValue }) => {
+  async (params = null, { rejectWithValue }) => {
     try {
-      const response = await lodgingService.getAllLodging();
-        return response;
+      const response = await lodgingService.getAllLodging(params);
+      console.log(response);
+      return response;
     } catch (error) {
       return rejectWithValue(error.response);
     }
@@ -21,7 +25,11 @@ export const fetchLodgings = createAsyncThunk(
 const lodgingSlice = createSlice({
   name: "lodging",
   initialState,
-  reducers: {},
+  reducers: {
+    setIsSearching: (state, action) => {
+      state.isSearching = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchLodgings.pending, (state) => {
@@ -30,7 +38,7 @@ const lodgingSlice = createSlice({
       .addCase(fetchLodgings.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.lodgings = action.payload;
-        state.error = action.payload?.error_text;
+        state.error = null;
       })
       .addCase(fetchLodgings.rejected, (state, action) => {
         state.status = "failed";
@@ -39,4 +47,5 @@ const lodgingSlice = createSlice({
   },
 });
 
+export const { setIsSearching } = lodgingSlice.actions;
 export default lodgingSlice.reducer;

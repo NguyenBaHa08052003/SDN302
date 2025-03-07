@@ -36,6 +36,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
+    favLodging: {
+        type: [mongoose.Schema.Types.ObjectId],
+        required: true,
+        ref: 'Lodging'
+    },
     created_at: {
         type: Date,
         default: Date.now(),

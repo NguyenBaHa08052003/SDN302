@@ -13,5 +13,6 @@ export const privateRoutes = (
         <Route path="/dashboard" element={<DashboardPage />} />
       </Route>
     </Route>
+    
   </>
 );

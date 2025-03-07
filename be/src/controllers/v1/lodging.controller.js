@@ -19,7 +19,7 @@ module.exports = {
   },
   getAllLodgings :async (req, res) => {
     try {
-      const { search, price, address, area, page = 1, limit = 10 } = req.query;
+      const { search, price, address, area, page = 1, limit = 5 } = req.query;
       console.log(req.query);
       const filter = {};
       if (search) {

@@ -1,76 +1,101 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Select, Dropdown, Button, Checkbox, Menu } from "antd";
-import { DownOutlined } from "@ant-design/icons";
+import { Select, Dropdown, Button, Checkbox, Menu, Radio } from "antd";
+import { CloseOutlined, DownOutlined } from "@ant-design/icons";
 import { fetchLodgings } from "../stores/redux/slices/lodgingSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
-const LocationSelector = ({}) => {
+const LocationSelector = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const dispatch = useDispatch();
+  const {lodgings} = useSelector(state => state.lodgingRedux)
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [selectedAreas, setSelectedAreas] = useState([]);
-  const [listings, setListings] = useState([]); // Danh sách kết quả tìm kiếm
 
-  // 🏙 Fetch danh sách tỉnh/thành phố (chỉ gọi 1 lần)
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        const response = await axios.get("https://esgoo.net/api-tinhthanh/1/0.htm");
-        if (response.data.error === 0) {
-          setProvinces(response.data.data);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách tỉnh/thành phố:", error);
-      }
-    };
-    fetchProvinces();
-  }, []);
-
-  // 🏡 Fetch danh sách quận/huyện khi chọn tỉnh
-  const fetchDistricts = useCallback(async () => {
-    if (!selectedProvince) return;
+  // Fetch danh sách tỉnh/thành phố (chỉ gọi 1 lần)
+useEffect(() => {
+  const fetchProvinces = async () => {
     try {
-      const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`);
+      const response = await axios.get("https://esgoo.net/api-tinhthanh/1/0.htm");
       if (response.data.error === 0) {
-        setDistricts(response.data.data);
-
+        setProvinces(response.data.data);
       }
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách quận/huyện:", error);
+      console.error("Lỗi khi lấy danh sách tỉnh/thành phố:", error);
     }
-  }, [selectedProvince]);
+  };
+  fetchProvinces();
+}, []);
 
-  useEffect(() => {
-    fetchDistricts();
-  }, [fetchDistricts]);
+// Khi thay đổi tỉnh/thành phố
+const handleProvinceChange = (province) => {
+  setSelectedProvince(province);
+  setSelectedDistrict(null); // Xóa quận/huyện
+  setSelectedWard(null); // Xóa phường/xã
+  setDistricts([]); // Xóa danh sách quận/huyện
+  setWards([]); // Xóa danh sách phường/xã
+};
 
-  //Fetch danh sách phường/xã khi chọn quận
-  const fetchWards = useCallback(async () => {
-    if (!selectedDistrict) return;
+// Fetch danh sách quận/huyện khi chọn tỉnh
+const fetchDistricts = useCallback(async () => {
+  if (!selectedProvince) {
+    setDistricts([]);
+    setSelectedDistrict(null); // Xóa quận khi tỉnh bị xóa
+    setWards([]);
+    setSelectedWard(null); // Xóa phường/xã
+    return;
+  }
 
-    try {
-      const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`);
-      if (response.data.error === 0) {
-        setWards(response.data.data);
-        setSelectedWard(null); // Reset phường/xã
-      }
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách phường/xã:", error);
+  try {
+    const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`);
+    if (response.data.error === 0) {
+      setDistricts(response.data.data);
     }
-  }, [selectedDistrict]);
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách quận/huyện:", error);
+  }
+}, [selectedProvince]);
 
-  useEffect(() => {
-    fetchWards();
-  }, [fetchWards]);
+useEffect(() => {
+  fetchDistricts();
+}, [fetchDistricts]);
+
+// Khi thay đổi quận/huyện
+const handleDistrictChange = (district) => {
+  setSelectedDistrict(district);
+  setSelectedWard(null); // Xóa phường/xã
+  setWards([]); // Xóa danh sách phường/xã
+};
+
+// Fetch danh sách phường/xã khi chọn quận
+const fetchWards = useCallback(async () => {
+  if (!selectedDistrict) {
+    setWards([]);
+    setSelectedWard(null); // Xóa phường khi quận bị xóa
+    return;
+  }
+
+  try {
+    const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`);
+    if (response.data.error === 0) {
+      setWards(response.data.data);
+    }
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách phường/xã:", error);
+  }
+}, [selectedDistrict]);
+
+useEffect(() => {
+  fetchWards();
+}, [fetchWards]);
   // Danh sách lựa chọn giá
   const priceOptions = [
     "Dưới 1 triệu",
@@ -93,26 +118,28 @@ const LocationSelector = ({}) => {
     "Trên 90 m²",
   ];
 
-  // Hiển thị dropdown
-  const renderMenu = (options, selectedValues, handleChange) => (
+  const renderMenu = (options, selectedValue, handleChange) => (
     <Menu>
       {options.map((option) => (
         <Menu.Item key={option}>
-          <Checkbox
-            checked={selectedValues.includes(option)}
-            onChange={(e) => {
-              const newValue = e.target.checked
-                ? [...selectedValues, option]
-                : selectedValues.filter((v) => v !== option);
-              handleChange(newValue);
-            }}
+          <Radio
+            checked={selectedValue === option}
+            onChange={() => handleChange(option)}
           >
             {option}
-          </Checkbox>
+          </Radio>
         </Menu.Item>
       ))}
+      <Menu.Item
+        key="clear"
+        onClick={() => handleChange("")}
+        style={{ color: "red", textAlign: "center" }}
+      >
+        <CloseOutlined /> Xóa lựa chọn
+      </Menu.Item>
     </Menu>
   );
+  
 // Hàm tìm tên theo ID từ danh sách
 const findNameById = (list, id) => {
   const item = list.find((item) => item.id === id);
@@ -122,25 +149,17 @@ const findNameById = (list, id) => {
 const provinceName = findNameById(provinces, selectedProvince);
 const districtName = findNameById(districts, selectedDistrict);
 const wardName = findNameById(wards, selectedWard);
+console.log(lodgings);
+
 const navigate = useNavigate();
   // Xử lý tìm kiếm
   const handleSearch = () => {
-    const queryParams = new URLSearchParams();
-  
-    if (provinceName) queryParams.append("province", provinceName);
-    if (districtName) queryParams.append("district", districtName);
-    if (wardName) queryParams.append("ward", wardName);
-    if (selectedPrices.length) queryParams.append("price", selectedPrices[0]);
-    if (selectedAreas.length) queryParams.append("area", selectedAreas[0]);
-    queryParams.append("page", 1);
-    queryParams.append("limit", 10);
-    navigate(`?${queryParams.toString()}`); // Cập nhật URL với query params
     dispatch(fetchLodgings({
       address: provinceName ? `${wardName}, ${districtName}, ${provinceName}` : null,
-      price: selectedPrices.length ? selectedPrices[0] : null,
-      area: selectedAreas.length ? selectedAreas[0] : null,
-      page: 1,
-      limit: 10,
+      price: selectedPrices.length ? selectedPrices : null,
+      area: selectedAreas.length ? selectedAreas : null,
+      page: lodgings.page,
+      limit: lodgings.limit,
     }));
   };
   
@@ -200,7 +219,6 @@ const navigate = useNavigate();
             Chọn giá <DownOutlined />
           </Button>
         </Dropdown>
-
         <Dropdown overlay={renderMenu(areaOptions, selectedAreas, setSelectedAreas)} trigger={["click"]}>
           <Button>
             Chọn diện tích <DownOutlined />

@@ -13,11 +13,12 @@ const withAuth = (WrappedComponent) => {
     const user = useUser();
     const navigate = useNavigate();
     useEffect(() => {
-      if(user?.success){
-        if(user?.data?.role === "Admin"){
-            navigate("/dashboard");
+      if (user?.success) {
+        sessionStorage.setItem("Role", JSON.stringify(user.data.role));
+        if (user?.data?.role === "Admin") {
+          navigate("/dashboard");
         }
-        if(user?.data?.role === "User"){
+        if (user?.data?.role === "User") {
           console.log("hello User");
         }
       }

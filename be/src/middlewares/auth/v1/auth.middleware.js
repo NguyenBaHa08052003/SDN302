@@ -47,11 +47,12 @@ module.exports = async (req, res, next) => {
           "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên!!!",
       });
     }
-
-    if (user.role.name !== 'admin' && req.path.includes('/admin')) {
+    console.log("user", user);
+    console.log(req.originalUrl); // lay duong dan toan bo
+    if (user.role.name !== 'Admin' && req.originalUrl.includes('/admin')) {
       return res.status(404).json({
         success: false,
-        message: "Bạn không có quyền truy cập",
+        message: "Bạn không có quyền truy cập vì đây dành cho admin",
       });
     };
 

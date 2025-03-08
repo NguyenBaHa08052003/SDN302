@@ -32,9 +32,13 @@ const userSchema = new mongoose.Schema({
         ref: 'Provider',
         default: '67a8b65e9a36f2ef8c4f01e7',
     },
+    phoneNumber: {
+        type: String,
+        trim: true,
+    },
     favLodging: {
         type: [mongoose.Schema.Types.ObjectId],
-        required: true,
+        ref: 'Lodging'
     },
     created_at: {
         type: Date,

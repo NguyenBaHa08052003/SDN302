@@ -62,12 +62,13 @@ export default function DashBoard() {
       await axios.delete(`http://localhost:3000/api/lodgings/${proId}`);
       setProducts(products.filter((product) => product._id !== proId));
     } catch (error) {
-      console.error("Lỗi khi xóa sản phẩm:", error);}
+      console.error("Lỗi khi xóa sản phẩm:", error);
+    }
   }
   console.log(products);
   const handleLogout = () => {
-      Cookies.remove("authToken");
-      window.location.reload();
+    Cookies.remove("authToken");
+    window.location.reload();
   }
   return (
     <div className="p-4 border rounded-md shadow-md w-96">
@@ -144,7 +145,7 @@ export default function DashBoard() {
                   {product.name}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {product.price.toLocaleString()} VNĐ
+                  {product?.price?.toLocaleString()} VNĐ
                 </p>
                 <button className="bg-red-500 text-white px-3 py-1 rounded-full mt-3 hover:bg-red-600 transition" onClick={() => handleDeleteProduct(product._id)}>
                   Xóa

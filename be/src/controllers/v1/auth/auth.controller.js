@@ -38,15 +38,15 @@ module.exports = {
         data: user,
       });
     } catch (e) {
-        if (e.errors) {
-            console.log(e.errors);
-            const errors = Object.fromEntries(
-              e.inner.map((err) => [err.path, err.message])
-            );
-            return res.json({
-                message: errors,
-            })
-          }
+      if (e.errors) {
+        console.log(e.errors);
+        const errors = Object.fromEntries(
+          e.inner.map((err) => [err.path, err.message])
+        );
+        return res.json({
+          message: errors,
+        })
+      }
       return res.json({
         message: e.message,
       });
@@ -72,7 +72,7 @@ module.exports = {
         select: "name -_id",
       });
       console.log(user);
-      
+
       if (!user) {
         console.log("hello");
         return res.status(400).json({
@@ -102,7 +102,7 @@ module.exports = {
           e.inner.map((err) => [err.path, err.message])
         );
         return res.json({
-            message: errors,
+          message: errors,
         })
       }
       return res.json({
@@ -138,7 +138,6 @@ module.exports = {
       console.log("đã vào profile");
       const user = req.user;
       console.log(user);
-      
       return res.json({
         success: true,
         message: "Đăng nhập thành công. Chào mừng bạn trở lại!!!",

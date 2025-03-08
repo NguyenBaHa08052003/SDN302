@@ -19,21 +19,13 @@ module.exports = {
   },
   getAllLodgings :async (req, res) => {
     try {
-      const { search, price, address, area, page = 1, limit = 10 } = req.query;
-      console.log(req.query);
+      const {price, address, area, page = 1, limit = 5 } = req.query;
+      console.log(req.query.address);
       const filter = {};
-      if (search) {
-        filter.$or = [
-          { title: { $regex: search, $options: "i" } },
-          { description: { $regex: search, $options: "i" } },
-          { address: { $regex: search, $options: "i" } },
-        ];
-      }
       if (address) {
         const regexAddress = new RegExp(address.split(",").map(part => part.trim()).join(".*"), "i");
         filter.address = { $regex: regexAddress };
       }
-      
       if (price) {
         const priceRanges = {
           "Dưới 1 triệu": [0, 1000000],
@@ -82,11 +74,12 @@ module.exports = {
     }
   },
 
+  
+
   updateLogding: async (req, res) => {
     try {
       const { id } = req.params;
       const { name, price } = req.body;
-
       let lodging = await Lodging.findById(id);
       if (!lodging)
         return res.status(404).json({ message: "Lodging không tồn tại" });

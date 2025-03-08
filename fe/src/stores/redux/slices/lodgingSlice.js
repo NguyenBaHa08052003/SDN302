@@ -14,7 +14,6 @@ export const fetchLodgings = createAsyncThunk(
   async (params = null, { rejectWithValue }) => {
     try {
       const response = await lodgingService.getAllLodging(params);
-      console.log(response);
       return response;
     } catch (error) {
       return rejectWithValue(error.response);

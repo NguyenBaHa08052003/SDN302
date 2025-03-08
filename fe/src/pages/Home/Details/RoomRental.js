@@ -3,22 +3,34 @@ import withAuth from "../../../stores/hoc/withAuth";
 import LocationPro from "../../../components/LocationPro";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLodgings } from "../../../stores/redux/slices/lodgingSlice";
+import ClientPagination from "../../../components/Pagination";
+import { Link } from "react-router-dom";
 
+const priceRanges = {
+  "Dưới 1 triệu": [0, 1000000],
+  "1 - 2 triệu": [1000000, 2000000],
+  "2 - 3 triệu": [2000000, 3000000],
+  "3 - 5 triệu": [3000000, 5000000],
+  "5 - 7 triệu": [5000000, 7000000],
+  "7 - 10 triệu": [7000000, 10000000],
+  "10 - 15 triệu": [10000000, 15000000],
+  "Trên 15 triệu": [15000000, Infinity],
+};
+
+const areaRanges = {
+  "Dưới 20 m²": [0, 20],
+  "20 - 30 m²": [20, 30],
+  "30 - 50 m²": [30, 50],
+  "50 - 70 m²": [50, 70],
+  "70 - 90 m²": [70, 90],
+  "Trên 90 m²": [90, Infinity],
+};
 const RoomRental = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { lodgings, status } = useSelector((state) => state.lodgingRedux);
   const dispatch = useDispatch();
-
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
-  // const parsePrice = (priceStr) => {
-  //   const number = parseFloat(priceStr.replace(/[^\d.]/g, ""));
-  //   return isNaN(number) ? 0 : number;
-  // };
-  // const parseArea = (areaStr) => {
-  //   const number = parseFloat(areaStr.replace(/[^\d.]/g, ""));
-  //   return isNaN(number) ? 0 : number;
-  // };
   useEffect(() => {
     const fetchListings = async () => {
       try {
@@ -30,26 +42,19 @@ const RoomRental = () => {
     fetchListings();
   }, [dispatch]);
   const filteredListings = lodgings?.listings?.filter((listing) => {
-    const matchesSearch =
-      listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      listing.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-    // const listingPrice = parsePrice(listing.price);
-    // const listingArea = parseArea(listing.area);
-
-    // const matchesPrice =
-    //   !selectedPrice ||
-    //   (listingPrice >= priceRanges[selectedPrice][0] &&
-    //     listingPrice <= priceRanges[selectedPrice][1]);
-
-    // const matchesArea =
-    //   !selectedArea ||
-    //   (listingArea >= areaRanges[selectedArea][0] &&
-    //     listingArea <= areaRanges[selectedArea][1]);
-    // && matchesPrice && matchesArea
-    return matchesSearch;
+    const listingPrice = listing.price;
+    const listingArea = listing.area;
+    const matchesPrice =
+      !selectedPrice ||
+      (listingPrice >= priceRanges[selectedPrice][0] &&
+        listingPrice <= priceRanges[selectedPrice][1]);
+    const matchesArea =
+      !selectedArea ||
+      (listingArea >= areaRanges[selectedArea][0] &&
+        listingArea <= areaRanges[selectedArea][1]);
+    return matchesPrice && matchesArea;
   });
-  
+
   const priceOptions = [
     "",
     "Dưới 1 triệu",
@@ -76,7 +81,7 @@ const RoomRental = () => {
     <div className="container mx-auto max-w-7xl px-4 py-6">
       {/* Search Bar */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <LocationPro  />
+        <LocationPro />
       </div>
       {/* Main Content */}
       <div className="flex gap-6">
@@ -86,7 +91,7 @@ const RoomRental = () => {
             <div>
               <h1 className="text-xl font-bold">Phòng Trọ Cho Thuê</h1>
               <span className="text-sm text-gray-500">
-                Tìm thấy {filteredListings?.length} kết quả
+                Tìm thấy {lodgings?.total} kết quả
               </span>
             </div>
             <select className="p-2 border rounded-lg">
@@ -97,56 +102,62 @@ const RoomRental = () => {
             </select>
           </div>
           {filteredListings?.map((listing) => (
-            <div
-              key={listing._id}
-              className="bg-white rounded-lg shadow-md mb-4 overflow-hidden hover:shadow-lg transition-shadow flex"
-            >
-              <div className="w-1/4">
-                <img
-                  alt={listing.title}
-                  className="w-full h-48 object-cover"
-                  src={listing.images[0]}
-                />
-              </div>
-              <div className="flex-1 p-4">
-                <div className="flex justify-between items-start">
-                  <h2 className="text-lg font-semibold hover:text-red-500 cursor-pointer">
-                    {listing.title}
-                  </h2>
-                  <span className="text-red-500 text-xl font-bold whitespace-nowrap">
-                    {listing.price.toLocaleString()} VNĐ
-                  </span>
+            <Link to={`/loging/room-rental/room-detail/${listing._id}`}>
+              <div
+                key={listing._id}
+                className="bg-white rounded-lg shadow-md mb-4 overflow-hidden hover:shadow-lg transition-shadow flex"
+              >
+                <div className="w-1/4">
+                  <img
+                    alt={listing.title}
+                    className="w-full h-48 object-cover"
+                    src={listing.images[0]}
+                  />
                 </div>
-                <div className="flex gap-2 text-sm text-gray-600 mt-1">
-                  <span>{listing.area}</span>
-                  <span>•</span>
-                  {listing.type && (
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                      {listing.type.name}
-                    </span>
-                  )}
-                </div>
-                <p className="text-gray-600 text-sm mt-1">{listing.address}</p>
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                  {listing.description}
-                </p>
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-2">
-                    <img
-                      alt={`Profile picture of ${listing.user.name}`}
-                      className="w-8 h-8 rounded-full"
-                      src={listing.user.avatar || 'https://picsum.photos/200/300'}
-                    />
-                    <span className="text-sm text-gray-600">
-                      {listing.user.fullname}
+                <div className="flex-1 p-4">
+                  <div className="flex justify-between items-start">
+                    <h2 className="text-lg font-semibold hover:text-red-500 cursor-pointer">
+                      {listing.title}
+                    </h2>
+                    <span className="text-red-500 text-xl font-bold whitespace-nowrap">
+                      {listing.price.toLocaleString()} VNĐ
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {listing.posted}
-                  </span>
+                  <div className="flex gap-2 text-sm text-gray-600 mt-1">
+                    <span>{listing.area}</span>
+                    <span>•</span>
+                    {listing.type && (
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                        {listing.type.name}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {listing.address}
+                  </p>
+                  <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+                    {listing.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-2">
+                      <img
+                        alt={`Profile picture of ${listing.user.name}`}
+                        className="w-8 h-8 rounded-full"
+                        src={
+                          listing.user.avatar || "https://picsum.photos/200/300"
+                        }
+                      />
+                      <span className="text-sm text-gray-600">
+                        {listing.user.fullname}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {listing.posted}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -154,7 +165,6 @@ const RoomRental = () => {
         <div className="w-80 hidden lg:block">
           <div className="bg-white rounded-lg shadow-md p-4 sticky top-6">
             <h3 className="font-semibold mb-3">Lọc nhanh</h3>
-
             <div className="mb-4">
               <h4 className="text-sm font-medium mb-2">Khoảng giá</h4>
               <select
@@ -170,7 +180,6 @@ const RoomRental = () => {
                 ))}
               </select>
             </div>
-
             <div>
               <h4 className="text-sm font-medium mb-2">Diện tích</h4>
               <select
@@ -188,6 +197,9 @@ const RoomRental = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ClientPagination />
       </div>
     </div>
   );

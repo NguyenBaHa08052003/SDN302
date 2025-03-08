@@ -14,5 +14,5 @@ router.use("/users", userRouter);
 router.use("/lodgings", lodgingRouter);
 
 //admin
-router.use("/admin", authMiddleware, adminRouter);
+router.use("/admin", adminRouter);
 module.exports = router;

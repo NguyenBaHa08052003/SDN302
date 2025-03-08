@@ -1,5 +1,6 @@
 const userModel = require('../../../models/user.model');
 const { successResponse, errorResponse } = require('../../../utils/response');
+const roleModel = require('../../../models/role.model');
 const getAllUsers = async (req, res) => {
     try {
         const users = await userModel.find();
@@ -9,7 +10,8 @@ const getAllUsers = async (req, res) => {
         const formatUsers = users.map(user => {
             return { ...user._doc, password: undefined }
         });
-        return successResponse(res, formatUsers, {}, 201, "Danh sách nguoi dung");
+        console.log(formatUsers);
+        return successResponse(res, formatUsers, {}, 201, "Danh sách nguoi dung thanh cong");
     } catch (error) {
         console.log(error);
 
@@ -45,6 +47,17 @@ const updateUser = async (req, res) => {
     }
 }
 
+const getAllRole = async (req, res) => {
+    try {
+        const roles = await roleModel.find();
+        if (roles.length === 0) {
+            return errorResponse(res, {}, 404, "Không có danh sách quyền");
+        }
+        return successResponse(res, roles, {}, 200, "Danh sách quyen");
+    } catch (error) {
+        console.log(error);
+    }
+}
 module.exports = {
-    getAllUsers, getDetailUser, updateUser
+    getAllUsers, getDetailUser, updateUser, getAllRole
 }

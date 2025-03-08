@@ -13,4 +13,17 @@ const getAllUsers = async (token) => {
     }
 };
 
-export { getAllUsers }
+const getAllRole = async (token) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/api/admin/role/getAll`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+};
+
+export { getAllUsers, getAllRole }

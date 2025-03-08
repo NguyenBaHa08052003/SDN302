@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Users, Settings } from "lucide-react";
-import { getAllUsers } from "../../services/adminService/admin.service";
+import { getAllRole, getAllUsers } from "../../services/adminService/admin.service";
 import Cookies from 'js-cookie';
 import Modal from "react-modal";
 
@@ -21,7 +21,7 @@ const Sidebar = ({ setActivePage }) => {
 };
 
 const UserTable = (props) => {
-    const { search, setSearch } = props;
+    const { search, setSearch, roles, setRoles } = props;
     const token = Cookies.get('authToken');
     const [users, setUsers] = useState([]);
 
@@ -32,6 +32,8 @@ const UserTable = (props) => {
                 if (response) {
                     setUsers(response.data);
                 }
+                const responseRole = await getAllRole(token);
+                setRoles(responseRole.data);
             } catch (error) {
                 console.log(error);
             }
@@ -81,6 +83,7 @@ export default function AdminDashboard() {
     const [activePage, setActivePage] = useState("users");
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [search, setSearch] = useState("");
+    const [roles, setRoles] = useState([]);
     return (
         <div className="flex h-screen">
             <Sidebar setActivePage={setActivePage} />
@@ -104,7 +107,7 @@ export default function AdminDashboard() {
                     </button>
                 </div>
 
-                {activePage === "users" ? <UserTable search={search}
+                {activePage === "users" ? <UserTable roles={roles} setRoles={setRoles} search={search}
                     setSearch={setSearch} /> : <p>Settings Page</p>}
 
                 {/* Modal */}
@@ -114,8 +117,9 @@ export default function AdminDashboard() {
                     <input type="email" placeholder="Email" className="w-full p-2 border border-gray-300 rounded mb-2" />
                     <input type="text" placeholder="Phone Number" className="w-full p-2 border border-gray-300 rounded mb-2" />
                     <select className="w-full p-2 border border-gray-300 rounded mb-4">
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
+                        {roles?.map((role) => (
+                            <option key={role.id} value={role._id}>{role.name}</option>
+                        ))}
                     </select>
                     <div className="flex justify-end">
                         <button className="mr-2 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded" onClick={() => setModalIsOpen(false)}>Cancel</button>

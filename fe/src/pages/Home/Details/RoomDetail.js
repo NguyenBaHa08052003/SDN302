@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const App = () => {
+const RoomDetail = () => {
     // State cho bộ lọc
     const [propertyTypeFilter, setPropertyTypeFilter] = useState('Phòng trọ');
     const [areaFilter, setAreaFilter] = useState('');
@@ -220,4 +220,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default RoomDetail;

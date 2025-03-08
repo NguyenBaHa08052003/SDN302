@@ -4,98 +4,96 @@ import { Select, Dropdown, Button, Checkbox, Menu, Radio } from "antd";
 import { CloseOutlined, DownOutlined } from "@ant-design/icons";
 import { fetchLodgings } from "../stores/redux/slices/lodgingSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const { Option } = Select;
 
+// Hàm tìm tên theo ID từ danh sách
+const findNameById = (list, id) => {
+  const item = list.find((item) => item.id === id);
+  return item ? item.full_name : "";
+};
 const LocationSelector = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const dispatch = useDispatch();
-  const {lodgings} = useSelector(state => state.lodgingRedux)
+  const navigate = useNavigate();
+  const { lodgings } = useSelector((state) => state.lodgingRedux);
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [selectedAreas, setSelectedAreas] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Fetch danh sách tỉnh/thành phố (chỉ gọi 1 lần)
-useEffect(() => {
-  const fetchProvinces = async () => {
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const response = await axios.get(
+          "https://esgoo.net/api-tinhthanh/1/0.htm"
+        );
+        if (response.data.error === 0) {
+          setProvinces(response.data.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách tỉnh/thành phố:", error);
+      }
+    };
+    fetchProvinces();
+  }, []);
+
+  // Fetch danh sách quận/huyện khi chọn tỉnh
+  const fetchDistricts = useCallback(async () => {
+    if (!selectedProvince) {
+      setDistricts([]);
+      setSelectedDistrict(null); // Xóa quận khi tỉnh bị xóa
+      setWards([]);
+      setSelectedWard(null); // Xóa phường/xã
+      return;
+    }
+    setSelectedDistrict(null);
+    setSelectedWard(null);
     try {
-      const response = await axios.get("https://esgoo.net/api-tinhthanh/1/0.htm");
+      const response = await axios.get(
+        `https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`
+      );
       if (response.data.error === 0) {
-        setProvinces(response.data.data);
+        setDistricts(response.data.data);
       }
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách tỉnh/thành phố:", error);
+      console.error("Lỗi khi lấy danh sách quận/huyện:", error);
     }
-  };
-  fetchProvinces();
-}, []);
+  }, [selectedProvince]);
 
-// Khi thay đổi tỉnh/thành phố
-const handleProvinceChange = (province) => {
-  setSelectedProvince(province);
-  setSelectedDistrict(null); // Xóa quận/huyện
-  setSelectedWard(null); // Xóa phường/xã
-  setDistricts([]); // Xóa danh sách quận/huyện
-  setWards([]); // Xóa danh sách phường/xã
-};
+  useEffect(() => {
+    fetchDistricts();
+  }, [fetchDistricts]);
 
-// Fetch danh sách quận/huyện khi chọn tỉnh
-const fetchDistricts = useCallback(async () => {
-  if (!selectedProvince) {
-    setDistricts([]);
-    setSelectedDistrict(null); // Xóa quận khi tỉnh bị xóa
-    setWards([]);
-    setSelectedWard(null); // Xóa phường/xã
-    return;
-  }
-
-  try {
-    const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${selectedProvince}.htm`);
-    if (response.data.error === 0) {
-      setDistricts(response.data.data);
+  // Fetch danh sách phường/xã khi chọn quận
+  const fetchWards = useCallback(async () => {
+    if (!selectedDistrict) {
+      setWards([]);
+      setSelectedWard(null); // Xóa phường khi quận bị xóa
+      return;
     }
-  } catch (error) {
-    console.error("Lỗi khi lấy danh sách quận/huyện:", error);
-  }
-}, [selectedProvince]);
-
-useEffect(() => {
-  fetchDistricts();
-}, [fetchDistricts]);
-
-// Khi thay đổi quận/huyện
-const handleDistrictChange = (district) => {
-  setSelectedDistrict(district);
-  setSelectedWard(null); // Xóa phường/xã
-  setWards([]); // Xóa danh sách phường/xã
-};
-
-// Fetch danh sách phường/xã khi chọn quận
-const fetchWards = useCallback(async () => {
-  if (!selectedDistrict) {
-    setWards([]);
-    setSelectedWard(null); // Xóa phường khi quận bị xóa
-    return;
-  }
-
-  try {
-    const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`);
-    if (response.data.error === 0) {
-      setWards(response.data.data);
+    setSelectedWard(null);
+    try {
+      const response = await axios.get(
+        `https://esgoo.net/api-tinhthanh/3/${selectedDistrict}.htm`
+      );
+      if (response.data.error === 0) {
+        setWards(response.data.data);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách phường/xã:", error);
     }
-  } catch (error) {
-    console.error("Lỗi khi lấy danh sách phường/xã:", error);
-  }
-}, [selectedDistrict]);
+  }, [selectedDistrict]);
 
-useEffect(() => {
-  fetchWards();
-}, [fetchWards]);
+  useEffect(() => {
+    fetchWards();
+  }, [fetchWards]);
   // Danh sách lựa chọn giá
   const priceOptions = [
     "Dưới 1 triệu",
@@ -139,30 +137,36 @@ useEffect(() => {
       </Menu.Item>
     </Menu>
   );
-  
-// Hàm tìm tên theo ID từ danh sách
-const findNameById = (list, id) => {
-  const item = list.find((item) => item.id === id);
-  return item ? item.full_name : "";
-};
-// Chuyển ID thành tên
-const provinceName = findNameById(provinces, selectedProvince);
-const districtName = findNameById(districts, selectedDistrict);
-const wardName = findNameById(wards, selectedWard);
-console.log(lodgings);
 
-const navigate = useNavigate();
+  // Chuyển ID thành tên
+  const provinceName = findNameById(provinces, selectedProvince);
+  const districtName = findNameById(districts, selectedDistrict);
+  const wardName = findNameById(wards, selectedWard);
+
   // Xử lý tìm kiếm
   const handleSearch = () => {
-    dispatch(fetchLodgings({
-      address: provinceName ? `${wardName}, ${districtName}, ${provinceName}` : null,
-      price: selectedPrices.length ? selectedPrices : null,
-      area: selectedAreas.length ? selectedAreas : null,
-      page: lodgings.page,
-      limit: lodgings.limit,
-    }));
+    const queryParams = [
+      provinceName ? `province=${provinceName}` : "",
+      districtName ? `district=${districtName}` : "",
+      wardName ? `ward=${wardName}` : "",
+      `page=${lodgings.page}`,
+      `limit=${lodgings.limit}`,
+    ]
+      .filter(Boolean) // Loại bỏ chuỗi rỗng
+      .join("&"); // Nối chuỗi đúng định dạng URL
+    navigate(`/loging/room-rental?${queryParams}`);
+    dispatch(
+      fetchLodgings({
+        address: provinceName
+          ? `${wardName}, ${districtName}, ${provinceName}`
+          : null,
+        price: selectedPrices.length ? selectedPrices : null,
+        area: selectedAreas.length ? selectedAreas : null,
+        page: lodgings.page,
+        limit: lodgings.limit,
+      })
+    );
   };
-  
 
   return (
     <div className="flex flex-col space-y-4">
@@ -190,7 +194,7 @@ const navigate = useNavigate();
           allowClear
         >
           {districts.map((district) => (
-            <Option key={district.id} value={district.ide}>
+            <Option key={district.id} value={district.id}>
               {district.full_name}
             </Option>
           ))}
@@ -214,12 +218,18 @@ const navigate = useNavigate();
 
       {/* Chọn giá & diện tích */}
       <div className="flex items-center gap-4">
-        <Dropdown overlay={renderMenu(priceOptions, selectedPrices, setSelectedPrices)} trigger={["click"]}>
+        <Dropdown
+          overlay={renderMenu(priceOptions, selectedPrices, setSelectedPrices)}
+          trigger={["click"]}
+        >
           <Button>
             Chọn giá <DownOutlined />
           </Button>
         </Dropdown>
-        <Dropdown overlay={renderMenu(areaOptions, selectedAreas, setSelectedAreas)} trigger={["click"]}>
+        <Dropdown
+          overlay={renderMenu(areaOptions, selectedAreas, setSelectedAreas)}
+          trigger={["click"]}
+        >
           <Button>
             Chọn diện tích <DownOutlined />
           </Button>

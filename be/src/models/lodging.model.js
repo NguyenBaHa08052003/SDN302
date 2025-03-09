@@ -16,7 +16,7 @@ const LodgingSchema = new mongoose.Schema(
       default: 1,
     },
     detail_address: {
-      type: String
+      type: String,
     },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     type: { type: mongoose.Schema.Types.ObjectId, ref: "Lodgingtype" },

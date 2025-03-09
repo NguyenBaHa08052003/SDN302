@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, InputNumber, Button, Upload, Select, message } from "antd";
+import {
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Upload,
+  Select,
+  message,
+} from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import LocationUtil from "../../components/LocationUtil.js";
@@ -19,7 +27,9 @@ const CreateLodgingPage = () => {
   useEffect(() => {
     const fetchLodgingTypes = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/lodgings/lodging-types"); // Thay URL bằng API thực tế
+        const response = await axios.get(
+          "http://localhost:3000/api/lodgings/lodging-types"
+        ); // Thay URL bằng API thực tế
         setLodgingTypes(response.data);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách loại chỗ ở:", error);
@@ -77,15 +87,27 @@ const CreateLodgingPage = () => {
       <h2 className="text-2xl font-bold text-center mb-6">Tạo Chỗ Ở Mới</h2>
 
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item name="name" label="Tên Chỗ Ở" rules={[{ required: true, message: "Vui lòng nhập tên!" }]}>
+        <Form.Item
+          name="name"
+          label="Tên Chỗ Ở"
+          rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+        >
           <Input placeholder="Nhập tên chỗ ở" />
         </Form.Item>
 
-        <Form.Item name="price" label="Giá (VND)" rules={[{ required: true, message: "Vui lòng nhập giá!" }]}>
+        <Form.Item
+          name="price"
+          label="Giá (VND)"
+          rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
+        >
           <InputNumber min={0} className="w-full" placeholder="Nhập giá" />
         </Form.Item>
 
-        <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}>
+        <Form.Item
+          name="title"
+          label="Tiêu đề"
+          rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
+        >
           <Input placeholder="Nhập tiêu đề" />
         </Form.Item>
 
@@ -93,8 +115,16 @@ const CreateLodgingPage = () => {
           <TextArea rows={4} placeholder="Nhập mô tả chi tiết" />
         </Form.Item>
 
-        <Form.Item name="area" label="Diện tích (m²)" rules={[{ required: true, message: "Vui lòng nhập diện tích!" }]}>
-          <InputNumber min={0} className="w-full" placeholder="Nhập diện tích" />
+        <Form.Item
+          name="area"
+          label="Diện tích (m²)"
+          rules={[{ required: true, message: "Vui lòng nhập diện tích!" }]}
+        >
+          <InputNumber
+            min={0}
+            className="w-full"
+            placeholder="Nhập diện tích"
+          />
         </Form.Item>
 
         <Form.Item name="detail_address" label="Địa chỉ chi tiết">
@@ -103,13 +133,22 @@ const CreateLodgingPage = () => {
 
         {/* Component chọn địa chỉ */}
         <div className="mb-4">
-          <label className="block text-gray-700 font-semibold mb-2">Địa chỉ</label>
+          <label className="block text-gray-700 font-semibold mb-2">
+            Địa chỉ
+          </label>
           <LocationUtil setLocation={setLocation} />
         </div>
 
         {/* Chọn loại chỗ ở từ API */}
-        <Form.Item name="type" label="Loại Chỗ Ở" rules={[{ required: true, message: "Vui lòng chọn loại!" }]}>
-          <Select placeholder="Chọn loại chỗ ở" loading={lodgingTypes.length === 0}>
+        <Form.Item
+          name="type"
+          label="Loại Chỗ Ở"
+          rules={[{ required: true, message: "Vui lòng chọn loại!" }]}
+        >
+          <Select
+            placeholder="Chọn loại chỗ ở"
+            loading={lodgingTypes.length === 0}
+          >
             {lodgingTypes?.map((type) => (
               <Option key={type._id} value={type._id}>
                 {type.name}
@@ -119,19 +158,33 @@ const CreateLodgingPage = () => {
         </Form.Item>
 
         {/* Upload hình ảnh */}
-        <Form.Item label="Hình ảnh" rules={[{ required: true, message: "Vui lòng tải ít nhất một hình ảnh!" }]}>
+        <Form.Item
+          label="Hình ảnh"
+          rules={[
+            { required: true, message: "Vui lòng tải ít nhất một hình ảnh!" },
+          ]}
+        >
           <Upload
             listType="picture-card"
             fileList={fileList}
             onChange={handleUploadChange}
             beforeUpload={() => false} // Chặn auto-upload
           >
-            {fileList.length < 5 && <div><PlusOutlined /> <div className="mt-2">Tải lên</div></div>}
+            {fileList.length < 5 && (
+              <div>
+                <PlusOutlined /> <div className="mt-2">Tải lên</div>
+              </div>
+            )}
           </Upload>
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} className="w-full">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            className="w-full"
+          >
             Tạo Chỗ Ở
           </Button>
         </Form.Item>

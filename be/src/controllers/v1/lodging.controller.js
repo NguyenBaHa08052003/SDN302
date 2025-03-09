@@ -4,7 +4,16 @@ const { deleteImagesFromCloudinary } = require("../../utils/cloudinaryUtils");
 module.exports = {
   createLodging: async (req, res) => {
     try {
-      const { name, price, address, description, title, area, detail_address, type } = req.body;
+      const {
+        name,
+        price,
+        address,
+        description,
+        title,
+        area,
+        detail_address,
+        type,
+      } = req.body;
       const imageUrls = req.files.map((file) => file.path);
       if (!name || !price || imageUrls.length === 0) {
         return res
@@ -12,21 +21,38 @@ module.exports = {
           .json({ message: "Vui lòng nhập đầy đủ thông tin!" });
       }
       const user = req.user;
-      
-      const newLodging = new Lodging({ name, price, images: imageUrls, address, description, title, area, detail_address, user: user.UID, type });
+
+      const newLodging = new Lodging({
+        name,
+        price,
+        images: imageUrls,
+        address,
+        description,
+        title,
+        area,
+        detail_address,
+        user: user.UID,
+        type,
+      });
       await newLodging.save();
       res.status(201).json(newLodging);
     } catch (error) {
       res.status(500).json({ message: "Lỗi server", error });
     }
   },
-  getAllLodgings :async (req, res) => {
+  getAllLodgings: async (req, res) => {
     try {
-      const {price, address, area, page = 1, limit = 5 } = req.query;
+      const { price, address, area, page = 1, limit = 5 } = req.query;
       console.log(req.query.address);
       const filter = {};
       if (address) {
-        const regexAddress = new RegExp(address.split(",").map(part => part.trim()).join(".*"), "i");
+        const regexAddress = new RegExp(
+          address
+            .split(",")
+            .map((part) => part.trim())
+            .join(".*"),
+          "i"
+        );
         filter.address = { $regex: regexAddress };
       }
       if (price) {
@@ -55,15 +81,15 @@ module.exports = {
         const [min, max] = areaRanges[area] || [0, Infinity];
         filter.area = { $gte: min, $lte: max };
       }
-  
+
       const skip = (parseInt(page) - 1) * parseInt(limit);
       const total = await Lodging.countDocuments(filter);
-  
+
       const listings = await Lodging.find(filter)
         .skip(skip)
         .limit(parseInt(limit))
         .populate({ path: "type", select: "name -_id" }) // Fix lỗi populate
-        .populate({ path: "user", select: "fullname email -_id" }); 
+        .populate({ path: "user", select: "fullname email -_id" });
       res.json({
         total,
         page: parseInt(page),
@@ -76,8 +102,6 @@ module.exports = {
       res.status(500).json({ message: "Lỗi server" });
     }
   },
-
-  
 
   updateLogding: async (req, res) => {
     try {

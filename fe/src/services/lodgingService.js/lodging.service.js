@@ -1,4 +1,5 @@
 import axios from "axios";
+import authTokenControl from "../../utils/authToken";
 
 const getAllLodging = async (params = null) => {
     try {
@@ -11,7 +12,20 @@ const getAllLodging = async (params = null) => {
         return error.response;
     }
 };
+
+const createLodging = async (data) => {
+    try {
+        const response = await axios.post("http://localhost:3000/api/lodgings", data, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${authTokenControl.getToken()}` } });
+        if (response.status === 201) {
+            return response.data;
+        }
+        return response?.error;
+    } catch (error) {
+        return error.response;
+    }
+}
 const lodgingService = {
-    getAllLodging
+    getAllLodging,
+    createLodging
 };
 export default lodgingService;

@@ -1,16 +1,19 @@
 const Lodging = require("../../models/lodging.model");
+const LodgingType = require("../../models/lodgingtype.model");
 const { deleteImagesFromCloudinary } = require("../../utils/cloudinaryUtils");
 module.exports = {
   createLodging: async (req, res) => {
     try {
-      const { name, price } = req.body;
+      const { name, price, address, description, title, area, detail_address, type } = req.body;
       const imageUrls = req.files.map((file) => file.path);
       if (!name || !price || imageUrls.length === 0) {
         return res
           .status(400)
           .json({ message: "Vui lòng nhập đầy đủ thông tin!" });
       }
-      const newLodging = new Lodging({ name, price, imageUrls });
+      const user = req.user;
+      
+      const newLodging = new Lodging({ name, price, images: imageUrls, address, description, title, area, detail_address, user: user.UID, type });
       await newLodging.save();
       res.status(201).json(newLodging);
     } catch (error) {
@@ -116,6 +119,15 @@ module.exports = {
       res.json({ message: "Xóa thành công" });
     } catch (error) {
       res.status(500).json({ message: "Lỗi khi xóa lodging", error });
+    }
+  },
+
+  getAllLodgingTypes: async (req, res) => {
+    try {
+      const lodgingTypes = await LodgingType.find({}).select("name");
+      res.json(lodgingTypes);
+    } catch (error) {
+      res.status(500).json({ message: "Lỗi server", error });
     }
   },
 };

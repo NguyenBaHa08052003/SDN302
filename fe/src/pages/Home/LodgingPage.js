@@ -6,7 +6,7 @@ import LazyImage from "../../utils/LazyImage";
 
 export default function LodgingPage() {
   const dispatch = useDispatch();
-  const lodings = useSelector((state) => state.lodgingRedux.lodgings);
+  const lodgings = useSelector((state) => state.lodgingRedux.lodgings);
 
   useEffect(() => {
     dispatch(fetchLodgings());
@@ -16,7 +16,7 @@ export default function LodgingPage() {
     <div>
       <h1 className="text-3xl font-bold">List</h1>
       <div className="grid grid-cols-4 gap-4">
-        {lodings.map((lodging) => (
+        {lodgings.map((lodging) => (
           <div key={lodging.id}>
             <h1 className="text-1xl font-bold">{lodging.title}</h1>
             <LazyImage

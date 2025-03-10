@@ -119,6 +119,9 @@ const RoomRental = () => {
                     <h2 className="text-lg font-semibold hover:text-red-500 cursor-pointer">
                       {listing.title}
                     </h2>
+                    <h2 className="text-lg font-semibold hover:text-red-500 cursor-pointer">
+                      {listing?.name}
+                    </h2>
                     <span className="text-red-500 text-xl font-bold whitespace-nowrap">
                       {listing.price.toLocaleString()} VNĐ
                     </span>

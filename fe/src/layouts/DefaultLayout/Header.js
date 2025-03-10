@@ -137,9 +137,9 @@ const Header = () => {
             )}
           </div>
           {user?.data?.role !== "Admin" && (
-            <a className="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-red-500 ml-2"
+            <Link to={"/dang-bai"} className="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-red-500 ml-2"
             >Đăng tin
-            </a>
+            </Link>
           )}
         </div>
       </nav>

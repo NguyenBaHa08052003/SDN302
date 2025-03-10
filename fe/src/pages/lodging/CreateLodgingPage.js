@@ -167,6 +167,7 @@ const CreateLodgingPage = () => {
           <Upload
             listType="picture-card"
             fileList={fileList}
+            multiple
             onChange={handleUploadChange}
             beforeUpload={() => false} // Chặn auto-upload
           >

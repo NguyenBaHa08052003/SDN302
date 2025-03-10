@@ -119,7 +119,7 @@ module.exports = {
 
       lodging.name = name || lodging.name;
       lodging.price = price || lodging.price;
-      lodging.imageUrls = imageUrls.length > 0 ? imageUrls : lodging.imageUrls;
+      lodging.images = imageUrls.length > 0 ? imageUrls : lodging.images;
       await lodging.save();
 
       res.json({ message: "Cập nhật thành công", lodging });

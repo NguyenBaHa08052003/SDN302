@@ -89,7 +89,7 @@ module.exports = {
         .skip(skip)
         .limit(parseInt(limit))
         .populate({ path: "type", select: "name -_id" }) // Fix lỗi populate
-        .populate({ path: "user", select: "fullname email -_id" });
+        .populate({ path: "user", select: "fullname email phoneNumber -_id" }); 
       res.json({
         total,
         page: parseInt(page),
@@ -119,7 +119,7 @@ module.exports = {
 
       lodging.name = name || lodging.name;
       lodging.price = price || lodging.price;
-      lodging.imageUrls = imageUrls.length > 0 ? imageUrls : lodging.imageUrls;
+      lodging.images = imageUrls.length > 0 ? imageUrls : lodging.images;
       await lodging.save();
 
       res.json({ message: "Cập nhật thành công", lodging });

@@ -5,7 +5,6 @@ import { fetchLodgings } from "../stores/redux/slices/lodgingSlice";
 const PAGE_SIZE = 10;
 const ServerPagination = ({}) => {
   const dispatch = useDispatch();
-
   const { lodgings } = useSelector((state) => state.lodgingRedux);
   const currentPage = lodgings.page || 1;
   const totalItems = lodgings.total || 0;

@@ -9,7 +9,7 @@ import LodgingPage from "../pages/Home/LodgingPage";
 import NotFound from "../pages/not_found/NotFound";
 import RoomRental from "../pages/Home/Details/RoomRental"
 import RoomDetail from "../pages/Home/Details/RoomDetail";
-import VerifyUserPage from "../pages/admins/VerifyUserPage";
+import VerifyUserPage from "../pages/admin/VerifyUserPage";
 export const publicRoutes = (
   <>
     <Route path="*" element={<NotFound />} />

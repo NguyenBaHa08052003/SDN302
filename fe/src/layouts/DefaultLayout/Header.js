@@ -18,7 +18,7 @@ const Header = () => {
     }
     toast.success(`Đang tải dữ liệu`);
     setTimeout(() => {
-      navigate("/tai-khoan", { state: { data: user } });
+      navigate("/quan-ly/tai-khoan", { state: { data: user } });
     }, 1000);
   };
   // Xử lý đăng xuất

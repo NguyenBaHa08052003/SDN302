@@ -3,8 +3,10 @@ import { Route } from "react-router-dom";
 import Profile from "../pages/auth/Profile";
 import AuthMiddleware from "../middlewares/AuthMiddleware";
 // import DashBoard from "../pages/admins/DashBoard";
-import DashboardPage from "../pages/admins/DashboardPage";
+import DashboardPage from "../pages/admin/DashboardPage";
 import CreateLodgingPage from "../pages/lodging/CreateLodgingPage";
+import LayoutDasboard from "../pages/dasboard/LayoutDasboard";
+import ProfilePage from "../pages/dasboard/ProfilePage";
 export const privateRoutes = (
   <>
     <Route element={<DefaultLayout />}>
@@ -13,6 +15,9 @@ export const privateRoutes = (
         <Route path="/vi-tien" element={<Profile />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/dang-bai" element={<CreateLodgingPage />} />
+        <Route path="/quan-ly" element={<LayoutDasboard />}  >
+          <Route path="tai-khoan" element={<ProfilePage />} index />
+        </Route>
       </Route>
     </Route>
 

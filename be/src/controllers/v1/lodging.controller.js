@@ -89,7 +89,7 @@ module.exports = {
         .skip(skip)
         .limit(parseInt(limit))
         .populate({ path: "type", select: "name -_id" }) // Fix lỗi populate
-        .populate({ path: "user", select: "fullname email -_id" });
+        .populate({ path: "user", select: "fullname email phoneNumber -_id" }); 
       res.json({
         total,
         page: parseInt(page),

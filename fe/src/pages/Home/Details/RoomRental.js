@@ -28,6 +28,8 @@ const areaRanges = {
 const RoomRental = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { lodgings, status } = useSelector((state) => state.lodgingRedux);
+  console.log(lodgings);
+  
   const dispatch = useDispatch();
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
@@ -102,7 +104,7 @@ const RoomRental = () => {
             </select>
           </div>
           {filteredListings?.map((listing) => (
-            <Link to={`/loging/room-rental/room-detail/${listing._id}`}>
+            <Link to={`/loging/room-rental/room-detail/${listing._id}`} state={listing}>
               <div
                 key={listing._id}
                 className="bg-white rounded-lg shadow-md mb-4 overflow-hidden hover:shadow-lg transition-shadow flex"

@@ -28,7 +28,13 @@ const properties = [
     area: "An Giang",
   },
 ];
-
+function formatDate(date) {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Tháng tính từ 0
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+}
 const RoomDetail = () => {
   const location = useLocation();
   const listing = location.state || {};
@@ -136,20 +142,13 @@ const RoomDetail = () => {
               <h3 className="text-lg font-semibold mt-4">Thông tin mô tả</h3>
               <p className="text-gray-700 mt-2">{listing.description}</p>
               <div className="flex space-x-4 mt-4">
-                {[
-                  { label: "Ngày đăng", value: "24/02/2025" },
-                  { label: "Ngày hết hạn", value: "11/03/2025" },
-                  { label: "Loại tin", value: "BẠC" },
-                  { label: "Mã tin", value: "152811" },
-                ].map((item, index) => (
+
                   <div
-                    key={index}
                     className="border border-gray-300 p-4 rounded-lg bg-white shadow-md"
                   >
-                    <p className="text-gray-600">{item.label}</p>
-                    <p className="text-gray-800 font-semibold">{item.value}</p>
+                    <p className="text-gray-600">Ngày đăng</p>
+                    <p className="text-gray-800 font-semibold">{formatDate(listing.createdAt)}</p>
                   </div>
-                ))}
               </div>
             </div>
 

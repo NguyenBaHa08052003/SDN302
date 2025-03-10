@@ -25,6 +25,7 @@ const Header = () => {
   const handleLogout = () => {
     authService.logout();
     sessionStorage.removeItem("welcomeToast");
+    sessionStorage.removeItem("Role");
     authTokenControl.removeToken();
     setTimeout(() => {
       dispatch(logout());

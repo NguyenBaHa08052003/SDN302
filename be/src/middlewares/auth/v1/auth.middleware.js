@@ -39,7 +39,8 @@ module.exports = async (req, res, next) => {
         message: "Bạn không có quyền truy cập",
       });
     }
-
+    console.log("user", user);
+    
     if (!user.status) {
       return res.status(404).json({
         success: false,

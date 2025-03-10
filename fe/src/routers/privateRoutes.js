@@ -1,7 +1,7 @@
 import DefaultLayout from "../layouts/DefaultLayout/DefaultLayout";
 import { Route } from "react-router-dom";
 import Profile from "../pages/auth/Profile";
-import AuthMiddleware from "../middlewares/AuthMiddleware";
+import AuthMiddleware from "../middlewares/authMiddleware";
 // import DashBoard from "../pages/admins/DashBoard";
 import DashboardPage from "../pages/admins/DashboardPage";
 import CreateLodgingPage from "../pages/lodging/CreateLodgingPage";
@@ -15,6 +15,6 @@ export const privateRoutes = (
         <Route path="/dang-bai" element={<CreateLodgingPage />} />
       </Route>
     </Route>
-    
+
   </>
 );

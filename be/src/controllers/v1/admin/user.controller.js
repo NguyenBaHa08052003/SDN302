@@ -26,18 +26,24 @@ const addUser = async (req, res) => {
         if (!fullname || !email || !phoneNumber || !role) {
             return errorResponse(res, {}, 404, "Vui long nhap day du thong tin");
         }
+
+        const checkEmail = await userModel.findOne({ email, status: true });
+        if (checkEmail) {
+            return errorResponse(res, {}, 404, "Email nay da ton tai");
+        }
+
         const randomPassword = Math.random().toString(36).slice(-8);
         const hashPassword = await hashMake(randomPassword);
         const user = await userModel.create({ fullname, email, phoneNumber, password: hashPassword, role });
         await sendEmail(email,
             "Mật khẩu do admin cung cấp",
             `<h2>Mật khẩu của bạn là: ${randomPassword}</h2>
-             <a href="http://localhost:3000/api/admin/verify-account/${user._id}">Click vào đây để kích hoạt tài khoản</a>
+             <a href="http://localhost:3001/verify-account/${user._id}">Click vào đây để kích hoạt tài khoản</a>
              `);
 
         return successResponse(res, { ...user._doc, password: undefined }, {}, 201, "Tạo người dùng thanh cong");
     } catch (error) {
-
+        console.log(error);
     }
 }
 
@@ -59,12 +65,12 @@ const getDetailUser = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
+        const user = await userModel.findById(id);
         if (!user) {
             return errorResponse(res, {}, 404, "Không có người dùng này");
         }
-        const { fullname, role } = req.body;
-        const user = await userModel.findByIdAndUpdate(id, { fullname, role }, { new: true });
-        return successResponse(res, user, {}, 201, "Cập nhật người dùng thành công");
+        const updateUser = await userModel.findByIdAndUpdate(id, req.body, { new: true });
+        return successResponse(res, updateUser, {}, 201, "Cập nhật người dùng thành công");
     } catch (error) {
         console.log(error);
     }

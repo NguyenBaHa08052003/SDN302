@@ -9,15 +9,16 @@ import LodgingPage from "../pages/Home/LodgingPage";
 import NotFound from "../pages/not_found/NotFound";
 import RoomRental from "../pages/Home/Details/RoomRental"
 import RoomDetail from "../pages/Home/Details/RoomDetail";
+import VerifyUserPage from "../pages/admins/VerifyUserPage";
 export const publicRoutes = (
   <>
     <Route path="*" element={<NotFound />} />
     <Route element={<DefaultLayout />}>
-        <Route index path="/" element={<HomePage />} />
-        <Route path="/lodging" element={<LodgingPage />}/>
-        <Route path="/loging/room-rental" element={<RoomRental/>}/>
-        <Route path="/loging/room-rental/room-detail/:id" element={<RoomDetail/>}/>
-
+      <Route index path="/" element={<HomePage />} />
+      <Route path="/lodging" element={<LodgingPage />} />
+      <Route path="/loging/room-rental" element={<RoomRental />} />
+      <Route path="/loging/room-rental/room-detail/:id" element={<RoomDetail />} />
+      <Route path="/verify-account/:id" element={<VerifyUserPage />} />
     </Route>
 
     <Route element={<AuthLayout />}>

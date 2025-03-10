@@ -35,7 +35,8 @@ const Sidebar = ({ setActivePage }) => {
 
 const UserTable = (props) => {
   const { search, setSearch, roles, setRoles, users, token, setUsers } = props;
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const filterUser = users?.filter?.((user) => {
     const matchSearch =
       user?.fullname?.toLowerCase().includes(search?.toLowerCase()) ||
@@ -43,44 +44,35 @@ const UserTable = (props) => {
       search === "";
     return matchSearch;
   });
-  const handleUpdate = async (idUser, data, type) => {
-    //67b09b2be997baec6f9b4ce1 là admin
-    //67b09b2be997baec6f9b4ce2 là user
-    //67b09b2be997baec6f9b4ce3 là landlord
-    console.log(roles.find((rol) => rol._id == data.role)?.name);
 
-    if (type == "role" && data.role == "67b09b2be997baec6f9b4ce1") {
-      toast.error(
-        "Bạn không thể thay đổi role tài khoản này vì là tài khoản này là admin",
-        {
+  const openRoleModal = (user) => {
+    setSelectedUser(user);
+    setIsOpen(true);
+  };
+
+  const changeUserRole = async (newRole) => {
+    try {
+      if (!selectedUser) return;
+      const updateU = await updateUser(selectedUser._id, { role: newRole }, token);
+      if (updateU) {
+        toast.success(`Role updated to ${roles.find((role) => role._id === newRole).name}`, {
           position: "top-center",
-        }
-      );
-      return;
+        });
+        console.log(updateU);
+
+        setUsers(users.map((user) => (user._id === selectedUser._id ? updateU?.data : user)));
+        setIsOpen(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
+  const handleUpdate = async (idUser, data, type) => {
     try {
       if (
-        window.confirm(
-          type == "status"
-            ? "Bạn có thật sự muốn thay đổi status của tài khoản này?"
-            : `Bạn có thật sự muốn thay đổi role của tài khoản này sang role khác?. Role hiện tại là ${
-                roles.find((rol) => rol._id == data.role)?.name
-              }`
-        )
+        window.confirm("Bạn có thật sự muốn thay đổi status của tài khoản này?")
       ) {
-        const updateU =
-          type == "status"
-            ? await updateUser(idUser, { status: !data.status }, token)
-            : await updateUser(
-                idUser,
-                {
-                  role:
-                    data.role == "67b09b2be997baec6f9b4ce2"
-                      ? "67b09b2be997baec6f9b4ce3"
-                      : "67b09b2be997baec6f9b4ce2",
-                },
-                token
-              );
+        const updateU = await updateUser(idUser, { status: !data.status }, token)
         if (updateU) {
           console.log(updateU);
           // hien thi ra toast
@@ -109,6 +101,7 @@ const UserTable = (props) => {
               <th className="border p-2">Name</th>
               <th className="border p-2">Email</th>
               <th className="border p-2">Phone Number</th>
+              <th className="border p-2">Role</th>
               <th className="border p-2">Status</th>
               <th className="border p-2">Change Status</th>
               <th className="border p-2">Change Role</th>
@@ -120,10 +113,10 @@ const UserTable = (props) => {
                 <td className="border p-2">{user?.fullname ?? "N/A"}</td>
                 <td className="border p-2">{user?.email ?? "N/A"}</td>
                 <td className="border p-2">{user?.phoneNumber ?? "N/A"}</td>
+                <td className="border p-2">{user?.role.name ?? "N/A"}</td>
                 <td
-                  className={`border p-2 ${
-                    user?.status ? "text-green-500" : "text-red-500"
-                  }`}
+                  className={`border p-2 ${user?.status ? "text-green-500" : "text-red-500"
+                    }`}
                 >
                   {user?.status ? "Active" : "Inactive"}
                 </td>
@@ -137,7 +130,8 @@ const UserTable = (props) => {
                 </td>
                 <td className="border p-2">
                   <button
-                    onClick={() => handleUpdate(user?._id, user, "role")}
+                    // onClick={() => handleUpdate(user?._id, user, "role")}
+                    onClick={() => openRoleModal(user)}
                     className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                   >
                     Change Role
@@ -149,6 +143,31 @@ const UserTable = (props) => {
         </table>
       ) : (
         <p>Cannot get data...</p>
+      )}
+
+      {isOpen && selectedUser && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-lg font-semibold">Select New Role for {selectedUser.fullname}</h2>
+            <div className="mt-4">
+              {roles?.filter((role) => role?.name !== "Admin").map((role) => (
+                <button
+                  key={role._id}
+                  onClick={() => changeUserRole(role._id)}
+                  className="block w-full p-2 my-1 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+                >
+                  {role.name}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -177,8 +196,8 @@ export default function AdminDashboard() {
           setUsers(response?.data);
         }
         const responseRole = await getAllRole(token);
-        if (!responseRole.data.success) {
-            return;
+        if (responseRole.data.success === false) {
+          return;
         }
         setRoles(responseRole?.data);
       } catch (error) {
@@ -187,6 +206,7 @@ export default function AdminDashboard() {
     };
     fetchData();
   }, []);
+
 
   const [error, setError] = useState([]);
   const handleSave = async () => {

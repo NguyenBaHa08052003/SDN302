@@ -5,7 +5,7 @@ const sendEmail = require('../../../utils/email');
 const { hashMake } = require('../../../utils/hash');
 const getAllUsers = async (req, res) => {
     try {
-        const users = await userModel.find();
+        const users = await userModel.find().populate('role');
         if (!users) {
             return errorResponse(res, {}, 404, "Không có danh sách người dùng");
         }
@@ -69,8 +69,8 @@ const updateUser = async (req, res) => {
         if (!user) {
             return errorResponse(res, {}, 404, "Không có người dùng này");
         }
-        const updateUser = await userModel.findByIdAndUpdate(id, req.body, { new: true });
-        return successResponse(res, updateUser, {}, 201, "Cập nhật người dùng thành công");
+        const updateUser = await userModel.findByIdAndUpdate(id, req.body, { new: true }).populate('role');
+        return successResponse(res, { ...updateUser._doc, password: undefined }, {}, 201, "Cập nhật người dùng thành công");
     } catch (error) {
         console.log(error);
     }

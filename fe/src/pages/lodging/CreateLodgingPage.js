@@ -12,6 +12,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import LocationUtil from "../../components/LocationUtil.js";
 import lodgingService from "../../services/lodgingService.js/lodging.service";
+import { toast, ToastContainer } from "react-toastify";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -72,6 +73,7 @@ const CreateLodgingPage = () => {
         message.error(response.message);
         return;
       }
+      toast.success("Thêm trọ mới thành công!");
       message.success("Tạo chỗ ở thành công!");
       form.resetFields();
       setFileList([]);
@@ -84,6 +86,7 @@ const CreateLodgingPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <ToastContainer position="bottom-right" />
       <h2 className="text-2xl font-bold text-center mb-6">Tạo Chỗ Ở Mới</h2>
 
       <Form form={form} layout="vertical" onFinish={handleSubmit}>

@@ -117,7 +117,16 @@ const ProfilePage = () => {
                 />
                 <input type="file" name="image" onChange={handleOnChange} className="bg-gray-200 py-2 px-4 rounded-md" />
             </div>
-
+            <div className="mb-5">
+                <label className="block font-medium">Email *</label>
+                <input
+                    type="text"
+                    disabled
+                    name="Email"
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    value={currentUser?.data?.email}
+                />
+            </div>
             <div className="mb-5">
                 <label className="block font-medium">Số điện thoại *</label>
                 <input
@@ -128,7 +137,6 @@ const ProfilePage = () => {
                     onChange={handleOnChange}
                 />
             </div>
-
 
             <Button type="primary" onClick={handleUpdate} className="bg-red-500 text-white py-2 px-4 rounded-md" loading={loading} iconPosition={position}>
                 Lưu thay đổi

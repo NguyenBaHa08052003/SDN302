@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchLodgings } from "../../../stores/redux/slices/lodgingSlice";
 import ClientPagination from "../../../components/Pagination";
 import { Link } from "react-router-dom";
+import { formatDate } from "../../../utils/convert";
 
 const priceRanges = {
   "Dưới 1 triệu": [0, 1000000],
@@ -157,7 +158,7 @@ const RoomRental = () => {
                       </span>
                     </div>
                     <span className="text-sm text-gray-500">
-                      {listing.posted}
+                      {listing.posted ? formatDate(listing.posted) : formatDate(listing.createdAt)}
                     </span>
                   </div>
                 </div>

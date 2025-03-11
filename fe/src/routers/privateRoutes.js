@@ -7,6 +7,7 @@ import DashboardPage from "../pages/admin/DashboardPage";
 import CreateLodgingPage from "../pages/lodging/CreateLodgingPage";
 import LayoutDasboard from "../pages/dasboard/LayoutDasboard";
 import ProfilePage from "../pages/dasboard/ProfilePage";
+import LodgingManagement from "../pages/dasboard/LodgingManagement";
 export const privateRoutes = (
   <>
     <Route element={<DefaultLayout />}>
@@ -14,9 +15,11 @@ export const privateRoutes = (
         <Route path="/tai-khoan" element={<Profile />} />
         <Route path="/vi-tien" element={<Profile />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/dang-bai" element={<CreateLodgingPage />} />
+
         <Route path="/quan-ly" element={<LayoutDasboard />}  >
           <Route path="tai-khoan" element={<ProfilePage />} index />
+          <Route path="bai-dang/dang-tin" element={<CreateLodgingPage />} />
+          <Route path="bai-dang" element={<LodgingManagement />} />
         </Route>
       </Route>
     </Route>

@@ -55,11 +55,9 @@ const UserTable = (props) => {
       if (!selectedUser) return;
       const updateU = await updateUser(selectedUser._id, { role: newRole }, token);
       if (updateU) {
-        toast.success(`Role updated to ${roles.find((role) => role._id === newRole).name}`, {
+        toast.success(`Role updated to ${roles.find((role) => role._id === newRole)?.name}`, {
           position: "top-center",
         });
-        console.log(updateU);
-
         setUsers(users.map((user) => (user._id === selectedUser._id ? updateU?.data : user)));
         setIsOpen(false);
       }
@@ -113,7 +111,7 @@ const UserTable = (props) => {
                 <td className="border p-2">{user?.fullname ?? "N/A"}</td>
                 <td className="border p-2">{user?.email ?? "N/A"}</td>
                 <td className="border p-2">{user?.phoneNumber ?? "N/A"}</td>
-                <td className="border p-2">{user?.role.name ?? "N/A"}</td>
+                <td className="border p-2">{user?.role?.name ?? "N/A"}</td>
                 <td
                   className={`border p-2 ${user?.status ? "text-green-500" : "text-red-500"
                     }`}

@@ -1,7 +1,7 @@
-import React from 'react'
-import Sidebar from './Sidebarr'
-import ProfilePage from './ProfilePage'
-import { Outlet } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import Sidebar from './Sidebarr';
+import { Outlet, useNavigate } from 'react-router-dom';
+
 
 function LayoutDasboard() {
     return (
@@ -9,7 +9,7 @@ function LayoutDasboard() {
             <Sidebar />
             <Outlet />
         </div>
-    )
+    );
 }
 
-export default LayoutDasboard
+export default LayoutDasboard;

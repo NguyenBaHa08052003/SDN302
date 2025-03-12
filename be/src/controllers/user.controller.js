@@ -26,7 +26,6 @@ module.exports = {
     },
     updateUser: async (req, res) => {
         console.log("Da vao backend");
-
         const { fullname, email, phoneNumber } = req.body;
         const image = req.file ? req.file.path : null;
         console.log("Image " + req.file.path);

@@ -1,6 +1,7 @@
 import { UserOutlined, FileTextOutlined, PlusOutlined, UnorderedListOutlined, DownOutlined, RightOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { useUser } from "../../utils/customHook";
+import { Link } from "react-router-dom";
 
 const Sidebarr = () => {
     const [openDropdown, setOpenDropdown] = useState(false);
@@ -39,7 +40,7 @@ const Sidebarr = () => {
                             }}
                         >
                             {item.icon}
-                            {item.text}
+                            {item.text === "Thông tin cá nhân" ? <Link to={`/quan-ly/tai-khoan`}>{item.text}</Link> : `${item.text}`}
                             {item.isDropdown && (
                                 <span className="ml-auto">
                                     {openDropdown ? <DownOutlined /> : <RightOutlined />}
@@ -56,7 +57,7 @@ const Sidebarr = () => {
                                         className="flex items-center p-2 cursor-pointer hover:bg-gray-100 rounded-md"
                                     >
                                         {child.icon}
-                                        {child.text}
+                                        {child.text === "Đăng tin" ? <Link to={"/quan-ly/dang-tin"}>{child.text}</Link> : `${child.text}`}
                                     </div>
                                 ))}
                             </div>

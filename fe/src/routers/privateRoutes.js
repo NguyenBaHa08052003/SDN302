@@ -17,6 +17,8 @@ export const privateRoutes = (
         <Route path="/dang-bai" element={<CreateLodgingPage />} />
         <Route path="/quan-ly" element={<LayoutDasboard />}  >
           <Route path="tai-khoan" element={<ProfilePage />} index />
+          <Route path="dang-tin" element={<CreateLodgingPage />} />
+
         </Route>
       </Route>
     </Route>

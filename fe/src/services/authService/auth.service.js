@@ -28,8 +28,6 @@ const logout = async () => {
       headers: {
         Authorization: `Bearer ${authTokenControl.getToken()}`,
     }});
-    console.log(response);
-    authTokenControl.removeToken();
   } catch (error) {
     console.log(error.response);
     return error.response;
@@ -48,6 +46,8 @@ const getCurrentUser = async (token) => {
     return error.response;
   }
 };
+
+
 
 const googleLogin = async () => {
   try {

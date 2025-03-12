@@ -13,21 +13,23 @@ const withAuth = (WrappedComponent) => {
     const user = useUser();
     const navigate = useNavigate();
     useEffect(() => {
-      if(user?.success){
-        if(user?.data?.role === "Admin"){
-            navigate("/dashboard");
-        }
-        if(user?.data?.role === "User"){
-          console.log("hello User");
-        }
-      }
-    }, [user]);
-    useEffect(() => {
       const token = Cookies.get("authToken");
+      console.log(token);
       if (token) {
         dispatch(fetchUser(token));
       }
     }, [dispatch]);
+
+    useEffect(() => {
+      if (user?.success) {
+        sessionStorage.setItem("Role", JSON.stringify(user.data.role));
+        console.log(user?.data?.role);
+        if (user?.data?.role === "Admin") {
+          navigate("/dashboard");
+          return
+        }
+      }
+    }, [user]);
 
     if (loading) {
       return (

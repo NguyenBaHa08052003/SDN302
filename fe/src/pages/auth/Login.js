@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../../services/authService/auth.service";
 import { ToastContainer, toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function Login() {
       setLoading(true);
       const response = await authService.login(form);
       console.log(response);
-      
+
       setLoading(false);
       if (response.data) {
         toast.success("Chờ một chút!!!");
@@ -38,7 +38,17 @@ export default function Login() {
       setLoading(false);
     }
   };
-  
+
+  useEffect(() => {
+    const messVerify = localStorage.getItem("message verify");
+    if (messVerify) {
+      toast.success(messVerify, {
+        position: "top-center"
+      });
+      localStorage.removeItem("message verify");
+    }
+  })
+
   return (
     <div
       tabIndex="-1"

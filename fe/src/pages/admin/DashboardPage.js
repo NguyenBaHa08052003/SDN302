@@ -46,6 +46,10 @@ const UserTable = (props) => {
   });
 
   const openRoleModal = (user) => {
+    if (user?.role?.name == 'Admin') {
+      toast.error('Không thể thay đổi role của Admin', { position: "top-center" });
+      return;
+    }
     setSelectedUser(user);
     setIsOpen(true);
   };
@@ -66,6 +70,10 @@ const UserTable = (props) => {
     }
   };
   const handleUpdate = async (idUser, data, type) => {
+    if (data?.role?.name == 'Admin') {
+      toast.error('Không thể thay đổi quyền của Admin', { position: "top-center" });
+      return;
+    }
     try {
       if (
         window.confirm("Bạn có thật sự muốn thay đổi status của tài khoản này?")

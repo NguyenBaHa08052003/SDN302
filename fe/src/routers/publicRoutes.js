@@ -7,7 +7,8 @@ import Login from "../pages/auth/Login";
 import HomePage from "../pages/Home/HomePage";
 import LodgingPage from "../pages/Home/LodgingPage";
 import NotFound from "../pages/not_found/NotFound";
-import RoomRental from "../pages/Home/Details/RoomRental"
+//import RoomRental from "../pages/Home/Details/RoomRental";
+import RoomRental from "../pages/Home/Details/Dashboard"
 export const publicRoutes = (
   <>
     <Route path="*" element={<NotFound />} />

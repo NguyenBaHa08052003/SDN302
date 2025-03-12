@@ -11,10 +11,10 @@ const initialState = {
 export const fetchUser = createAsyncThunk("user/fetchUser", async (token, { rejectWithValue }) => {
   try {
     const response = await authService.getCurrentUser(token);
-    if(response.data.success){
-      return response.data;
+    if(!response.data){
+      return rejectWithValue(response.data);
     }
-    return rejectWithValue(response.data);
+    return response.data;
   } catch (error) {
     if(error.response.status === 404){
       console.log(error.response);

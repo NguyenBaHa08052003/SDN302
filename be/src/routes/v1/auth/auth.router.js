@@ -20,6 +20,7 @@ router.get("/google/callback", passport.authenticate("google", {failureRedirect:
     const accessToken = await createAccessToken({
       userId: req.user._id,
     });
+    
     const refreshToken = await refreshAccessToken();
     console.log("Google", accessToken);
     res.cookie("authToken", accessToken, {

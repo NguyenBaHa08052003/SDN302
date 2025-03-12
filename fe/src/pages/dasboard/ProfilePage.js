@@ -110,7 +110,6 @@ const ProfilePage = () => {
     <div className="flex-1 p-5">
       <ToastContainer position="bottom-right"/>
       <h3 className="text-xl font-semibold mb-5">Thông tin cá nhân</h3>
-
       <div className="mb-5">
         <label className="block font-medium">Tên hiển thị *</label>
         <input

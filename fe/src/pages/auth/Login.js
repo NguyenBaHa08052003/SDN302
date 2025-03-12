@@ -12,7 +12,6 @@ export default function Login() {
       setLoading(true);
       const response = await authService.login(form);
       console.log(response);
-
       setLoading(false);
       if (response.data) {
         toast.success("Chờ một chút!!!");

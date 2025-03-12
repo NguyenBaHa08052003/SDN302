@@ -19,7 +19,6 @@ const withAuth = (WrappedComponent) => {
         dispatch(fetchUser(token));
       }
     }, [dispatch]);
-
     useEffect(() => {
       if (user?.success) {
         sessionStorage.setItem("Role", JSON.stringify(user.data.role));

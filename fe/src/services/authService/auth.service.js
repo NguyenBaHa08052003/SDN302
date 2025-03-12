@@ -47,8 +47,6 @@ const getCurrentUser = async (token) => {
   }
 };
 
-
-
 const googleLogin = async () => {
   try {
     await axios.get(`http://localhost:3000/api/auth/google`);

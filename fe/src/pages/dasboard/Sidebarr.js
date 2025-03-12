@@ -5,6 +5,7 @@ import {
   UnorderedListOutlined,
   DownOutlined,
   RightOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import React, { useState } from "react";
 import { useUser } from "../../utils/customHook";
@@ -25,6 +26,7 @@ const Sidebarr = () => {
       children: [
         { icon: <PlusOutlined className="mr-3" />, text: "Đăng tin" },
         { icon: <UnorderedListOutlined className="mr-3" />, text: "Danh sách" },
+        { icon: <BarChartOutlined className="mr-3" />, text: "Phân tích" },
       ],
     },
   ];
@@ -42,7 +44,14 @@ const Sidebarr = () => {
       />
       <h2 className="text-lg font-semibold mt-2">{userCurren?.data.name}</h2>
       <p className="text-sm text-gray-500">Tài khoản thường</p>
-
+      <div className="mt-5">
+        <button className="w-full bg-red-500 text-white py-2 rounded-lg mb-2">
+          Tạo tin
+        </button>
+        <button className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg mb-4">
+          Nạp tiền
+        </button>
+      </div>
       <div className="mt-4">
         {menuItems.map((item, index) => (
           <div key={index} className="mb-1">
@@ -92,7 +101,7 @@ const Sidebarr = () => {
                       >
                         {child.text}
                       </Link>
-                    ) : (
+                    ) : child.text === "Danh sách" ? (
                       <Link
                         to="/quan-ly/danh-sach"
                         style={{
@@ -101,6 +110,10 @@ const Sidebarr = () => {
                       >
                         {child.text}
                       </Link>
+                    ) : (
+                      <Link style={{
+                        color: lastSegment === "phan-tich" ? "red" : "black",
+                      }}  to="/quan-ly/phan-tich">{child.text}</Link>
                     )}
                   </div>
                 ))}

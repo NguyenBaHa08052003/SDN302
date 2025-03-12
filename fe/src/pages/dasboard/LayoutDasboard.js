@@ -5,7 +5,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 
 function LayoutDasboard() {
     return (
-        <div className="flex min-h-screen bg-gray-100 p-5">
+        <div className="flex  bg-gray-100 p-5">
             <Sidebar />
             <Outlet />
         </div>

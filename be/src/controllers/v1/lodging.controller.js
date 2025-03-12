@@ -1,6 +1,8 @@
 const Lodging = require("../../models/lodging.model");
 const LodgingType = require("../../models/lodgingtype.model");
+const User = require("../../models/user.model");
 const { deleteImagesFromCloudinary } = require("../../utils/cloudinaryUtils");
+const { errorResponse, successResponse } = require("../../utils/response");
 module.exports = {
   createLodging: async (req, res) => {
     try {
@@ -154,4 +156,21 @@ module.exports = {
       res.status(500).json({ message: "Lỗi server", error });
     }
   },
+
+  getLodgingByUserId: async (req, res) => {
+      try {
+          const {userId} = req.params;
+          const user = await User.findById(userId);
+          if(!user){
+              return errorResponse(res, "User not found", 404, 'User không tồn tại');
+          };
+          const lodgings = await Lodging.find({user: userId}).populate({
+            path: "type",
+            select: "name -_id"
+          });
+          return successResponse(res, lodgings, {}, 200, "Lấy dữ liệu thành công");
+      } catch (error) {
+        return errorResponse(res, error.message, 500, error.message);
+      }
+  }
 };

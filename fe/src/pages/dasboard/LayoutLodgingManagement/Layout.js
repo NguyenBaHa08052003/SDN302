@@ -14,11 +14,11 @@ const Header = () => {
   );
 };
 
-const Stats = () => {
+const Stats = ({lodgings}) => {
   const stats = [
     {
       title: "Số lượng trọ",
-      value: "12",
+      value: `${lodgings?.length * 1223}`,
       change: "↑13%",
       changeType: "green",
       icon: "fas fa-wallet",
@@ -42,8 +42,8 @@ const Stats = () => {
     },
     {
       title: "Doanh thu",
-      value: "95%",
-      change: "↑ 10%",
+      value: "15%",
+      change: "↓30%",
       changeType: "green",
       icon: "fas fa-shopping-cart",
       iconColor: "text-orange-500",
@@ -59,7 +59,7 @@ const Stats = () => {
               <h2 className="text-gray-600">{stat.title}</h2>
               <p className="text-2xl font-bold">{stat.value}</p>
               <p className={`text-${stat.changeType}-500`}>
-                {stat.change} Since last month
+                {stat.change} so với tháng trước
               </p>
             </div>
             <div className={`${stat.iconColor} text-3xl`}>

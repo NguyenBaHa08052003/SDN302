@@ -36,14 +36,14 @@ const Sidebarr = () => {
       <img
         className="w-12 h-12 rounded-full"
         src={
-          userCurren?.data.image
-            ? userCurren?.data.image
+          userCurren?.data?.image
+            ? userCurren?.data?.image
             : "https://storage.googleapis.com/a1aa/image/y85mz9wkfMBFqMTHT1zIVrYagfQfyyxDvCS5QcQo7iM.jpg"
         }
         alt="Profile"
       />
-      <h2 className="text-lg font-semibold mt-2">{userCurren?.data.name}</h2>
-      <p className="text-sm text-gray-500">Tài khoản thường</p>
+      <h2 className="text-lg font-semibold mt-2">{userCurren?.data?.name}</h2>
+      <p className="text-sm text-gray-500" style={{color: "red"}}>Tài khoản Admin</p>
       <div className="mt-5">
         <button className="w-full bg-red-500 text-white py-2 rounded-lg mb-2">
           Tạo tin

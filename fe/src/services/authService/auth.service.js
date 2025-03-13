@@ -1,5 +1,6 @@
 import axios from "axios";
 import authTokenControl from "../../utils/authToken";
+import { jwtDecode } from "jwt-decode";
 
 const login = async (data) => {
   try {
@@ -15,6 +16,8 @@ const login = async (data) => {
     const datas = response.data;
     if (datas.data) {
       authTokenControl.saveToken(datas.data.accessToken);
+      const decode = jwtDecode(datas.data.accessToken);
+      console.log(decode);
     }
     return datas;
   } catch (error) {

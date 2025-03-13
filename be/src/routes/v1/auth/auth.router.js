@@ -27,10 +27,6 @@ router.get("/google/callback", passport.authenticate("google", {failureRedirect:
       sameSite: "Strict",
       secure: process.env.NODE_ENV === "production"
     });
-    // res.cookie("refreshToken", refreshToken, {
-    //   sameSite: "Strict",
-    //   secure: process.env.NODE_ENV === "production"
-    // });
     return res.redirect(process.env.FRONTEND_URL);
   } catch (error) {
     console.error("Google Callback Error:", error);

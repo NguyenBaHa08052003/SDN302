@@ -5,6 +5,7 @@ import { fetchUser } from "../redux/slices/userSlice";
 import { useLoading, useUser } from "../../utils/customHook";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { jwtDecode } from "jwt-decode";
 
 const withAuth = (WrappedComponent) => {
   return (props) => {
@@ -16,6 +17,11 @@ const withAuth = (WrappedComponent) => {
       const token = Cookies.get("authToken");
       console.log(token);
       if (token) {
+        const decode = jwtDecode(token);
+        // Kiểm tra nếu chưa có `UserId` trong sessionStorage thì mới set
+        if (decode.userId && !sessionStorage.getItem("UserId")) {
+          sessionStorage.setItem("UserId", JSON.stringify(decode.userId));
+        }
         dispatch(fetchUser(token));
       }
     }, [dispatch]);
@@ -25,7 +31,7 @@ const withAuth = (WrappedComponent) => {
         console.log(user?.data?.role);
         if (user?.data?.role === "Admin") {
           navigate("/dashboard");
-          return
+          return;
         }
       }
     }, [user]);

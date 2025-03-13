@@ -28,8 +28,7 @@ const Header = () => {
   // Xử lý đăng xuất
   const handleLogout = () => {
     authService.logout();
-    sessionStorage.removeItem("welcomeToast");
-    sessionStorage.removeItem("Role");
+    sessionStorage.clear();
     authTokenControl.removeToken();
     setTimeout(() => {
       dispatch(logout());

@@ -96,7 +96,7 @@ const Sidebar = () => (
   </div>
 );
 
-const App = () => (
+const WishList = () => (
   <div className="bg-gray-100 min-h-screen">
     <main className="container mx-auto px-4 py-6 flex">
       <PropertyList />
@@ -105,4 +105,4 @@ const App = () => (
   </div>
 );
 
-export default App;
+export default WishList;

@@ -10,4 +10,6 @@ router.post("/", authMiddleware, uploadCloud.array("images", 10), lodgingControl
 router.put("/:id", uploadCloud.array("images", 10), lodgingController.updateLogding);
 router.delete("/:id", lodgingController.deleteLodging);
 router.get("/lodging-types", lodgingController.getAllLodgingTypes);
+router.get("/:userId/users", lodgingController.getLodgingByUserId);
+router.put("/:id/toggle-status", lodgingController.updateStatusLoding);
 module.exports = router;

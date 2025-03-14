@@ -89,7 +89,7 @@ const RoomDetail = () => {
                   ))}
                 </Carousel>
                 <span className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded">
-                  {listing.type.name}
+                  {listing?.type?.name}
                 </span>
               </div>
               <div className="flex space-x-2 mt-4 overflow-x-auto">
@@ -149,7 +149,7 @@ const RoomDetail = () => {
             {/* Related Properties */}
             <div className="bg-white shadow rounded-lg p-4 mt-6">
               <h2 className="text-xl font-bold">
-                {listing.type.name} dành cho bạn
+                {listing?.type?.name} dành cho bạn
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                 {filteredProperties.map((property, index) => (

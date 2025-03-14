@@ -2,6 +2,8 @@ import axios from "axios";
 import authTokenControl from "../../utils/authToken";
 
 const getAllLodging = async (params = null) => {
+  console.log(params);
+  
   try {
     const response = await axios.get("http://localhost:3000/api/lodgings", {
       params: params || {},

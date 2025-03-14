@@ -88,12 +88,12 @@ module.exports = {
       const accessToken = await createAccessToken({
         userId: user._id,
       });
-      const refreshToken = await refreshAccessToken();
+      // const refreshToken = await refreshAccessToken();
       return res.json({
         message: "Đăng nhập thành công",
         data: {
           accessToken,
-          refreshToken,
+          // refreshToken,
         },
       });
     } catch (e) {

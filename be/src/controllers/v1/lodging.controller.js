@@ -1,6 +1,9 @@
+const { default: mongoose } = require("mongoose");
 const Lodging = require("../../models/lodging.model");
 const LodgingType = require("../../models/lodgingtype.model");
+const User = require("../../models/user.model");
 const { deleteImagesFromCloudinary } = require("../../utils/cloudinaryUtils");
+const { errorResponse, successResponse } = require("../../utils/response");
 module.exports = {
   createLodging: async (req, res) => {
     try {
@@ -42,9 +45,13 @@ module.exports = {
   },
   getAllLodgings: async (req, res) => {
     try {
-      const { price, address, area, page = 1, limit = 5 } = req.query;
+      // Giả sử limit mặc định là 5, bạn có thể thay đổi giá trị này thành 8 nếu cần
+      const { price, address, area, page = 1, limit = null } = req.query;  // limit mặc định là 5
       console.log(req.query.address);
+  
       const filter = {};
+  
+      // Lọc theo địa chỉ
       if (address) {
         const regexAddress = new RegExp(
           address
@@ -55,6 +62,8 @@ module.exports = {
         );
         filter.address = { $regex: regexAddress };
       }
+  
+      // Lọc theo giá
       if (price) {
         const priceRanges = {
           "Dưới 1 triệu": [0, 1000000],
@@ -69,6 +78,8 @@ module.exports = {
         const [min, max] = priceRanges[price] || [0, Infinity];
         filter.price = { $gte: min, $lte: max };
       }
+  
+      // Lọc theo diện tích
       if (area) {
         const areaRanges = {
           "Dưới 20 m²": [0, 20],
@@ -81,15 +92,22 @@ module.exports = {
         const [min, max] = areaRanges[area] || [0, Infinity];
         filter.area = { $gte: min, $lte: max };
       }
-
+  
+      // Tính skip dựa trên page
       const skip = (parseInt(page) - 1) * parseInt(limit);
       const total = await Lodging.countDocuments(filter);
-
-      const listings = await Lodging.find(filter)
-        .skip(skip)
-        .limit(parseInt(limit))
-        .populate({ path: "type", select: "name -_id" }) // Fix lỗi populate
-        .populate({ path: "user", select: "fullname email phoneNumber -_id" }); 
+  
+      // Query Lodging và áp dụng limit nếu có
+      const query = Lodging.find(filter).skip(skip);
+  
+      if (limit) {
+        query.limit(parseInt(limit)); // Áp dụng limit nếu limit có giá trị
+      }
+  
+      const listings = await query
+        .populate({ path: "type", select: "name -_id" })
+        .populate({ path: "user", select: "fullname email phoneNumber -_id" });
+  
       res.json({
         total,
         page: parseInt(page),
@@ -102,6 +120,7 @@ module.exports = {
       res.status(500).json({ message: "Lỗi server" });
     }
   },
+  
 
   updateLogding: async (req, res) => {
     try {
@@ -152,6 +171,67 @@ module.exports = {
       res.json(lodgingTypes);
     } catch (error) {
       res.status(500).json({ message: "Lỗi server", error });
+    }
+  },
+
+  getLodgingByUserId: async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const user = await User.findById(userId);
+      if (!user) {
+        return errorResponse(res, "User not found", 404, "User không tồn tại");
+      }
+      const lodgings = await Lodging.find({ user: userId }).populate({
+        path: "type",
+        select: "name -_id",
+      });
+      return successResponse(res, lodgings, {}, 200, "Lấy dữ liệu thành công");
+    } catch (error) {
+      return errorResponse(res, error.message, 500, error.message);
+    }
+  },
+  updateStatusLoding: async (req, res) => {
+    try {
+      
+      const { id } = req.params;
+      const { status, userId } = req.body;
+      console.log(status, userId);
+
+      // Validate input
+      if (status !== 0 && status !== 1) {
+        return res
+          .status(400)
+          .json({
+            message: "Trạng thái không hợp lệ. Chỉ chấp nhận giá trị 0 hoặc 1.",
+          });
+      }
+      // Validate id is a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "ID phòng trọ không hợp lệ" });
+      }
+      // Check if the lodging exists and belongs to the user
+      const lodging = await Lodging.findOne({ _id: id, user: userId });
+      if (!lodging) {
+        return res
+          .status(404)
+          .json({
+            message:
+              "Không tìm thấy phòng trọ hoặc bạn không có quyền cập nhật.",
+          });
+      }
+      lodging.status = status;
+      await lodging.save();
+      return res.status(200).json({
+        message: `Đã ${
+          status === 1 ? "mở" : "đóng"
+        } trạng thái phòng thành công.`,
+        status,
+      });
+    } catch (error) {
+      console.error("Error toggling lodging status:", error);
+      return res
+        .status(500)
+        .json({ message: "Lỗi server khi cập nhật trạng thái phòng." });
     }
   },
 };

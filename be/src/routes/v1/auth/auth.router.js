@@ -20,16 +20,13 @@ router.get("/google/callback", passport.authenticate("google", {failureRedirect:
     const accessToken = await createAccessToken({
       userId: req.user._id,
     });
+    
     const refreshToken = await refreshAccessToken();
     console.log("Google", accessToken);
     res.cookie("authToken", accessToken, {
       sameSite: "Strict",
       secure: process.env.NODE_ENV === "production"
     });
-    // res.cookie("refreshToken", refreshToken, {
-    //   sameSite: "Strict",
-    //   secure: process.env.NODE_ENV === "production"
-    // });
     return res.redirect(process.env.FRONTEND_URL);
   } catch (error) {
     console.error("Google Callback Error:", error);

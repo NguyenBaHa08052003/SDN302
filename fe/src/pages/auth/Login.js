@@ -2,6 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import authService from "../../services/authService/auth.service";
 import { ToastContainer, toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import C from "js-cookie"
+import authTokenControl from "../../utils/authToken";
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -11,10 +13,9 @@ export default function Login() {
       const form = Object.fromEntries(new FormData(e.target));
       setLoading(true);
       const response = await authService.login(form);
-      console.log(response);
-
       setLoading(false);
       if (response.data) {
+        authTokenControl.saveToken(response.data.accessToken)
         toast.success("Chờ một chút!!!");
         setTimeout(() => {
           navigate("/", { replace: true });

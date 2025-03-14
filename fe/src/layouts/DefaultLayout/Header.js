@@ -25,17 +25,19 @@ const Header = () => {
     }, 1000);
   };
 
-  // Xử lý đăng xuất
-  const handleLogout = () => {
-    authService.logout();
-    sessionStorage.removeItem("welcomeToast");
-    sessionStorage.removeItem("Role");
-    authTokenControl.removeToken();
-    setTimeout(() => {
+  const handleLogout = async () => {
+    try {
+      // Gọi API logout
+      await authService.logout();
+      sessionStorage.clear();
+      authTokenControl.removeToken();
       dispatch(logout());
-    }, 500);
-    toast.info("Bạn đã đăng xuất thành công!");
-    window.location.reload();
+      toast.info("Bạn đã đăng xuất thành công!");
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error: ", error);
+      toast.error("Có lỗi khi đăng xuất!");
+    }
   };
 
   // Menu Dropdown

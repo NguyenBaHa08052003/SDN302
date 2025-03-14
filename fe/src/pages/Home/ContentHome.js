@@ -12,7 +12,7 @@ function ContentHome() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const getListLodging = await lodgingService.getAllLodging()
+                const getListLodging = await lodgingService.getAllLodging({limit: null})
                 console.log(getListLodging);
                 if (getListLodging) {
                     setListingsContent(getListLodging.listings)

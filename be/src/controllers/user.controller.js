@@ -28,7 +28,6 @@ module.exports = {
         console.log("Da vao backend");
         const { fullname, email, phoneNumber } = req.body;
         const image = req.file ? req.file.path : null;
-
         const id = req.params.id;
         console.log(req.body, id);
         // return res.json(image);

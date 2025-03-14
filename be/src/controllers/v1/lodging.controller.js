@@ -46,11 +46,9 @@ module.exports = {
   getAllLodgings: async (req, res) => {
     try {
       // Giả sử limit mặc định là 5, bạn có thể thay đổi giá trị này thành 8 nếu cần
-      const { price, address, area, page = 1, limit = null } = req.query;  // limit mặc định là 5
+      const { price, address, area, page = 1, limit = null } = req.query;
       console.log(req.query.address);
-  
       const filter = {};
-  
       // Lọc theo địa chỉ
       if (address) {
         const regexAddress = new RegExp(

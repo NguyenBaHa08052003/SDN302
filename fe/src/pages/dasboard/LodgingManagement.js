@@ -22,7 +22,8 @@ import {
 import { Header, Stats } from "./LayoutLodgingManagement/Layout";
 import RoomDetailModal from "./LayoutLodgingManagement/room-detail-modal";
 import "./lodging-management.css";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import UpdateLodgingModal from "./LayoutLodgingManagement/update-lodging-modal";
 
 const { Title } = Typography;
 
@@ -33,7 +34,7 @@ const LodgingManagement = () => {
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [selectedRecordUpdate, setSelectedRecordUpdate] = useState(null);
   useEffect(() => {
     const userId = sessionStorage.getItem("UserId");
     if (!userId) {
@@ -84,11 +85,13 @@ const LodgingManagement = () => {
     setIsDetailModalVisible(true);
   };
 
-  const handleEditRoom = (record) => {
-    console.log("Chỉnh sửa phòng:", record);
-    // Implement edit functionality
-  };
 
+  // Update your handleEditRoom function
+  const handleEditRoom = (record) => {
+    setSelectedRecordUpdate(record)
+    setIsUpdateModalVisible(true)
+  }
+  
   const handleToggleRoomStatus = async (record) => {
      if(window.confirm("Bạn có chắc muốn thay đổi trạng thái?")){
       try {
@@ -262,6 +265,7 @@ const LodgingManagement = () => {
   ];
   return (
     <div className="container mx-auto p-4">
+    <ToastContainer position="top-center"/>
       <Header />
       <Stats lodgings={lodgings.data} />
       <Card className="lodging-table-card">
@@ -284,6 +288,32 @@ const LodgingManagement = () => {
         handleCloseModal={handleCloseModal}
         selectedRecord={selectedRecord}
       />
+      {selectedRecordUpdate && (
+        <UpdateLodgingModal
+          isVisible={isUpdateModalVisible}
+          onClose={() => setIsUpdateModalVisible(false)}
+          selectedRecordUpdate={selectedRecordUpdate}
+          onUpdateSuccess={() => {
+            // Refresh your data
+            const userId = sessionStorage.getItem("UserId")
+            if (userId) {
+              setLoading(true)
+              axios
+                .get(`http://localhost:3000/api/lodgings/${JSON.parse(userId)}/users`)
+                .then((res) => {
+                  setLodgings(res.data)
+                  setFilteredLodgings(res?.data?.data || [])
+                })
+                .catch((error) => {
+                  console.error("Lỗi khi lấy dữ liệu:", error)
+                })
+                .finally(() => {
+                  setLoading(false)
+                })
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

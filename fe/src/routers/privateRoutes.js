@@ -1,6 +1,5 @@
 import DefaultLayout from "../layouts/DefaultLayout/DefaultLayout";
 import { Route } from "react-router-dom";
-import Profile from "../pages/auth/Profile";
 import AuthMiddleware from "../middlewares/authMiddleware";
 import DashboardPage from "../pages/admin/DashboardPage";
 import CreateLodgingPage from "../pages/lodging/CreateLodgingPage";

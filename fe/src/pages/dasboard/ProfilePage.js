@@ -17,8 +17,6 @@ const ProfilePage = () => {
     image: "",
     phoneNumber: "",
   });
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [previewImage, setPreviewImage] = useState("");
   useEffect(() => {
     if (Cookies.get("authToken") && currentUser?.success) {
@@ -58,7 +56,7 @@ const ProfilePage = () => {
       });
       return;
     }
-
+  
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(updateUser.phoneNumber)) {
       toast.error("Số điện thoại không hợp lệ! (10 số)", {
@@ -66,7 +64,7 @@ const ProfilePage = () => {
       });
       return;
     }
-
+  
     if (updateUser.image instanceof File) {
       const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!allowedTypes.includes(updateUser.image.type)) {
@@ -86,17 +84,21 @@ const ProfilePage = () => {
       setLoading(true);
       const res = await updateUserr(currentUser.data.UID, formData, token);
       console.log(res);
-
+  
       if (res?.success === true) {
         setLoading(false);
-        console.log("cap nhat ");
-
+        console.log("Cập nhật thành công");
+  
         toast.success(res?.message, { position: "top-center" });
+  
+        // Cập nhật lại giá trị trong state sau khi thành công
         setUpdateUser((prev) => ({
           ...prev,
-          image: res?.data?.imageUrl, // Cập nhật ảnh từ backend cha
+          image: res?.data?.imageUrl || prev.image, // Cập nhật ảnh mới nếu có
+          fullname: res?.data?.fullname || prev.fullname, // Cập nhật fullname nếu có thay đổi
+          phoneNumber: res?.data?.phoneNumber || prev.phoneNumber, // Cập nhật phoneNumber nếu có thay đổi
         }));
-        window.location.reload();
+  
       } else {
         toast.error(res?.message, { position: "top-center" });
       }
@@ -105,6 +107,7 @@ const ProfilePage = () => {
       toast.error("Đã xảy ra lỗi khi cập nhật!", { position: "top-center" });
     }
   };
+  
 
   return (
     <div className="flex-1 p-5">

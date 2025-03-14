@@ -18,7 +18,7 @@ const Stats = ({lodgings}) => {
   const stats = [
     {
       title: "Số lượng trọ",
-      value: `${lodgings?.length * 1223}`,
+      value: `${lodgings?.length}`,
       change: "↑13%",
       changeType: "green",
       icon: "fas fa-wallet",

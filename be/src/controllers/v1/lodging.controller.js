@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Lodging = require("../../models/lodging.model");
 const LodgingType = require("../../models/lodgingtype.model");
 const User = require("../../models/user.model");
@@ -91,7 +92,7 @@ module.exports = {
         .skip(skip)
         .limit(parseInt(limit))
         .populate({ path: "type", select: "name -_id" }) // Fix lỗi populate
-        .populate({ path: "user", select: "fullname email phoneNumber -_id" }); 
+        .populate({ path: "user", select: "fullname email phoneNumber -_id" });
       res.json({
         total,
         page: parseInt(page),
@@ -158,19 +159,63 @@ module.exports = {
   },
 
   getLodgingByUserId: async (req, res) => {
-      try {
-          const {userId} = req.params;
-          const user = await User.findById(userId);
-          if(!user){
-              return errorResponse(res, "User not found", 404, 'User không tồn tại');
-          };
-          const lodgings = await Lodging.find({user: userId}).populate({
-            path: "type",
-            select: "name -_id"
-          });
-          return successResponse(res, lodgings, {}, 200, "Lấy dữ liệu thành công");
-      } catch (error) {
-        return errorResponse(res, error.message, 500, error.message);
+    try {
+      const { userId } = req.params;
+      const user = await User.findById(userId);
+      if (!user) {
+        return errorResponse(res, "User not found", 404, "User không tồn tại");
       }
-  }
+      const lodgings = await Lodging.find({ user: userId }).populate({
+        path: "type",
+        select: "name -_id",
+      });
+      return successResponse(res, lodgings, {}, 200, "Lấy dữ liệu thành công");
+    } catch (error) {
+      return errorResponse(res, error.message, 500, error.message);
+    }
+  },
+  updateStatusLoding: async (req, res) => {
+    try {
+      
+      const { id } = req.params;
+      const { status, userId } = req.body;
+      console.log(status, userId);
+
+      // Validate input
+      if (status !== 0 && status !== 1) {
+        return res
+          .status(400)
+          .json({
+            message: "Trạng thái không hợp lệ. Chỉ chấp nhận giá trị 0 hoặc 1.",
+          });
+      }
+      // Validate id is a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "ID phòng trọ không hợp lệ" });
+      }
+      // Check if the lodging exists and belongs to the user
+      const lodging = await Lodging.findOne({ _id: id, user: userId });
+      if (!lodging) {
+        return res
+          .status(404)
+          .json({
+            message:
+              "Không tìm thấy phòng trọ hoặc bạn không có quyền cập nhật.",
+          });
+      }
+      lodging.status = status;
+      await lodging.save();
+      return res.status(200).json({
+        message: `Đã ${
+          status === 1 ? "mở" : "đóng"
+        } trạng thái phòng thành công.`,
+        status,
+      });
+    } catch (error) {
+      console.error("Error toggling lodging status:", error);
+      return res
+        .status(500)
+        .json({ message: "Lỗi server khi cập nhật trạng thái phòng." });
+    }
+  },
 };

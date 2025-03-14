@@ -11,7 +11,6 @@ function VerifyUserPage() {
             try {
                 const verify = await verifyAccount(id);
                 console.log(verify);
-
                 if (verify) {
                     if (token) {
                         Cookies.remove('authToken');

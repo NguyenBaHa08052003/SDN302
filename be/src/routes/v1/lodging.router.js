@@ -11,4 +11,5 @@ router.put("/:id", uploadCloud.array("images", 10), lodgingController.updateLogd
 router.delete("/:id", lodgingController.deleteLodging);
 router.get("/lodging-types", lodgingController.getAllLodgingTypes);
 router.get("/:userId/users", lodgingController.getLodgingByUserId);
+router.put("/:id/toggle-status", lodgingController.updateStatusLoding);
 module.exports = router;

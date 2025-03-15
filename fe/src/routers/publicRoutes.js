@@ -24,6 +24,7 @@ export const publicRoutes = (
     <Route element={<AuthLayout />}>
       <Route element={<GuestMiddleware />}>
         <Route path="/dang-nhap" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
       </Route>
     </Route>
   </>

@@ -48,9 +48,9 @@ module.exports = {
       // Giả sử limit mặc định là 5, bạn có thể thay đổi giá trị này thành 8 nếu cần
       const { price, address, area, page = 1, limit = null } = req.query;  // limit mặc định là 5
       console.log(req.query.address);
-  
-      const filter = {};
-  
+
+      const filter = { status: 0 };
+
       // Lọc theo địa chỉ
       if (address) {
         const regexAddress = new RegExp(
@@ -62,7 +62,7 @@ module.exports = {
         );
         filter.address = { $regex: regexAddress };
       }
-  
+
       // Lọc theo giá
       if (price) {
         const priceRanges = {
@@ -78,7 +78,7 @@ module.exports = {
         const [min, max] = priceRanges[price] || [0, Infinity];
         filter.price = { $gte: min, $lte: max };
       }
-  
+
       // Lọc theo diện tích
       if (area) {
         const areaRanges = {
@@ -92,22 +92,22 @@ module.exports = {
         const [min, max] = areaRanges[area] || [0, Infinity];
         filter.area = { $gte: min, $lte: max };
       }
-  
+
       // Tính skip dựa trên page
       const skip = (parseInt(page) - 1) * parseInt(limit);
       const total = await Lodging.countDocuments(filter);
-  
+
       // Query Lodging và áp dụng limit nếu có
       const query = Lodging.find(filter).skip(skip);
-  
+
       if (limit) {
         query.limit(parseInt(limit)); // Áp dụng limit nếu limit có giá trị
       }
-  
+
       const listings = await query
         .populate({ path: "type", select: "name -_id" })
         .populate({ path: "user", select: "fullname email phoneNumber -_id" });
-  
+
       res.json({
         total,
         page: parseInt(page),
@@ -120,7 +120,7 @@ module.exports = {
       res.status(500).json({ message: "Lỗi server" });
     }
   },
-  
+
 
   updateLogding: async (req, res) => {
     try {
@@ -192,7 +192,7 @@ module.exports = {
   },
   updateStatusLoding: async (req, res) => {
     try {
-      
+
       const { id } = req.params;
       const { status, userId } = req.body;
       console.log(status, userId);
@@ -222,9 +222,8 @@ module.exports = {
       lodging.status = status;
       await lodging.save();
       return res.status(200).json({
-        message: `Đã ${
-          status === 1 ? "mở" : "đóng"
-        } trạng thái phòng thành công.`,
+        message: `Đã ${status === 1 ? "mở" : "đóng"
+          } trạng thái phòng thành công.`,
         status,
       });
     } catch (error) {

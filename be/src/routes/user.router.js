@@ -7,6 +7,8 @@ const router = express.Router();
 router.get("/", userController.index);
 router.get("/providers", userController.getProviders);
 router.get("/update/:id", authMiddleware, userController.getDetailUser);
+router.get("/favorite/:id", userController.getFavoriteLodging)
 
+router.post("/favorite/:id", authMiddleware, userController.addFavoriteLodging)
 router.put("/update/:id", authMiddleware, uploadCloud.single('image'), userController.updateUser);
 module.exports = router;

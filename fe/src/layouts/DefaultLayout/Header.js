@@ -53,8 +53,8 @@ const Header = () => {
       )}
       <Menu.Item key="logout" onClick={handleLogout} icon={<LogoutOutlined />}>
         Đăng xuất
-      </Menu.Item> 
-     
+      </Menu.Item>
+
     </Menu>
   );
 
@@ -94,11 +94,11 @@ const Header = () => {
 
         <div className="ml-auto flex items-center">
           {user?.data?.role !== "Admin" && (
-            <a
+            <Link to={'/yeu-thich'}
               className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 mr-2"
             >
               <i className="far fa-heart mr-1"></i> Yêu thích
-            </a>
+            </Link>
           )}
 
           {/* Hiển thị đăng nhập / đăng ký nếu chưa đăng nhập */}

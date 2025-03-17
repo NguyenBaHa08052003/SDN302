@@ -1,376 +1,368 @@
-"use client"
 
 import { useState, useEffect } from "react"
 import {
-  Modal,
   Form,
   Input,
   InputNumber,
   Button,
-  Select,
   Upload,
-  Space,
+  Select,
+  Modal,
+  Card,
   Divider,
-  Typography,
-  Row,
-  Col,
-  message,
   Spin,
+  message,
+  notification,
 } from "antd"
-import { HomeOutlined, DollarOutlined, EnvironmentOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons"
+import {
+  HomeOutlined,
+  DollarOutlined,
+  FileTextOutlined,
+  AreaChartOutlined,
+  EnvironmentOutlined,
+  PictureOutlined,
+  SaveOutlined,
+  CloseOutlined,
+  PlusOutlined,
+  LoadingOutlined,
+  EditOutlined,
+  CheckCircleOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons"
+import { motion } from "framer-motion"
 import axios from "axios"
-const { Title, Text } = Typography
+import "antd/dist/reset.css"
+
+// Assuming LocationUtil is a custom component that you have
+import LocationUtil from "../../../components/LocationUtil"
+import lodgingService from "../../../services/lodgingService.js/lodging.service"
+import { toast } from "react-toastify"
+
 const { TextArea } = Input
+const { Option } = Select
+
 const UpdateLodgingModal = ({ isVisible, onClose, selectedRecordUpdate, onUpdateSuccess }) => {
   const [form] = Form.useForm()
+  const [location, setLocation] = useState("")
   const [fileList, setFileList] = useState([])
   const [loading, setLoading] = useState(false)
-  const [previewImages, setPreviewImages] = useState([])
-  const [amenities, setAmenities] = useState([])
-  const [newAmenity, setNewAmenity] = useState("")
-  console.log(selectedRecordUpdate);
-  
+  const [lodgingTypes, setLodgingTypes] = useState([])
+  const [previewImage, setPreviewImage] = useState(null)
+  const [previewVisible, setPreviewVisible] = useState(false)
+
   useEffect(() => {
     if (isVisible && selectedRecordUpdate) {
       form.setFieldsValue({
-        name: selectedRecordUpdate.name,
-        description: selectedRecordUpdate.description,
-        price: selectedRecordUpdate.price,
-        area: selectedRecordUpdate.area,
-        address: selectedRecordUpdate.address,
-        detail_address: selectedRecordUpdate.detail_address,
-        rooms: selectedRecordUpdate.rooms || 1,
-        bathrooms: selectedRecordUpdate.bathrooms || 1,
+        name: selectedRecordUpdate?.name,
+        title: selectedRecordUpdate?.title,
+        type: selectedRecordUpdate?.type?._id,
+        price: selectedRecordUpdate?.price,
+        detail_address: selectedRecordUpdate?.detail_address,
+        area: selectedRecordUpdate?.area,
+        description: selectedRecordUpdate?.description,
       })
-      if (selectedRecordUpdate.images && selectedRecordUpdate.images.length > 0) {
-        setPreviewImages(selectedRecordUpdate.images)
-      } else {
-        setPreviewImages([])
-      }
-      if (selectedRecordUpdate.amenities && selectedRecordUpdate.amenities.length > 0) {
-        setAmenities(selectedRecordUpdate.amenities)
-      } else {
-        setAmenities([])
+      setLocation(selectedRecordUpdate.address || "")
+      setFileList(
+        selectedRecordUpdate.images?.map((img, index) => ({
+          uid: index.toString(),
+          name: `image-${index}`,
+          status: "done",
+          url: img,
+        })) || [],
+      )
+    }
+  }, [selectedRecordUpdate, isVisible, form])
+
+  useEffect(() => {
+    const fetchLodgingTypes = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/lodgings/lodging-types")
+        setLodgingTypes(response.data)
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách loại chỗ ở:", error)
+        message.error("Không thể tải danh sách loại chỗ ở")
       }
     }
-  }, [isVisible, selectedRecordUpdate, form])
+    fetchLodgingTypes()
+  }, [])
 
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields()
-      setLoading(true)
+  const handleUploadChange = ({ fileList }) => {
+    setFileList(fileList.slice(0, 5)) // Limit to 5 images
+  }
 
-      // Prepare form data for file upload
-      const formData = new FormData()
+  const handlePreview = (file) => {
+    setPreviewImage(file.url || file.thumbUrl)
+    setPreviewVisible(true)
+  }
 
-      // Add form values to formData
-      Object.keys(values).forEach((key) => {
-        formData.append(key, values[key])
-      })
-
-      // Add amenities
-      formData.append("amenities", JSON.stringify(amenities))
-
-      // Add existing images that weren't deleted
-      formData.append("existingImages", JSON.stringify(previewImages))
-
-      // Add new images
-      fileList.forEach((file) => {
-        if (file.originFileObj) {
-          formData.append("images", file.originFileObj)
-        }
-      })
-
-      // Send update request
-      const response = await axios.put(`http://localhost:3000/api/lodgings/${selectedRecordUpdate._id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-
-      if (response.status === 200) {
-        message.success("Cập nhật thông tin phòng trọ thành công!")
-        onUpdateSuccess()
-        onClose()
-
-        // Reset states
-        setFileList([])
-        setPreviewImages([])
-        setAmenities([])
-        form.resetFields()
+  const handleSubmit = async (values) => {
+    const formData = new FormData()
+    formData.append("name", values.name)
+    formData.append("price", values.price)
+    formData.append("title", values.title)
+    formData.append("description", values.description || "")
+    formData.append("area", values.area)
+    formData.append("detail_address", values.detail_address || "")
+    formData.append("address", location)
+    formData.append("type", values.type)
+  // Nếu có ảnh cũ mà chưa bị xóa, thêm vào formData
+    fileList.forEach((imgUrl) => {
+        formData.append("existingImages", imgUrl.url);
+    });
+    fileList.forEach((file) => {
+      if (file.originFileObj) {
+        formData.append("images", file.originFileObj)
       }
+    })
+    setLoading(true)
+    try {
+      const response = await lodgingService.updateLodging(selectedRecordUpdate._id, formData)
+      if (response.error) {
+        toast.error(response.message || "Cập nhật thất bại")
+        return
+      }
+      // Sử dụng notification thay vì toast
+      toast.success({
+        message: "Thành công",
+        description: "Cập nhật chỗ ở thành công!",
+        icon: <CheckCircleOutlined style={{ color: "#52c41a" }} />,
+        placement: "bottomRight",
+        duration: 4,
+      })
+
+      toast.success("Cập nhật chỗ ở thành công!")
+      onUpdateSuccess()
+      onClose()
     } catch (error) {
-      console.error("Lỗi khi cập nhật:", error)
-      message.error("Không thể cập nhật thông tin phòng trọ. Vui lòng thử lại sau.")
+      console.error("Lỗi khi cập nhật chỗ ở:", error)
+      toast.error({
+        message: "Thất bại",
+        description: "Cập nhật chỗ ở thất bại. Vui lòng thử lại sau.",
+        icon: <InfoCircleOutlined style={{ color: "#ff4d4f" }} />,
+        placement: "bottomRight",
+        duration: 4,
+      })
     } finally {
       setLoading(false)
     }
   }
 
-  const handleCancel = () => {
-    form.resetFields()
-    setFileList([])
-    onClose()
-  }
-
-  const handleDeleteExistingImage = (index) => {
-    const newImages = [...previewImages]
-    newImages.splice(index, 1)
-    setPreviewImages(newImages)
-  }
-
-  const handleAddAmenity = () => {
-    if (newAmenity && !amenities.includes(newAmenity)) {
-      setAmenities([...amenities, newAmenity])
-      setNewAmenity("")
-    }
-  }
-
-  const handleRemoveAmenity = (item) => {
-    setAmenities(amenities.filter((amenity) => amenity !== item))
-  }
-
-  const uploadProps = {
-    onRemove: (file) => {
-      const index = fileList.indexOf(file)
-      const newFileList = fileList.slice()
-      newFileList.splice(index, 1)
-      setFileList(newFileList)
-    },
-    beforeUpload: (file) => {
-      // Check file type
-      const isImage = file.type.startsWith("image/")
-      if (!isImage) {
-        message.error("Chỉ chấp nhận file hình ảnh!")
-        return Upload.LIST_IGNORE
-      }
-
-      // Check file size (5MB limit)
-      const isLt5M = file.size / 1024 / 1024 < 5
-      if (!isLt5M) {
-        message.error("Hình ảnh phải nhỏ hơn 5MB!")
-        return Upload.LIST_IGNORE
-      }
-
-      setFileList([...fileList, file])
-      return false
-    },
-    fileList,
-    listType: "picture-card",
-  }
+  const uploadButton = (
+    <div className="upload-button">
+      <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+        <PlusOutlined />
+        <div style={{ marginTop: 8 }}>Tải lên</div>
+      </motion.div>
+    </div>
+  )
 
   return (
-    <Modal
-      title={
-        <Space>
-          <HomeOutlined />
-          <span>Cập nhật thông tin phòng trọ</span>
-        </Space>
-      }
-      open={isVisible}
-      onCancel={handleCancel}
-      width={800}
-      footer={[
-        <Button key="back" onClick={handleCancel}>
-          Hủy
-        </Button>,
-        <Button key="submit" type="primary" loading={loading} onClick={handleSubmit}>
-          Cập nhật
-        </Button>,
-      ]}
-      destroyOnClose
-    >
-      <Spin spinning={loading}>
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={{
-            rooms: 1,
-            bathrooms: 1,
-          }}
-        >
-          <Divider orientation="left">
-            <Title level={5}>Thông tin cơ bản</Title>
-          </Divider>
+    <>
+      <Modal
+        title={
+          <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-center">
+            <HomeOutlined className="mr-2 text-blue-500" />
+            <span className="text-lg font-bold">Cập Nhật Chỗ Ở</span>
+          </motion.div>
+        }
+        open={isVisible}
+        onCancel={onClose}
+        footer={null}
+        width={800}
+        className="lodging-update-modal"
+        destroyOnClose
+      >
+        <Divider className="my-3" />
 
-          <Row gutter={16}>
-            <Col span={24}>
+        <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}>
+          <Form form={form} layout="vertical" onFinish={handleSubmit} className="lodging-form" requiredMark="optional">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Form.Item
                 name="name"
-                label="Tên phòng trọ"
-                rules={[{ required: true, message: "Vui lòng nhập tên phòng trọ!" }]}
+                label={
+                  <span className="flex items-center">
+                    <HomeOutlined className="mr-2 text-blue-500" />
+                    Tên Chỗ Ở
+                  </span>
+                }
+                rules={[{ required: true, message: "Vui lòng nhập tên chỗ ở!" }]}
               >
-                <Input prefix={<HomeOutlined />} placeholder="Nhập tên phòng trọ" />
+                <Input
+                  prefix={<HomeOutlined className="site-form-item-icon" />}
+                  placeholder="Nhập tên chỗ ở"
+                  className="custom-input"
+                />
               </Form.Item>
-            </Col>
-          </Row>
 
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item name="description" label="Mô tả" rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}>
-                <TextArea placeholder="Nhập mô tả chi tiết về phòng trọ" autoSize={{ minRows: 3, maxRows: 6 }} />
+              <Form.Item
+                name="title"
+                label={
+                  <span className="flex items-center">
+                    <EditOutlined className="mr-2 text-blue-500" />
+                    Tiêu đề
+                  </span>
+                }
+                rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
+              >
+                <Input
+                  prefix={<EditOutlined className="site-form-item-icon" />}
+                  placeholder="Nhập tiêu đề"
+                  className="custom-input"
+                />
               </Form.Item>
-            </Col>
-          </Row>
+            </div>
 
-          <Row gutter={16}>
-            <Col span={8}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Form.Item
                 name="price"
-                label="Giá thuê (VNĐ/tháng)"
-                rules={[{ required: true, message: "Vui lòng nhập giá thuê!" }]}
+                label={
+                  <span className="flex items-center">
+                    <DollarOutlined className="mr-2 text-blue-500" />
+                    Giá (VND)
+                  </span>
+                }
+                rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
               >
                 <InputNumber
-                  style={{ width: "100%" }}
-                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  parser={(value) => value?.replace(/\$\s?|(,*)/g, "")}
                   min={0}
-                  placeholder="Nhập giá thuê"
-                  prefix={<DollarOutlined />}
+                  className="w-full custom-input"
+                  formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  placeholder="Nhập giá"
                 />
               </Form.Item>
-            </Col>
-            <Col span={8}>
+
               <Form.Item
                 name="area"
-                label="Diện tích (m²)"
+                label={
+                  <span className="flex items-center">
+                    <AreaChartOutlined className="mr-2 text-blue-500" />
+                    Diện tích (m²)
+                  </span>
+                }
                 rules={[{ required: true, message: "Vui lòng nhập diện tích!" }]}
               >
-                <InputNumber style={{ width: "100%" }} min={1} placeholder="Nhập diện tích" />
+                <InputNumber min={0} className="w-full custom-input" placeholder="Nhập diện tích" />
               </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item name="rooms" label="Số phòng">
-                <InputNumber style={{ width: "100%" }} min={1} placeholder="Số phòng" />
-              </Form.Item>
-            </Col>
-            <Col span={4}>
-              <Form.Item name="bathrooms" label="Số phòng tắm">
-                <InputNumber style={{ width: "100%" }} min={1} placeholder="Số phòng tắm" />
-              </Form.Item>
-            </Col>
-          </Row>
+            </div>
 
-          <Divider orientation="left">
-            <Title level={5}>Địa chỉ</Title>
-          </Divider>
+            <Form.Item
+              name="description"
+              label={
+                <span className="flex items-center">
+                  <FileTextOutlined className="mr-2 text-blue-500" />
+                  Mô tả
+                </span>
+              }
+            >
+              <TextArea rows={4} placeholder="Nhập mô tả chi tiết về chỗ ở" className="custom-textarea" />
+            </Form.Item>
 
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item name="address" label="Địa chỉ" rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Form.Item
+                name="detail_address"
+                label={
+                  <span className="flex items-center">
+                    <EnvironmentOutlined className="mr-2 text-blue-500" />
+                    Địa chỉ chi tiết
+                  </span>
+                }
+              >
                 <Input
-                  prefix={<EnvironmentOutlined />}
-                  placeholder="Nhập địa chỉ (Phường/Xã, Quận/Huyện, Tỉnh/Thành phố)"
+                  prefix={<EnvironmentOutlined className="site-form-item-icon" />}
+                  placeholder="Nhập địa chỉ chi tiết"
+                  className="custom-input"
                 />
               </Form.Item>
-            </Col>
-          </Row>
 
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item name="detail_address" label="Địa chỉ chi tiết">
-                <Input placeholder="Nhập địa chỉ chi tiết (Số nhà, tên đường, ...)" />
+              <Form.Item
+                name="type"
+                label={
+                  <span className="flex items-center">
+                    <HomeOutlined className="mr-2 text-blue-500" />
+                    Loại Chỗ Ở
+                  </span>
+                }
+                rules={[{ required: true, message: "Vui lòng chọn loại chỗ ở!" }]}
+              >
+                <Select placeholder="Chọn loại chỗ ở" className="custom-select">
+                  {lodgingTypes?.map((type) => (
+                    <Option key={type._id} value={type._id}>
+                      {type.name}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
-            </Col>
-          </Row>
+            </div>
 
-          <Divider orientation="left">
-            <Title level={5}>Tiện ích</Title>
-          </Divider>
+            <Form.Item
+              label={
+                <span className="flex items-center">
+                  <EnvironmentOutlined className="mr-2 text-blue-500" />
+                  Địa chỉ
+                </span>
+              }
+            >
+              <Card className="location-card">
+                <LocationUtil setLocation={setLocation} defaultAddress={selectedRecordUpdate?.address} />
+              </Card>
+            </Form.Item>
 
-          <div className="mb-4">
-            <Space className="mb-2" style={{ width: "100%" }}>
-              <Input
-                placeholder="Thêm tiện ích (VD: WiFi, Máy lạnh, ...)"
-                value={newAmenity}
-                onChange={(e) => setNewAmenity(e.target.value)}
-                onPressEnter={handleAddAmenity}
-              />
-              <Button type="primary" onClick={handleAddAmenity} icon={<PlusOutlined />}>
-                Thêm
-              </Button>
-            </Space>
+            <Form.Item
+              label={
+                <span className="flex items-center">
+                  <PictureOutlined className="mr-2 text-blue-500" />
+                  Hình ảnh ({fileList.length}/5)
+                </span>
+              }
+            >
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                onChange={handleUploadChange}
+                onPreview={handlePreview}
+                beforeUpload={() => false}
+                multiple
+                name="images"
+                className="lodging-image-upload"
+              >
+                {fileList.length >= 5 ? null : uploadButton}
+              </Upload>
+            </Form.Item>
 
-            <div className="mt-2">
-              {amenities.map((item, index) => (
-                <Button key={index} className="mr-2 mb-2" onClick={() => handleRemoveAmenity(item)}>
-                  {item} <DeleteOutlined />
+            <Form.Item className="form-actions">
+              <div className="flex justify-end gap-3">
+                <Button onClick={onClose} icon={<CloseOutlined />} className="cancel-button">
+                  Hủy
                 </Button>
-              ))}
-              {amenities.length === 0 && <Text type="secondary">Chưa có tiện ích nào được thêm</Text>}
-            </div>
-          </div>
-
-          <Divider orientation="left">
-            <Title level={5}>Hình ảnh</Title>
-          </Divider>
-
-          <div className="mb-4">
-            <Text type="secondary" className="mb-2 block">
-              Hình ảnh hiện tại (Nhấn vào để xóa)
-            </Text>
-
-            <div className="flex flex-wrap gap-2 mb-4">
-              {previewImages.length > 0 ? (
-                previewImages.map((img, index) => (
-                  <div
-                    key={index}
-                    className="relative"
-                    style={{
-                      width: 104,
-                      height: 104,
-                      border: "1px solid #d9d9d9",
-                      borderRadius: 8,
-                      padding: 8,
-                      marginBottom: 8,
-                      position: "relative",
-                      overflow: "hidden",
-                    }}
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                    icon={<SaveOutlined />}
+                    className="submit-button"
                   >
-                    <img
-                      src={img || "/placeholder.svg"}
-                      alt={`preview ${index}`}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: 4,
-                      }}
-                    />
-                    <Button
-                      type="primary"
-                      danger
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      style={{
-                        position: "absolute",
-                        top: 4,
-                        right: 4,
-                        opacity: 0.8,
-                      }}
-                      onClick={() => handleDeleteExistingImage(index)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <Text type="secondary">Không có hình ảnh</Text>
-              )}
-            </div>
-
-            <Text type="secondary" className="mb-2 block">
-              Thêm hình ảnh mới (Tối đa 5MB/ảnh)
-            </Text>
-
-            <Upload {...uploadProps}>
-              <div>
-                <PlusOutlined />
-                <div style={{ marginTop: 8 }}>Tải lên</div>
+                    Cập Nhật
+                  </Button>
+                </motion.div>
               </div>
-            </Upload>
-          </div>
-        </Form>
-      </Spin>
-    </Modal>
+            </Form.Item>
+          </Form>
+        </Spin>
+      </Modal>
+
+      <Modal
+        visible={previewVisible}
+        footer={null}
+        onCancel={() => setPreviewVisible(false)}
+        width="auto"
+        className="image-preview-modal"
+        centered
+      >
+        <img alt="Preview" style={{ maxWidth: "100%", maxHeight: "80vh" }} src={previewImage || "/placeholder.svg"} />
+      </Modal>
+    </>
   )
 }
 

@@ -13,7 +13,7 @@ const LodgingSchema = new mongoose.Schema(
     status: {
       type: Number,
       required: true,
-      default: 0,
+      default: 1,
     },
     detail_address: {
       type: String,

@@ -10,6 +10,7 @@ import {
   Typography,
   Space,
   Tag,
+  Input,
 } from "antd";
 import axios from "axios";
 import {
@@ -35,6 +36,11 @@ const LodgingManagement = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedRecordUpdate, setSelectedRecordUpdate] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [filteredStatus, setFilteredStatus] = useState(null);
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+  };
   useEffect(() => {
     const userId = sessionStorage.getItem("UserId");
     if (!userId) {
@@ -132,10 +138,23 @@ const LodgingManagement = () => {
   // Cột table
   const columns = [
     {
-      title: "Tên phòng",
+      title: (
+        <div>
+          <span style={{ marginRight: 8 }}>Tên phòng</span>
+          <Input
+            placeholder="Tìm kiếm..."
+            value={searchText}
+            onChange={handleSearch}
+            style={{ width: 150 }}
+            size="small"
+          />
+        </div>
+      ),
       dataIndex: "name",
       key: "name",
-      className: "w-50",
+      onFilter: (value, record) =>
+        record.name.toLowerCase().includes(value.toLowerCase()),
+      filteredValue: searchText ? [searchText] : [],
       render: (text) => <span className="font-bold text-blue-500">{text}</span>,
     },
     {
@@ -220,11 +239,14 @@ const LodgingManagement = () => {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
+      filters: [
+        { text: "Chưa ai thuê", value: 1 },
+        { text: "Đã cho thuê", value: 0 },
+      ],
+      onFilter: (value, record) => Number(record.status) === value,
+      filteredValue: filteredStatus !== null ? [filteredStatus] : null,
       render: (status) => (
-        <Tag
-          color={status === 1 ? "green" : "red"}
-          className="text-sm py-1 px-2"
-        >
+        <Tag color={status === 1 ? "green" : "red"} className="text-sm py-1 px-2">
           {status === 1 ? "Chưa ai thuê" : "Đã cho thuê"}
         </Tag>
       ),
@@ -280,6 +302,9 @@ const LodgingManagement = () => {
           loading={loading}
           className="lodging-table"
           rowClassName="lodging-table-row"
+          onChange={(pagination, filters) => {
+            setFilteredStatus(filters.status?.[0] ?? null);
+          }}
         />
       </Card>
       {/* Room Detail Modal Component */}

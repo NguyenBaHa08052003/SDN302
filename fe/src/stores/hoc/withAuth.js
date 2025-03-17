@@ -22,7 +22,7 @@ const withAuth = (WrappedComponent) => {
         Cookies.remove("authToken");
         sessionStorage.removeItem("UserId");
         sessionStorage.removeItem("Role");
-        navigate("/dang-nhap");
+        navigate("/");
         return; 
       }
 

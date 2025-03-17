@@ -4,6 +4,7 @@ const LodgingType = require("../../models/lodgingtype.model");
 const User = require("../../models/user.model");
 const { deleteImagesFromCloudinary } = require("../../utils/cloudinaryUtils");
 const { errorResponse, successResponse } = require("../../utils/response");
+
 module.exports = {
   createLodging: async (req, res) => {
     try {
@@ -17,6 +18,7 @@ module.exports = {
         detail_address,
         type,
       } = req.body;
+
       const imageUrls = req.files.map((file) => file.path);
       if (!name || !price || imageUrls.length === 0) {
         return res
@@ -60,7 +62,7 @@ module.exports = {
         );
         filter.address = { $regex: regexAddress };
       }
-  
+
       // Lọc theo giá
       if (price) {
         const priceRanges = {
@@ -76,7 +78,7 @@ module.exports = {
         const [min, max] = priceRanges[price] || [0, Infinity];
         filter.price = { $gte: min, $lte: max };
       }
-  
+
       // Lọc theo diện tích
       if (area) {
         const areaRanges = {
@@ -90,24 +92,24 @@ module.exports = {
         const [min, max] = areaRanges[area] || [0, Infinity];
         filter.area = { $gte: min, $lte: max };
       }
-  // TEXT {
-  //   filter.type = "id"
-  // }
+      // TEXT {
+      //   filter.type = "id"
+      // }
       // Tính skip dựa trên page
       const skip = (parseInt(page) - 1) * parseInt(limit);
       const total = await Lodging.countDocuments(filter);
-  
+
       // Query Lodging và áp dụng limit nếu có
       const query = Lodging.find(filter).skip(skip);
-  
+
       if (limit) {
         query.limit(parseInt(limit)); // Áp dụng limit nếu limit có giá trị
       }
-  
+
       const listings = await query
         .populate({ path: "type", select: "name -_id" })
         .populate({ path: "user", select: "fullname email phoneNumber -_id" });
-  
+
       res.json({
         total,
         page: parseInt(page),
@@ -118,50 +120,6 @@ module.exports = {
     } catch (error) {
       console.error("Lỗi API:", error);
       res.status(500).json({ message: "Lỗi server" });
-    }
-  },
-  
-
-  updateLogding: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { name, price } = req.body;
-      let lodging = await Lodging.findById(id);
-      if (!lodging)
-        return res.status(404).json({ message: "Lodging không tồn tại" });
-      // Nếu có ảnh mới, xóa ảnh cũ trước
-      if (req.files.length > 0) {
-        await deleteImagesFromCloudinary(lodging.imageUrls);
-      }
-      // Lưu ảnh mới vào database
-      const imageUrls = req.files.map((file) => file.path);
-
-      lodging.name = name || lodging.name;
-      lodging.price = price || lodging.price;
-      lodging.images = imageUrls.length > 0 ? imageUrls : lodging.images;
-      await lodging.save();
-
-      res.json({ message: "Cập nhật thành công", lodging });
-    } catch (error) {
-      res.status(500).json({ message: "Lỗi cập nhật lodging", error });
-    }
-  },
-  deleteLodging: async (req, res) => {
-    try {
-      const { id } = req.params;
-      console.log(id);
-      let lodging = await Lodging.findById(id);
-      console.log(lodging);
-
-      if (!lodging)
-        return res.status(404).json({ message: "Lodging không tồn tại" });
-      // Xóa tất cả ảnh của lodging trên Cloudinary
-      await deleteImagesFromCloudinary(lodging.imageUrls);
-      // Xóa lodging trong database
-      await Lodging.findByIdAndDelete(id);
-      res.json({ message: "Xóa thành công" });
-    } catch (error) {
-      res.status(500).json({ message: "Lỗi khi xóa lodging", error });
     }
   },
 
@@ -183,7 +141,7 @@ module.exports = {
       }
       const lodgings = await Lodging.find({ user: userId }).populate({
         path: "type",
-        select: "name -_id",
+        select: "name _id",
       });
       return successResponse(res, lodgings, {}, 200, "Lấy dữ liệu thành công");
     } catch (error) {
@@ -192,18 +150,15 @@ module.exports = {
   },
   updateStatusLoding: async (req, res) => {
     try {
-      
       const { id } = req.params;
       const { status, userId } = req.body;
       console.log(status, userId);
 
       // Validate input
       if (status !== 0 && status !== 1) {
-        return res
-          .status(400)
-          .json({
-            message: "Trạng thái không hợp lệ. Chỉ chấp nhận giá trị 0 hoặc 1.",
-          });
+        return res.status(400).json({
+          message: "Trạng thái không hợp lệ. Chỉ chấp nhận giá trị 0 hoặc 1.",
+        });
       }
       // Validate id is a valid ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -212,12 +167,9 @@ module.exports = {
       // Check if the lodging exists and belongs to the user
       const lodging = await Lodging.findOne({ _id: id, user: userId });
       if (!lodging) {
-        return res
-          .status(404)
-          .json({
-            message:
-              "Không tìm thấy phòng trọ hoặc bạn không có quyền cập nhật.",
-          });
+        return res.status(404).json({
+          message: "Không tìm thấy phòng trọ hoặc bạn không có quyền cập nhật.",
+        });
       }
       lodging.status = status;
       await lodging.save();
@@ -232,6 +184,74 @@ module.exports = {
       return res
         .status(500)
         .json({ message: "Lỗi server khi cập nhật trạng thái phòng." });
+    }
+  },
+
+  updateLodging: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const {
+        name,
+        description,
+        title,
+        price,
+        area,
+        detail_address,
+        existingImages,
+      } = req.body;
+      const filteredImages = existingImages.filter((img) => img !== "undefined");
+      console.log("dang filter", filteredImages);
+      
+      const address = req.body.location || req.body.address;
+      const newImageFiles = req.files || [];
+      const newImageUrls = [];
+      if (newImageFiles.length > 0) {
+        newImageFiles.forEach((file) => {
+          newImageUrls.push(file.path);
+        });
+      }
+      const allImages = [...filteredImages, ...newImageUrls];
+      if (allImages.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one image is required",
+        });
+      }
+      const updateData = {
+        name,
+        description,
+        title,
+        price,
+        area,
+        detail_address,
+        images: allImages,
+      };
+      if (address) {
+        updateData.address = address;
+      }
+      console.log("Update data:", updateData);
+      const updatedLodging = await Lodging.findByIdAndUpdate(id, updateData, {
+        new: true,
+      });
+
+      if (!updatedLodging) {
+        return res.status(404).json({
+          success: false,
+          message: "Lodging not found",
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Lodging updated successfully",
+        data: updatedLodging,
+      });
+    } catch (error) {
+      console.error("Error updating lodging:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update lodging",
+        error: error.message,
+      });
     }
   },
 };

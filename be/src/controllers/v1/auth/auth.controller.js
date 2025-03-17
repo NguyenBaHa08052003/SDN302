@@ -7,6 +7,7 @@ const {
 } = require("../../../utils/jwt");
 const BlackLists = require("../../../models/blacklist.model");
 const Provider = require("../../../models/provider.model");
+const OTP = require("../../../models/otp.model");
 
 module.exports = {
   register: async (req, res) => {
@@ -148,6 +149,76 @@ module.exports = {
         success: false,
         message: "Server chết",
       });
+    }
+  },
+  forgotPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      // Kiểm tra email có tồn tại không
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: "Email không tồn tại" });
+      }
+
+      // Tạo OTP ngẫu nhiên (6 chữ số)
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = Date.now() + 5 * 60 * 1000; // Hết hạn sau 5 phút
+
+      // Xóa OTP cũ nếu có
+      await OTP.deleteMany({ email });
+
+      // Lưu OTP mới vào database
+      await OTP.create({ email, otp, expiresAt });
+
+      // Gửi email OTP cho người dùng
+      await sendEmail(
+        email,
+        "Mã OTP đặt lại mật khẩu",
+        `<h2>Mã OTP của bạn là: <b>${otp}</b></h2>
+         <p>OTP này sẽ hết hạn sau 5 phút. Không chia sẻ mã này với bất kỳ ai.</p>`
+      );
+
+      return res.json({ message: "Mã OTP đã được gửi qua email" });
+
+    } catch (error) {
+      return res.status(500).json({ message: "Lỗi server" });
+    }
+  },
+
+  // 🔵 Xác thực OTP & đặt lại mật khẩu mới
+  resetPassword: async (req, res) => {
+    try {
+      const { email, otp } = req.body;
+
+      // Kiểm tra OTP hợp lệ không
+      const otpRecord = await OTP.findOne({ email, otp });
+      if (!otpRecord || otpRecord.expiresAt < Date.now()) {
+        return res.status(400).json({ message: "OTP không hợp lệ hoặc đã hết hạn" });
+      }
+
+      // Tạo mật khẩu mới ngẫu nhiên
+      const randomPassword = Math.random().toString(36).slice(-8);
+      const hashPassword = await hashMake(randomPassword);
+
+      // Cập nhật mật khẩu mới cho user
+      await User.updateOne({ email }, { password: hashPassword });
+
+      // Xóa OTP sau khi sử dụng
+      await OTP.deleteOne({ email, otp });
+
+      // Gửi email chứa mật khẩu mới
+      await sendEmail(
+        email,
+        "Mật khẩu mới của bạn",
+        `<h2>Mật khẩu mới của bạn là: <b>${randomPassword}</b></h2>
+         <p>Hãy đăng nhập và đổi mật khẩu ngay lập tức để bảo mật tài khoản.</p>`
+      );
+
+      return res.json({ message: "Mật khẩu đã được đặt lại. Vui lòng kiểm tra email." });
+
+    } catch (error) {
+      return res.status(500).json({ message: "Lỗi server" });
     }
   },
 };

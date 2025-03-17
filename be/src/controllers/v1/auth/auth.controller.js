@@ -59,15 +59,15 @@ module.exports = {
   login: async (req, res) => {
     try {
       const body = req.body;
-      let userSchema = object({
-        email: string().required("Email hoặc mật khẩu không chính xác").email("Email hoặc mật khẩu không chính xác"),
-        password: string()
-          .required()
-          .min(8, "Email hoặc mật khẩu không chính xác"),
-      });
-      await userSchema.validate(body, {
-        abortEarly: false,
-      });
+      // let userSchema = object({
+      //   email: string().required("Email hoặc mật khẩu không chính xác").email("Email hoặc mật khẩu không chính xác"),
+      //   password: string()
+      //     .required()
+      //     .min(8, "Email hoặc mật khẩu không chính xác"),
+      // });
+      // await userSchema.validate(body, {
+      //   abortEarly: false,
+      // });
       console.log(body);
       const provider = await Provider.findOne({ name: "email" });
       const user = await User.findOne({ email: body.email, provider: provider._id }).populate({
@@ -197,31 +197,34 @@ module.exports = {
     }
   },
 
-  // 🔵 Xác thực OTP & đặt lại mật khẩu mới (chỉ cho phép tài khoản đăng ký bằng email/password)
   resetPassword: async (req, res) => {
     try {
-      const { email, otp } = req.body;
+      const { email, otp, newPassword } = req.body;
 
-      // Kiểm tra OTP hợp lệ không
-      const otpRecord = await OTP.findOne({ email, otp });
-      if (!otpRecord || otpRecord.expiresAt < Date.now()) {
-        return res.status(400).json({ message: "OTP không hợp lệ hoặc đã hết hạn" });
-      }
-
-      // Kiểm tra tài khoản có đăng ký bằng email/password không
+      // Kiểm tra email có tồn tại không
       const user = await User.findOne({ email }).populate("provider");
       if (!user) {
         return res.status(404).json({ message: "Người dùng không tồn tại" });
       }
 
+      // Kiểm tra tài khoản có đăng ký bằng email/password không
       const emailProvider = await Provider.findOne({ name: "email" });
       if (!user.provider || user.provider._id.toString() !== emailProvider._id.toString()) {
         return res.status(403).json({ message: "Tài khoản này không thể đặt lại mật khẩu bằng email" });
       }
 
-      // Tạo mật khẩu mới ngẫu nhiên
-      const randomPassword = Math.random().toString(36).slice(-8);
-      const hashPassword = await hashMake(randomPassword);
+      // Kiểm tra OTP hợp lệ không
+      const otpRecord = await OTP.findOne({ email, otp });
+      if (!otpRecord) {
+        return res.status(400).json({ message: "OTP không hợp lệ" });
+      }
+      if (otpRecord.expiresAt < Date.now()) {
+        await OTP.deleteOne({ email, otp }); // Xóa OTP đã hết hạn
+        return res.status(400).json({ message: "OTP đã hết hạn" });
+      }
+
+      // Băm mật khẩu mới
+      const hashPassword = await hashMake(newPassword);
 
       // Cập nhật mật khẩu mới cho user
       await User.updateOne({ email }, { password: hashPassword });
@@ -229,18 +232,12 @@ module.exports = {
       // Xóa OTP sau khi sử dụng
       await OTP.deleteOne({ email, otp });
 
-      // Gửi email chứa mật khẩu mới
-      await sendEmail(
-        email,
-        "Mật khẩu mới của bạn",
-        `<h2>Mật khẩu mới của bạn là: <b>${randomPassword}</b></h2>
-         <p>Hãy đăng nhập và đổi mật khẩu ngay lập tức để bảo mật tài khoản.</p>`
-      );
-
-      return res.json({ message: "Mật khẩu đã được đặt lại. Vui lòng kiểm tra email." });
+      return res.json({ message: "Mật khẩu đã được đặt lại thành công. Hãy đăng nhập!" });
 
     } catch (error) {
+      console.log("Lỗi reset password:", error);
       return res.status(500).json({ message: "Lỗi server" });
     }
-  },
+  }
+
 };

@@ -59,25 +59,22 @@ module.exports = {
   login: async (req, res) => {
     try {
       const body = req.body;
-      // let userSchema = object({
-      //   email: string().required("Email hoặc mật khẩu không chính xác").email("Email hoặc mật khẩu không chính xác"),
-      //   password: string()
-      //     .required()
-      //     .min(8, "Email hoặc mật khẩu không chính xác"),
-      // });
-      // await userSchema.validate(body, {
-      //   abortEarly: false,
-      // });
-      console.log(body);
+      let userSchema = object({
+        email: string().required("Email hoặc mật khẩu không chính xác").email("Email hoặc mật khẩu không chính xác"),
+        password: string()
+          .required()
+          .min(8, "Email hoặc mật khẩu không chính xác"),
+      });
+      await userSchema.validate(body, {
+        abortEarly: false,
+      });
       const provider = await Provider.findOne({ name: "email" });
       const user = await User.findOne({ email: body.email, provider: provider._id }).populate({
         path: "role",
         select: "name -_id",
       });
-      console.log(user);
 
       if (!user) {
-        console.log("hello");
         return res.status(400).json({
           message: "Email hoặc mật khẩu không chính xác",
         });
@@ -191,8 +188,6 @@ module.exports = {
       return res.json({ message: "Mã OTP đã được gửi qua email" });
 
     } catch (error) {
-      console.log(error);
-      
       return res.status(500).json({ message: "Lỗi server" });
     }
   },
@@ -200,6 +195,15 @@ module.exports = {
   resetPassword: async (req, res) => {
     try {
       const { email, otp, newPassword } = req.body;
+      let userSchema = object({
+        email: string().required("Email hoặc mật khẩu không chính xác").email("Email hoặc mật khẩu không chính xác"),
+        newPassword: string()
+          .required()
+          .min(8, "Email hoặc mật khẩu không chính xác"),
+      });
+      await userSchema.validate(body, {
+        abortEarly: false,
+      });
 
       // Kiểm tra email có tồn tại không
       const user = await User.findOne({ email }).populate("provider");
@@ -235,7 +239,6 @@ module.exports = {
       return res.json({ message: "Mật khẩu đã được đặt lại thành công. Hãy đăng nhập!" });
 
     } catch (error) {
-      console.log("Lỗi reset password:", error);
       return res.status(500).json({ message: "Lỗi server" });
     }
   }

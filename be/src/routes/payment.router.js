@@ -10,11 +10,9 @@ const ENDPOINT = "https://sb-openapi.zalopay.vn/v2/create";
 router.post("/create-payment", async (req, res) => {
   try {
     const { amount, description } = req.body;
-
     const app_trans_id = `${moment().format("YYMMDD")}_${Math.floor(
       Math.random() * 1000000
     )}`;
-
     const order = {
       app_id: APP_ID,
       app_user: "demo_user",
@@ -25,15 +23,18 @@ router.post("/create-payment", async (req, res) => {
       item: "[]",
       description: description || `Payment for Order ${app_trans_id}`,
       bank_code: "",
-      callback_url: "http://localhost:5000/payment-callback",
+      callback_url: "http://localhost:3001/api/payment/payment-callback",
     };
-
     const dataString = `${APP_ID}|${order.app_trans_id}|${order.app_user}|${order.amount}|${order.app_time}|${order.embed_data}|${order.item}`;
+    console.log(dataString);
+    
     order.mac = crypto
       .createHmac("sha256", KEY_1)
       .update(dataString)
       .digest("hex");
     const response = await axios.post(ENDPOINT, order);
+    console.log(response.data);
+    
     return res.json(response.data);
   } catch (error) {
     console.error("Payment error:", error);

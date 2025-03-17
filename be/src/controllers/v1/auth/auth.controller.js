@@ -156,9 +156,15 @@ module.exports = {
       const { email } = req.body;
 
       // Kiểm tra email có tồn tại không
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).populate("provider");
       if (!user) {
         return res.status(404).json({ message: "Email không tồn tại" });
+      }
+
+      // Kiểm tra tài khoản có đăng ký bằng email/password không
+      const emailProvider = await Provider.findOne({ name: "email" });
+      if (!user.provider || user.provider._id.toString() !== emailProvider._id.toString()) {
+        return res.status(403).json({ message: "Tài khoản này không thể đặt lại mật khẩu bằng email" });
       }
 
       // Tạo OTP ngẫu nhiên (6 chữ số)
@@ -186,7 +192,7 @@ module.exports = {
     }
   },
 
-  // 🔵 Xác thực OTP & đặt lại mật khẩu mới
+  // 🔵 Xác thực OTP & đặt lại mật khẩu mới (chỉ cho phép tài khoản đăng ký bằng email/password)
   resetPassword: async (req, res) => {
     try {
       const { email, otp } = req.body;
@@ -195,6 +201,17 @@ module.exports = {
       const otpRecord = await OTP.findOne({ email, otp });
       if (!otpRecord || otpRecord.expiresAt < Date.now()) {
         return res.status(400).json({ message: "OTP không hợp lệ hoặc đã hết hạn" });
+      }
+
+      // Kiểm tra tài khoản có đăng ký bằng email/password không
+      const user = await User.findOne({ email }).populate("provider");
+      if (!user) {
+        return res.status(404).json({ message: "Người dùng không tồn tại" });
+      }
+
+      const emailProvider = await Provider.findOne({ name: "email" });
+      if (!user.provider || user.provider._id.toString() !== emailProvider._id.toString()) {
+        return res.status(403).json({ message: "Tài khoản này không thể đặt lại mật khẩu bằng email" });
       }
 
       // Tạo mật khẩu mới ngẫu nhiên

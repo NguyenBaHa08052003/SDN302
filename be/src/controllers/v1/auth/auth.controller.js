@@ -8,6 +8,8 @@ const {
 const BlackLists = require("../../../models/blacklist.model");
 const Provider = require("../../../models/provider.model");
 const OTP = require("../../../models/otp.model");
+const sendEmail = require('../../../utils/email');
+
 
 module.exports = {
   register: async (req, res) => {
@@ -154,6 +156,7 @@ module.exports = {
   forgotPassword: async (req, res) => {
     try {
       const { email } = req.body;
+      
 
       // Kiểm tra email có tồn tại không
       const user = await User.findOne({ email }).populate("provider");
@@ -188,6 +191,8 @@ module.exports = {
       return res.json({ message: "Mã OTP đã được gửi qua email" });
 
     } catch (error) {
+      console.log(error);
+      
       return res.status(500).json({ message: "Lỗi server" });
     }
   },

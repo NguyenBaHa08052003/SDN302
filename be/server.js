@@ -62,6 +62,7 @@ app.use(express.json());
 app.use('/api', apiRouter);
 
 app.use((req, res, next) => {
+  console.log(err);
   res.status(404);
   if (process.env.NODE_ENV === "production") {
     return res.status(404).json({
@@ -74,6 +75,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log(err);
   res.status(err.status || 500);
   if (process.env.NODE_ENV === "production") {
     res.status(500).json({

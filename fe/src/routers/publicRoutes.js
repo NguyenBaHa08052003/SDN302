@@ -10,6 +10,7 @@ import NotFound from "../pages/not_found/NotFound";
 import RoomRental from "../pages/Home/Details/RoomRental"
 import RoomDetail from "../pages/Home/Details/RoomDetail";
 import VerifyUserPage from "../pages/admin/VerifyUserPage";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 export const publicRoutes = (
   <>
     <Route path="*" element={<NotFound />} />
@@ -24,6 +25,7 @@ export const publicRoutes = (
     <Route element={<AuthLayout />}>
       <Route element={<GuestMiddleware />}>
         <Route path="/dang-nhap" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
     </Route>
   </>

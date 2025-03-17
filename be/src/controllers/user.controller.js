@@ -54,6 +54,8 @@ module.exports = {
     },
     getFavoriteLodging: async (req, res) => {
         const id = req.params.id;
+        console.log(id);
+        
         const { page, limit } = req.query;
         try {
             const user = await User.findById(id).populate('favLodging')

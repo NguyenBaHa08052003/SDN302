@@ -50,9 +50,7 @@ module.exports = {
       // Giả sử limit mặc định là 5, bạn có thể thay đổi giá trị này thành 8 nếu cần
       const { price, address, area, page = 1, limit = null } = req.query;
       console.log(req.query.address);
-
-      const filter = { status: 0 };
-
+      const filter = { status: 1 };
       // Lọc theo địa chỉ
       if (address) {
         const regexAddress = new RegExp(

@@ -51,7 +51,7 @@ const LodgingManagement = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:3000/api/lodgings/${JSON.parse(userId)}/users`
+          `http://localhost:3000/api/lodgings/${userId}/users`
         );
         setLodgings(res.data);
         setFilteredLodgings(res?.data?.data || []);
@@ -324,7 +324,7 @@ const LodgingManagement = () => {
             if (userId) {
               setLoading(true)
               axios
-                .get(`http://localhost:3000/api/lodgings/${JSON.parse(userId)}/users`)
+                .get(`http://localhost:3000/api/lodgings/${userId}/users`)
                 .then((res) => {
                   setLodgings(res.data)
                   setFilteredLodgings(res?.data?.data || [])

@@ -33,4 +33,7 @@ router.get("/google/callback", passport.authenticate("google", {failureRedirect:
     return res.redirect(`${process.env.FRONTEND_URL}/dang-nhap?error=Server Error`);
   }
 });
+
+router.post("/forgot-password", authController.forgotPassword);
+router.post("/reset-password", authController.resetPassword);
 module.exports = router;

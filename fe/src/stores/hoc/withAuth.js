@@ -29,7 +29,7 @@ const withAuth = (WrappedComponent) => {
       if (token) {
         const decode = jwtDecode(token);
         if (decode.userId && !sessionStorage.getItem("UserId")) {
-          sessionStorage.setItem("UserId", JSON.stringify(decode.userId));
+          sessionStorage.setItem("UserId", decode.userId);
         }
         dispatch(fetchUser(token));
       }

@@ -9,6 +9,7 @@ module.exports = class extends Transformer {
             role: instance.role.name,
             image: instance.imageUrl,
             phoneNumber: instance.phoneNumber,
+            favoriteLodging: instance.favLodging,
             address: instance.address,
             createAt: instance.created_at,
             updateAt: instance.updated_at

@@ -50,7 +50,9 @@ module.exports = {
       // Giả sử limit mặc định là 5, bạn có thể thay đổi giá trị này thành 8 nếu cần
       const { price, address, area, page = 1, limit = null } = req.query;
       console.log(req.query.address);
-      const filter = {};
+
+      const filter = { status: 0 };
+
       // Lọc theo địa chỉ
       if (address) {
         const regexAddress = new RegExp(
@@ -174,9 +176,8 @@ module.exports = {
       lodging.status = status;
       await lodging.save();
       return res.status(200).json({
-        message: `Đã ${
-          status === 1 ? "mở" : "đóng"
-        } trạng thái phòng thành công.`,
+        message: `Đã ${status === 1 ? "mở" : "đóng"
+          } trạng thái phòng thành công.`,
         status,
       });
     } catch (error) {

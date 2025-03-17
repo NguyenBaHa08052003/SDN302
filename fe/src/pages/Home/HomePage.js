@@ -103,7 +103,7 @@ function HomePage() {
       </div>
       <div>
         {/* // content home page */}
-        <ContentHome />
+        <ContentHome user={user} />
       </div>
     </>
   );

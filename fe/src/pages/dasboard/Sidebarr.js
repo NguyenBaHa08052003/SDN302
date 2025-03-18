@@ -39,7 +39,11 @@ const Sidebarr = () => {
         text: "Thông tin cá nhân",
         path: "/quan-ly/tai-khoan",
       },
-      { icon: <RightOutlined className="mr-3" />, text: "Đổi mật khẩu", path: "/doi-mat-khau" },
+      {
+        icon: <RightOutlined className="mr-3" />,
+        text: "Đổi mật khẩu",
+        path: "/quan-ly/doi-mat-khau",
+      },
       {
         icon: <FileTextOutlined className="mr-3" />,
         text: "Quản lý bài đăng",
@@ -68,38 +72,42 @@ const Sidebarr = () => {
 
   // Điều hướng có kiểm tra quyền
   const handleNavigation = (path) => {
-    if (userRole !== "Landlord" && path !== "/quan-ly/tai-khoan") {
+    if (userRole !== "Landlord" && path !== "/quan-ly/tai-khoan"  && path !== "/quan-ly/tai-khoan" && path !== "/quan-ly/doi-mat-khau") {
       const toastId = "custom-toast";
-if (!toast.isActive(toastId)) {
-  toast.error(
-    <div>
-      <p>Bạn cần đăng ký trở thành <span style={{ color: "blue" , fontWeight: "bold"}}>chủ trọ</span> để sử dụng chức năng này?</p>
-      <div className="flex justify-end mt-2">
-        <button
-          onClick={() => {
-            toast.dismiss(toastId);
-            navigate("/quan-ly/nap-tien");
-          }}
-          className="bg-red-500 text-white px-3 py-1 rounded-md mr-2 hover:bg-red-600 "
-        >
-          OK
-        </button>
-        <button
-          onClick={() => toast.dismiss(toastId)}
-          className="bg-gray-300 px-3 py-1 rounded-md"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>,
-    {
-      autoClose: false,
-      closeOnClick: false,
-      toastId,
-      position: "top-right", 
-    }
-  );
-}
+      if (!toast.isActive(toastId)) {
+        toast.error(
+          <div>
+            <p>
+              Bạn cần đăng ký trở thành{" "}
+              <span style={{ color: "blue", fontWeight: "bold" }}>chủ trọ</span>{" "}
+              để sử dụng chức năng này?
+            </p>
+            <div className="flex justify-end mt-2">
+              <button
+                onClick={() => {
+                  toast.dismiss(toastId);
+                  navigate("/quan-ly/nap-tien");
+                }}
+                className="bg-red-500 text-white px-3 py-1 rounded-md mr-2 hover:bg-red-600 "
+              >
+                OK
+              </button>
+              <button
+                onClick={() => toast.dismiss(toastId)}
+                className="bg-gray-300 px-3 py-1 rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>,
+          {
+            autoClose: false,
+            closeOnClick: false,
+            toastId,
+            position: "top-right",
+          }
+        );
+      }
     } else {
       navigate(path);
     }
@@ -111,7 +119,9 @@ if (!toast.isActive(toastId)) {
       <div className="flex flex-col items-center">
         <img
           className="w-12 h-12 rounded-full"
-          src={userCurren?.data?.image || "https://example.com/default-avatar.jpg"}
+          src={
+            userCurren?.data?.image || "https://example.com/default-avatar.jpg"
+          }
           alt="Profile"
         />
         <h2 className="text-lg font-semibold mt-2">{userCurren?.data?.name}</h2>
@@ -124,9 +134,12 @@ if (!toast.isActive(toastId)) {
         <button className="w-full bg-red-500 text-white py-2 rounded-lg mb-2">
           Tạo tin
         </button>
-        <button onClick={() => {
+        <button
+          onClick={() => {
             navigate("/quan-ly/nap-tien");
-          }} className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg mb-4">
+          }}
+          className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg mb-4"
+        >
           Nạp tiền
         </button>
       </div>
@@ -137,12 +150,18 @@ if (!toast.isActive(toastId)) {
             <div
               className="flex items-center p-2 cursor-pointer hover:bg-gray-100 rounded-md"
               onClick={() =>
-                item.isDropdown ? toggleDropdown(index) : handleNavigation(item.path)
+                item.isDropdown
+                  ? toggleDropdown(index)
+                  : handleNavigation(item.path)
               }
             >
               {item.icon}
               <span
-                className={`ml-2 ${lastSegment === item.path?.split("/").pop() ? "text-red-500" : "text-black"}`}
+                className={`ml-2 ${
+                  lastSegment === item.path?.split("/").pop()
+                    ? "text-red-500"
+                    : "text-black"
+                }`}
               >
                 {item.text}
               </span>
@@ -164,7 +183,9 @@ if (!toast.isActive(toastId)) {
                     {child.icon}
                     <span
                       className={`ml-2 ${
-                        lastSegment === child.path?.split("/").pop() ? "text-red-500" : "text-black"
+                        lastSegment === child.path?.split("/").pop()
+                          ? "text-red-500"
+                          : "text-black"
                       }`}
                     >
                       {child.text}

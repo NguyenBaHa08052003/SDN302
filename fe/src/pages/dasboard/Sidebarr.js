@@ -39,6 +39,7 @@ const Sidebarr = () => {
         text: "Thông tin cá nhân",
         path: "/quan-ly/tai-khoan",
       },
+      { icon: <RightOutlined className="mr-3" />, text: "Đổi mật khẩu", path: "/doi-mat-khau" },
       {
         icon: <FileTextOutlined className="mr-3" />,
         text: "Quản lý bài đăng",

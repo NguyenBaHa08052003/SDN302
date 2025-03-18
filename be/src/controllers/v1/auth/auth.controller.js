@@ -236,6 +236,57 @@ module.exports = {
     } catch (error) {
       return res.status(500).json({ message: "Lỗi server" });
     }
+  },
+
+  changePassword: async (req, res) => {
+    try {
+      const { email, oldPassword, newPassword } = req.body;
+
+      // Validate dữ liệu nhập vào
+      const userSchema = object({
+        email: string().required("Email không hợp lệ").email("Email không hợp lệ"),
+        oldPassword: string().required("Vui lòng nhập mật khẩu cũ"),
+        newPassword: string().required().min(8, "Mật khẩu mới phải có ít nhất 8 ký tự"),
+      });
+      await userSchema.validate(req.body, { abortEarly: false });
+
+      const userToken = req.user;
+
+      if (userToken.email !== email) {
+        return res.status(400).json({ message: "Email không trùng khớp" });
+      }
+
+      // Kiểm tra tài khoản có tồn tại không
+      const user = await User.findOne({ email }).populate("provider");
+      if (!user) {
+        return res.status(404).json({ message: "Người dùng không tồn tại" });
+      }
+
+      // Kiểm tra tài khoản có đăng ký bằng email/password không
+      const emailProvider = await Provider.findOne({ name: "email" });
+      if (!user.provider || user.provider._id.toString() !== emailProvider._id.toString()) {
+        return res.status(403).json({ message: "Tài khoản này không thể thay đổi mật khẩu" });
+      }
+
+      // Kiểm tra mật khẩu cũ có đúng không
+      const isMatch = await hashCheck(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Mật khẩu cũ không chính xác" });
+      }
+
+      // Băm mật khẩu mới
+      const hashedPassword = await hashMake(newPassword);
+
+      // Cập nhật mật khẩu mới
+      await User.updateOne({ email }, { password: hashedPassword });
+
+      return res.json({ message: "Mật khẩu đã được cập nhật thành công!" });
+
+    } catch (error) {
+      console.error("Lỗi changePassword:", error);
+      return res.status(500).json({ message: "Lỗi server" });
+    }
   }
+
 
 };

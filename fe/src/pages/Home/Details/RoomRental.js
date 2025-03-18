@@ -37,7 +37,7 @@ const RoomRental = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        dispatch(fetchLodgings(null));
+        dispatch(fetchLodgings({limit: 8}));
       } catch (error) {
         console.error("Lỗi khi lấy danh sách phòng:", error);
       }

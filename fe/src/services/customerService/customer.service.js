@@ -30,4 +30,29 @@ const getInforUser = async (idCus, token) => {
     }
 }
 
-export { updateUserr, getInforUser }
+const getFavoriteLodging = async (id, token) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/api/users/favorite/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        })
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+const addFavoriteLodging = async (id, lodgingId, token) => {
+    try {
+        const response = await axios.post(`http://localhost:3000/api/users/favorite/${id}`, { lodgingId: lodgingId }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        })
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+export { updateUserr, getInforUser, addFavoriteLodging, getFavoriteLodging }

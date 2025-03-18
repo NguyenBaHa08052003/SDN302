@@ -15,7 +15,6 @@ function AuthMiddleware() {
   const loading = useLoading();
   useEffect(() => {
     if (!error?.success && error?.message === "Bạn không có quyền truy cập") {
-      console.log("hello");
       Cookies.remove("authToken");
       toast.error(
         "Hệ thống không nhận diện được tài khoản của bạn!. Mọi quá trình thao tác của bạn đã được ghi lại. Vui lòng đăng nhập để sử dụng hệ thống.",

@@ -46,6 +46,10 @@ const UserTable = (props) => {
   });
 
   const openRoleModal = (user) => {
+    if (user?.role?.name == 'Admin') {
+      toast.error('Không thể thay đổi role của Admin', { position: "top-center" });
+      return;
+    }
     setSelectedUser(user);
     setIsOpen(true);
   };
@@ -55,11 +59,9 @@ const UserTable = (props) => {
       if (!selectedUser) return;
       const updateU = await updateUser(selectedUser._id, { role: newRole }, token);
       if (updateU) {
-        toast.success(`Role updated to ${roles.find((role) => role._id === newRole).name}`, {
+        toast.success(`Role updated to ${roles.find((role) => role._id === newRole)?.name}`, {
           position: "top-center",
         });
-        console.log(updateU);
-
         setUsers(users.map((user) => (user._id === selectedUser._id ? updateU?.data : user)));
         setIsOpen(false);
       }
@@ -68,6 +70,10 @@ const UserTable = (props) => {
     }
   };
   const handleUpdate = async (idUser, data, type) => {
+    if (data?.role?.name == 'Admin') {
+      toast.error('Không thể thay đổi quyền của Admin', { position: "top-center" });
+      return;
+    }
     try {
       if (
         window.confirm("Bạn có thật sự muốn thay đổi status của tài khoản này?")
@@ -113,7 +119,7 @@ const UserTable = (props) => {
                 <td className="border p-2">{user?.fullname ?? "N/A"}</td>
                 <td className="border p-2">{user?.email ?? "N/A"}</td>
                 <td className="border p-2">{user?.phoneNumber ?? "N/A"}</td>
-                <td className="border p-2">{user?.role.name ?? "N/A"}</td>
+                <td className="border p-2">{user?.role?.name ?? "N/A"}</td>
                 <td
                   className={`border p-2 ${user?.status ? "text-green-500" : "text-red-500"
                     }`}

@@ -18,7 +18,7 @@ export const publicRoutes = (
       <Route path="/lodging" element={<LodgingPage />} />
       <Route path="/loging/room-rental" element={<RoomRental />} />
       <Route path="/loging/room-rental/room-detail/:id" element={<RoomDetail />} />
-      <Route path="/verify-account/:id" element={<VerifyUserPage />} />
+      <Route path="/verify-account/:id" element={<VerifyUserPage/>} />
     </Route>
 
     <Route element={<AuthLayout />}>

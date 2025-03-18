@@ -1,9 +1,291 @@
-import React from 'react'
+"use client";
 
-function LodgingManagement() {
+import { useEffect, useState } from "react";
+import {
+  Table,
+  InputNumber,
+  Tooltip,
+  Button,
+  Card,
+  Typography,
+  Space,
+  Tag,
+} from "antd";
+import axios from "axios";
+import {
+  EditOutlined,
+  EyeOutlined,
+  LockOutlined,
+  UnlockOutlined,
+  HomeOutlined,
+} from "@ant-design/icons";
+import { Header, Stats } from "./LayoutLodgingManagement/Layout";
+import RoomDetailModal from "./LayoutLodgingManagement/room-detail-modal";
+import "./lodging-management.css";
+import { toast } from "react-toastify";
+
+const { Title } = Typography;
+
+const LodgingManagement = () => {
+  const [lodgings, setLodgings] = useState({ data: [] });
+  const [filteredLodgings, setFilteredLodgings] = useState([]);
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const userId = sessionStorage.getItem("UserId");
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `http://localhost:3000/api/lodgings/${JSON.parse(userId)}/users`
+        );
+        setLodgings(res.data);
+        setFilteredLodgings(res?.data?.data || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+  // Hàm lọc theo giá và diện tích
+  const handleFilter = (key, minValue, maxValue) => {
+    if (
+      (minValue === undefined || minValue === null || minValue === "") &&
+      (maxValue === undefined || maxValue === null || maxValue === "")
+    ) {
+      setFilteredLodgings(lodgings?.data);
+      return;
+    }
+
+    const newData = lodgings?.data?.filter((item) => {
+      const value = item[key];
+      const isValidMin =
+        minValue === undefined || minValue === "" || value >= minValue;
+      const isValidMax =
+        maxValue === undefined || maxValue === "" || value <= maxValue;
+      return isValidMin && isValidMax;
+    });
+
+    setFilteredLodgings(newData);
+  };
+
+  // Hàm xử lý xem chi tiết phòng
+  const handleViewDetail = (record) => {
+    setSelectedRecord(record);
+    setIsDetailModalVisible(true);
+  };
+
+  const handleEditRoom = (record) => {
+    console.log("Chỉnh sửa phòng:", record);
+    // Implement edit functionality
+  };
+
+  const handleToggleRoomStatus = async (record) => {
+     if(window.confirm("Bạn có chắc muốn thay đổi trạng thái?")){
+      try {
+        setLoading(true);
+        const newStatus = record.status === 1 ? 0 : 1;
+        const statusText = newStatus === 1 ? "mở" : "đóng";
+        const response = await axios.put(
+          `http://localhost:3000/api/lodgings/${record._id}/toggle-status`,
+          {
+            status: newStatus,
+            userId: record.user,
+          }
+        );
+        if (response.status === 200) {
+          const updatedLodgings = lodgings.data.map((item) =>
+            item._id === record._id ? { ...item, status: newStatus } : item
+          );
+          setLodgings({ ...lodgings, data: updatedLodgings });
+          setFilteredLodgings(updatedLodgings);
+          toast.success(
+            `Đã ${statusText} trạng thái phòng "${record.name}" thành công!`
+          );
+        }
+      } catch (error) {
+        console.error("Lỗi khi cập nhật trạng thái phòng:", error);
+        toast.error("Không thể cập nhật trạng thái phòng. Vui lòng thử lại sau.");
+      } finally {
+        setLoading(false);
+      }
+     }
+  };
+
+  // Hàm xử lý đóng modal
+  const handleCloseModal = () => {
+    setIsDetailModalVisible(false);
+    setIsUpdateModalVisible(false);
+  };
+  // Cột table
+  const columns = [
+    {
+      title: "Tên phòng",
+      dataIndex: "name",
+      key: "name",
+      className: "w-50",
+      render: (text) => <span className="font-bold text-blue-500">{text}</span>,
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+      ellipsis: true,
+    },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
+      sorter: (a, b) => a.price - b.price,
+      render: (price) => (
+        <p>
+          <span style={{ color: "red" }}>{price.toLocaleString("vi-VN")}</span>{" "}
+          VND
+        </p>
+      ),
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div style={{ padding: 8 }}>
+          <InputNumber
+            placeholder="Tối thiểu"
+            value={selectedKeys[0]}
+            onChange={(value) => {
+              const newKeys = [value, selectedKeys[1]];
+              setSelectedKeys(newKeys);
+              handleFilter("price", newKeys[0], newKeys[1]);
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+          <InputNumber
+            placeholder="Tối đa"
+            value={selectedKeys[1]}
+            onChange={(value) => {
+              const newKeys = [selectedKeys[0], value];
+              setSelectedKeys(newKeys);
+              handleFilter("price", newKeys[0], newKeys[1]);
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+        </div>
+      ),
+    },
+    {
+      title: "Diện tích (m²)",
+      dataIndex: "area",
+      key: "area",
+      sorter: (a, b) => a.area - b.area,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
+        <div style={{ padding: 8 }}>
+          <InputNumber
+            placeholder="Tối thiểu"
+            value={selectedKeys[0]}
+            onChange={(value) => {
+              const newKeys = [value, selectedKeys[1]];
+              setSelectedKeys(newKeys);
+              handleFilter("area", newKeys[0], newKeys[1]);
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+          <InputNumber
+            placeholder="Tối đa"
+            value={selectedKeys[1]}
+            onChange={(value) => {
+              const newKeys = [selectedKeys[0], value];
+              setSelectedKeys(newKeys);
+              handleFilter("area", newKeys[0], newKeys[1]);
+            }}
+            style={{ marginBottom: 8, display: "block" }}
+          />
+        </div>
+      ),
+    },
+    {
+      title: "Địa chỉ",
+      dataIndex: "address",
+      key: "address",
+      render: (text, record) => `${record.detail_address || ""}, ${text}`,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag
+          color={status === 1 ? "green" : "red"}
+          className="text-sm py-1 px-2"
+        >
+          {status === 1 ? "Chưa ai thuê" : "Đã cho thuê"}
+        </Tag>
+      ),
+    },
+    {
+      title: "Hành động",
+      key: "actions",
+      align: "center",
+      render: (_, record) => (
+        <Space size="small">
+          <Tooltip title="Xem chi tiết">
+            <Button
+              type="primary"
+              icon={<EyeOutlined />}
+              onClick={() => handleViewDetail(record)}
+            />
+          </Tooltip>
+
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="default"
+              icon={<EditOutlined />}
+              onClick={() => handleEditRoom(record)}
+            />
+          </Tooltip>
+
+          <Tooltip title={record.status === 1 ? "Đóng trọ" : "Mở trọ"}>
+            <Button
+              type={record.status === 1 ? "dashed" : "primary"}
+              danger={record.status === 1}
+              icon={record.status === 1 ? <LockOutlined /> : <UnlockOutlined />}
+              onClick={() => handleToggleRoomStatus(record)}
+            />
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
   return (
-    <div>LodgingManagement</div>
-  )
-}
+    <div className="container mx-auto p-4">
+      <Header />
+      <Stats lodgings={lodgings.data} />
+      <Card className="lodging-table-card">
+        <Title level={4} className="mb-4">
+          <HomeOutlined className="mr-2" /> Quản lý tin đã đăng
+        </Title>
+        <Table
+          columns={columns}
+          dataSource={filteredLodgings}
+          rowKey="id"
+          pagination={{ pageSize: 8 }}
+          loading={loading}
+          className="lodging-table"
+          rowClassName="lodging-table-row"
+        />
+      </Card>
+      {/* Room Detail Modal Component */}
+      <RoomDetailModal
+        isDetailModalVisible={isDetailModalVisible}
+        handleCloseModal={handleCloseModal}
+        selectedRecord={selectedRecord}
+      />
+    </div>
+  );
+};
 
-export default LodgingManagement
+export default LodgingManagement;

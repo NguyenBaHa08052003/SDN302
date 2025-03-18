@@ -1,15 +1,15 @@
-import React from 'react'
-import Sidebar from './Sidebarr'
-import ProfilePage from './ProfilePage'
-import { Outlet } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import Sidebar from './Sidebarr';
+import { Outlet, useNavigate } from 'react-router-dom';
+
 
 function LayoutDasboard() {
     return (
-        <div className="flex min-h-screen bg-gray-100 p-5">
+        <div className="flex  bg-gray-100 p-5">
             <Sidebar />
             <Outlet />
         </div>
-    )
+    );
 }
 
-export default LayoutDasboard
+export default LayoutDasboard;

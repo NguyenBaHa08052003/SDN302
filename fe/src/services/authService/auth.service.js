@@ -1,5 +1,6 @@
 import axios from "axios";
 import authTokenControl from "../../utils/authToken";
+import { jwtDecode } from "jwt-decode";
 
 const login = async (data) => {
   try {
@@ -13,9 +14,6 @@ const login = async (data) => {
       }
     );
     const datas = response.data;
-    if (datas.data) {
-      authTokenControl.saveToken(datas.data.accessToken);
-    }
     return datas;
   } catch (error) {
     return error.response.data;
@@ -49,18 +47,10 @@ const getCurrentUser = async (token) => {
 
 
 
-const googleLogin = async () => {
-  try {
-    await axios.get(`http://localhost:3000/api/auth/google`);
-    // return response;
-  } catch (error) {}
-};
-
 const authService = {
   login,
   logout,
   getCurrentUser,
-  googleLogin,
 };
 
 export default authService;

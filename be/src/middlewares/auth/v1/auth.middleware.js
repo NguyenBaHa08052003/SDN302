@@ -21,7 +21,6 @@ module.exports = async (req, res, next) => {
     }
     const decode = await verifyToken(accessToken);
     console.log("decodeToken", decode);
-
     if (!decode) {
       return res.status(404).json({
         success: false,

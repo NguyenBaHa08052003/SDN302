@@ -4,7 +4,8 @@ import Cookies from "js-cookie";
 import { fetchUser } from "../redux/slices/userSlice";
 import { useLoading, useUser } from "../../utils/customHook";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import jwtToken from "../../utils/jwtToken";
+import { jwtDecode } from "jwt-decode";
 
 const withAuth = (WrappedComponent) => {
   return (props) => {
@@ -12,24 +13,37 @@ const withAuth = (WrappedComponent) => {
     const dispatch = useDispatch();
     const user = useUser();
     const navigate = useNavigate();
+
     useEffect(() => {
       const token = Cookies.get("authToken");
-      console.log(token);
+
+      // Kiểm tra xem token có tồn tại và hết hạn chưa
+      if (token && jwtToken.isTokenExpired(token)) {
+        Cookies.remove("authToken");
+        sessionStorage.removeItem("UserId");
+        sessionStorage.removeItem("Role");
+        navigate("/login");
+        return;
+      }
+
       if (token) {
+        const decode = jwtDecode(token);
+        if (decode.userId && !sessionStorage.getItem("UserId")) {
+          sessionStorage.setItem("UserId", decode.userId);
+        }
         dispatch(fetchUser(token));
       }
-    }, [dispatch]);
+    }, [dispatch, navigate]);
 
     useEffect(() => {
       if (user?.success) {
         sessionStorage.setItem("Role", JSON.stringify(user.data.role));
-        console.log(user?.data?.role);
         if (user?.data?.role === "Admin") {
           navigate("/dashboard");
-          return
+          return;
         }
       }
-    }, [user]);
+    }, [user, navigate]);
 
     if (loading) {
       return (
@@ -45,6 +59,7 @@ const withAuth = (WrappedComponent) => {
         </div>
       );
     }
+
     return <WrappedComponent {...props} />;
   };
 };

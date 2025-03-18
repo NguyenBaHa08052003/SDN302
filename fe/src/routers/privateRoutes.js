@@ -7,8 +7,8 @@ import LayoutDasboard from "../pages/dasboard/LayoutDasboard";
 import ProfilePage from "../pages/dasboard/ProfilePage";
 import LodgingManagement from "../pages/dasboard/LodgingManagement";
 import LodgingChart from "../pages/dasboard/LogingChart";
-import PaymentPage from "../pages/Payment/PaymentPage";
 import WishListPage from "../pages/Home/WishList/WishListPage";
+import PaymentZalo from "../pages/Payment/Payment_Zalo";
 export const privateRoutes = (
   <>
     <Route element={<DefaultLayout />}>
@@ -20,7 +20,7 @@ export const privateRoutes = (
           <Route path="dang-tin" element={<CreateLodgingPage />} />
           <Route path="danh-sach" element={<LodgingManagement />} />
           <Route path="phan-tich" element={<LodgingChart/>} />
-          <Route path="nap-tien" element={<PaymentPage/>} />
+          <Route path="nap-tien" element={<PaymentZalo/>} />
         </Route>
         <Route path="yeu-thich" element={<WishListPage />} />
       </Route>

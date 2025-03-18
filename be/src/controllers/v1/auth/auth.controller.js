@@ -1,15 +1,11 @@
 const { object, string } = require("yup");
 const User = require("../../../models/user.model");
 const { hashMake, hashCheck } = require("../../../utils/hash");
-const {
-  createAccessToken,
-  refreshAccessToken,
-} = require("../../../utils/jwt");
+const { createAccessToken, refreshAccessToken } = require("../../../utils/jwt");
 const BlackLists = require("../../../models/blacklist.model");
 const Provider = require("../../../models/provider.model");
 const OTP = require("../../../models/otp.model");
-const sendEmail = require('../../../utils/email');
-
+const sendEmail = require("../../../utils/email");
 
 module.exports = {
   register: async (req, res) => {
@@ -46,7 +42,7 @@ module.exports = {
         );
         return res.json({
           message: errors,
-        })
+        });
       }
       return res.json({
         message: e.message,
@@ -58,7 +54,9 @@ module.exports = {
     try {
       const body = req.body;
       let userSchema = object({
-        email: string().required("Email hoặc mật khẩu không chính xác").email("Email hoặc mật khẩu không chính xác"),
+        email: string()
+          .required("Email hoặc mật khẩu không chính xác")
+          .email("Email hoặc mật khẩu không chính xác"),
         password: string()
           .required()
           .min(8, "Email hoặc mật khẩu không chính xác"),
@@ -67,7 +65,10 @@ module.exports = {
         abortEarly: false,
       });
       const provider = await Provider.findOne({ name: "email" });
-      const user = await User.findOne({ email: body.email, provider: provider._id }).populate({
+      const user = await User.findOne({
+        email: body.email,
+        provider: provider._id,
+      }).populate({
         path: "role",
         select: "name -_id",
       });
@@ -101,7 +102,7 @@ module.exports = {
         );
         return res.json({
           message: errors,
-        })
+        });
       }
       return res.json({
         message: e.message,
@@ -149,7 +150,7 @@ module.exports = {
   forgotPassword: async (req, res) => {
     try {
       const { email } = req.body;
-      
+
       // Kiểm tra email có tồn tại không
       const user = await User.findOne({ email }).populate("provider");
       if (!user) {
@@ -158,8 +159,15 @@ module.exports = {
 
       // Kiểm tra tài khoản có đăng ký bằng email/password không
       const emailProvider = await Provider.findOne({ name: "email" });
-      if (!user.provider || user.provider._id.toString() !== emailProvider._id.toString()) {
-        return res.status(403).json({ message: "Tài khoản này không thể đặt lại mật khẩu bằng email" });
+      if (
+        !user.provider ||
+        user.provider._id.toString() !== emailProvider._id.toString()
+      ) {
+        return res
+          .status(403)
+          .json({
+            message: "Tài khoản này không thể đặt lại mật khẩu bằng email",
+          });
       }
 
       // Tạo OTP ngẫu nhiên (6 chữ số)
@@ -181,7 +189,6 @@ module.exports = {
       );
 
       return res.json({ message: "Mã OTP đã được gửi qua email" });
-
     } catch (error) {
       return res.status(500).json({ message: "Lỗi server" });
     }
@@ -191,7 +198,9 @@ module.exports = {
     try {
       const { email, otp, newPassword } = req.body;
       let userSchema = object({
-        email: string().required("Email hoặc mật khẩu không chính xác").email("Email hoặc mật khẩu không chính xác"),
+        email: string()
+          .required("Email hoặc mật khẩu không chính xác")
+          .email("Email hoặc mật khẩu không chính xác"),
         newPassword: string()
           .required()
           .min(8, "Email hoặc mật khẩu không chính xác"),
@@ -208,8 +217,15 @@ module.exports = {
 
       // Kiểm tra tài khoản có đăng ký bằng email/password không
       const emailProvider = await Provider.findOne({ name: "email" });
-      if (!user.provider || user.provider._id.toString() !== emailProvider._id.toString()) {
-        return res.status(403).json({ message: "Tài khoản này không thể đặt lại mật khẩu bằng email" });
+      if (
+        !user.provider ||
+        user.provider._id.toString() !== emailProvider._id.toString()
+      ) {
+        return res
+          .status(403)
+          .json({
+            message: "Tài khoản này không thể đặt lại mật khẩu bằng email",
+          });
       }
 
       // Kiểm tra OTP hợp lệ không
@@ -231,8 +247,9 @@ module.exports = {
       // Xóa OTP sau khi sử dụng
       await OTP.deleteOne({ email, otp });
 
-      return res.json({ message: "Mật khẩu đã được đặt lại thành công. Hãy đăng nhập!" });
-
+      return res.json({
+        message: "Mật khẩu đã được đặt lại thành công. Hãy đăng nhập!",
+      });
     } catch (error) {
       return res.status(500).json({ message: "Lỗi server" });
     }
@@ -244,9 +261,13 @@ module.exports = {
 
       // Validate dữ liệu nhập vào
       const userSchema = object({
-        email: string().required("Email không hợp lệ").email("Email không hợp lệ"),
+        email: string()
+          .required("Email không hợp lệ")
+          .email("Email không hợp lệ"),
         oldPassword: string().required("Vui lòng nhập mật khẩu cũ"),
-        newPassword: string().required().min(8, "Mật khẩu mới phải có ít nhất 8 ký tự"),
+        newPassword: string()
+          .required()
+          .min(8, "Mật khẩu mới phải có ít nhất 8 ký tự"),
       });
       await userSchema.validate(req.body, { abortEarly: false });
 
@@ -264,8 +285,13 @@ module.exports = {
 
       // Kiểm tra tài khoản có đăng ký bằng email/password không
       const emailProvider = await Provider.findOne({ name: "email" });
-      if (!user.provider || user.provider._id.toString() !== emailProvider._id.toString()) {
-        return res.status(403).json({ message: "Tài khoản này không thể thay đổi mật khẩu" });
+      if (
+        !user.provider ||
+        user.provider._id.toString() !== emailProvider._id.toString()
+      ) {
+        return res
+          .status(403)
+          .json({ message: "Tài khoản này không thể thay đổi mật khẩu" });
       }
 
       // Kiểm tra mật khẩu cũ có đúng không
@@ -281,12 +307,9 @@ module.exports = {
       await User.updateOne({ email }, { password: hashedPassword });
 
       return res.json({ message: "Mật khẩu đã được cập nhật thành công!" });
-
     } catch (error) {
       console.error("Lỗi changePassword:", error);
       return res.status(500).json({ message: "Lỗi server" });
     }
-  }
-
-
+  },
 };

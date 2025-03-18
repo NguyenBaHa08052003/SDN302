@@ -14,13 +14,15 @@ const ChangePassword = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/change-password", values,
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/change-password",
+        values,
         {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authTokenControl.getToken()}`,
-            },
-          }
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authTokenControl.getToken()}`,
+          },
+        }
       );
       toast.success(response.data.message);
       message.success("Mật khẩu đã được thay đổi!");
@@ -72,7 +74,12 @@ const ChangePassword = () => {
 
         {/* Nút Xác nhận */}
         <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} className="w-full">
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+            className="w-full"
+          >
             Đổi mật khẩu
           </Button>
         </Form.Item>

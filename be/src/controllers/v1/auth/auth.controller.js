@@ -21,9 +21,7 @@ module.exports = {
           .required()
           .email("Email không đúng định dạng")
           .test("checkEmail", "Email đã tồn tại", async (value) => {
-            console.log(value);
             const user = await User.findOne({ email: value });
-            console.log(user);
 
             return !user;
           }),
@@ -135,9 +133,7 @@ module.exports = {
 
   profile: async (req, res) => {
     try {
-      console.log("đã vào profile");
       const user = req.user;
-      console.log(user);
       return res.json({
         success: true,
         message: "Đăng nhập thành công. Chào mừng bạn trở lại!!!",

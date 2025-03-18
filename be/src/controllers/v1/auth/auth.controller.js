@@ -16,7 +16,7 @@ module.exports = {
     try {
       const body = req.body;
       let userSchema = object({
-        fullname: string().required().min(6, "Ten phai toi thieu 6 ky tu"),
+        fullname: string().required().min(6, "Tên phải tối thiểu 6 ký tự"),
         email: string()
           .required()
           .email("Email không đúng định dạng")
@@ -27,7 +27,7 @@ module.exports = {
           }),
         password: string()
           .required()
-          .min(8, "Mat khau phai co it nhat 8 ky tu"),
+          .min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
       });
       await userSchema.validate(body, {
         abortEarly: false,
@@ -35,7 +35,7 @@ module.exports = {
       body.password = await hashMake(body.password);
       const user = await User.create(body);
       return res.json({
-        message: "Dang ky thanh cong",
+        message: "Đăng ký thành công",
         data: user,
       });
     } catch (e) {

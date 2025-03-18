@@ -5,7 +5,6 @@ const UserTransformer = require("../../../transformers/user.transformers");
 module.exports = async (req, res, next) => {
   try {
     const accessToken = req.get("authorization").split(" ").slice(-1).join("");
-    console.log("ddang xuat", accessToken);
     if (!accessToken) {
       return res.status(404).json({
         success: false,
@@ -20,7 +19,6 @@ module.exports = async (req, res, next) => {
       });
     }
     const decode = await verifyToken(accessToken);
-    console.log("decodeToken", decode);
     if (!decode) {
       return res.status(404).json({
         success: false,
@@ -38,7 +36,6 @@ module.exports = async (req, res, next) => {
         message: "Bạn không có quyền truy cập",
       });
     }
-    console.log("user", user);
     
     if (!user.status) {
       return res.status(404).json({
@@ -47,8 +44,7 @@ module.exports = async (req, res, next) => {
           "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên!!!",
       });
     }
-    console.log("user", user);
-    console.log(req.originalUrl); // lay duong dan toan bo
+    
     if (user.role.name !== 'Admin' && req.originalUrl.includes('/admin')) {
       return res.status(404).json({
         success: false,

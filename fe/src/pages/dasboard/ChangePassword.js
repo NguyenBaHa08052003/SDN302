@@ -17,14 +17,14 @@ const ChangePassword = () => {
       const response = await axios.post("http://localhost:3000/api/auth/change-password", values,
         {
             headers: {
-              "Content-Type": "multipart/form-data",
+              "Content-Type": "application/json",
               Authorization: `Bearer ${authTokenControl.getToken()}`,
             },
           }
       );
       toast.success(response.data.message);
       message.success("Mật khẩu đã được thay đổi!");
-      setTimeout(() => navigate("/login"), 2000); // Chuyển về trang đăng nhập sau 2s
+      setTimeout(() => navigate("/"), 2000); // Chuyển về trang đăng nhập sau 2s
     } catch (error) {
       toast.error(error.response?.data?.message || "Đổi mật khẩu thất bại!");
     }

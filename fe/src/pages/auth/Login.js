@@ -24,15 +24,12 @@ export default function Login() {
       }
       if (response.message) {
         toast.error(response.message);
-        console.log("hello");
       }
       if (response.message.password) {
-        console.log("hello");
         toast.error(response.message.password);
       }
       if (response.message.email) {
         toast.error(response.message.email);
-        console.log("hello");
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again later.");

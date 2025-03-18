@@ -115,18 +115,18 @@ module.exports = {
       const accessToken = token.accessToken;
       if (!accessToken) {
         return res.status(404).json({
-          message: "Dang xuat khong thanh cong",
+          message: "Đăng xuất không thành công",
         });
       }
       const tokenDie = await BlackLists.create({
         token: accessToken,
       });
       return res.json({
-        message: "Đăng xuất thanh công",
+        message: "Đăng xuất thành công",
       });
     } catch (error) {
       return res.status(500).json({
-        message: "Dang xuat faild",
+        message: "Đăng xuất faild",
       });
     }
   },

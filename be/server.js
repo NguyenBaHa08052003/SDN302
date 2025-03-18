@@ -20,7 +20,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions))
-console.log(__dirname);
 // app.use(
 //   morgan("common", {
 //     stream: fs.createWriteStream(__dirname + "/src/logs/access.log", {
@@ -62,7 +61,6 @@ app.use(express.json());
 app.use('/api', apiRouter);
 
 app.use((req, res, next) => {
-  console.log(err);
   res.status(404);
   if (process.env.NODE_ENV === "production") {
     return res.status(404).json({
@@ -75,7 +73,6 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
   res.status(err.status || 500);
   if (process.env.NODE_ENV === "production") {
     res.status(500).json({

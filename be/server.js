@@ -20,7 +20,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions))
-console.log(__dirname);
 // app.use(
 //   morgan("common", {
 //     stream: fs.createWriteStream(__dirname + "/src/logs/access.log", {

@@ -152,7 +152,6 @@ module.exports = {
     try {
       const { id } = req.params;
       const { status, userId } = req.body;
-      console.log(status, userId);
 
       // Validate input
       if (status !== 0 && status !== 1) {

@@ -65,7 +65,6 @@ export default function DashBoard() {
       console.error("Lỗi khi xóa sản phẩm:", error);
     }
   }
-  console.log(products);
   const handleLogout = () => {
     Cookies.remove("authToken");
     window.location.reload();

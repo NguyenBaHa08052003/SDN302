@@ -20,7 +20,10 @@ export default function ForgotPassword() {
     }
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:3000/api/auth/forgot-password", { email });
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/forgot-password",
+        { email }
+      );
       setLoading(false);
       if (response.data.message) {
         toast.success(response.data.message);
@@ -41,11 +44,14 @@ export default function ForgotPassword() {
     }
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:3000/api/auth/reset-password", {
-        email,
-        otp,
-        newPassword,
-      });
+      const response = await axios.post(
+        "http://localhost:3000/api/auth/reset-password",
+        {
+          email,
+          otp,
+          newPassword,
+        }
+      );
       setLoading(false);
       if (response.data.message) {
         toast.success("Mật khẩu đã được đặt lại. Vui lòng đăng nhập!");
@@ -67,7 +73,9 @@ export default function ForgotPassword() {
 
         {step === 1 && (
           <form onSubmit={handleForgotPassword}>
-            <label className="block text-sm font-medium text-gray-700">Nhập email của bạn</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Nhập email của bạn
+            </label>
             <input
               type="email"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-black focus:border-black"
@@ -88,7 +96,9 @@ export default function ForgotPassword() {
 
         {step === 2 && (
           <form onSubmit={handleResetPassword}>
-            <label className="block text-sm font-medium text-gray-700">Nhập OTP</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Nhập OTP
+            </label>
             <input
               type="text"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-black focus:border-black"
@@ -97,7 +107,9 @@ export default function ForgotPassword() {
               onChange={(e) => setOtp(e.target.value)}
               required
             />
-            <label className="block text-sm font-medium text-gray-700 mt-3">Mật khẩu mới</label>
+            <label className="block text-sm font-medium text-gray-700 mt-3">
+              Mật khẩu mới
+            </label>
             <input
               type="password"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm px-3 py-2 focus:ring-black focus:border-black"
@@ -117,7 +129,9 @@ export default function ForgotPassword() {
         )}
 
         <div className="mt-4 text-center text-sm">
-          <Link to="/dang-nhap" className="text-blue-600 hover:text-blue-400">Quay lại đăng nhập</Link>
+          <Link to="/dang-nhap" className="text-blue-600 hover:text-blue-400">
+            Quay lại đăng nhập
+          </Link>
         </div>
       </div>
     </div>

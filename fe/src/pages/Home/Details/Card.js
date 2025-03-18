@@ -67,12 +67,7 @@ const MemberCard = () => {
                   ))}
                 </ul>
               </div>
-              <div>
-                <button className="bg-black text-white font-bold py-2 px-4 rounded-full w-full hover:bg-gray-800 transition">
-                  NÂNG HẠNG NGAY
-                </button>
-                <p className="text-gray-500 text-sm mt-4">{card.note}</p>
-              </div>
+              
             </div>
           ))}
         </div>

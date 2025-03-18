@@ -9,7 +9,9 @@ import LodgingPage from "../pages/Home/LodgingPage";
 import NotFound from "../pages/not_found/NotFound";
 import RoomRental from "../pages/Home/Details/RoomRental"
 import RoomDetail from "../pages/Home/Details/RoomDetail";
+import RoomWhole from "../pages/Home/Details/RoomWhole";
 import VerifyUserPage from "../pages/admin/VerifyUserPage";
+import SignUp from '../pages/auth/SignUp' 
 import ForgotPassword from "../pages/auth/ForgotPassword";
 export const publicRoutes = (
   <>
@@ -18,6 +20,7 @@ export const publicRoutes = (
       <Route index path="/" element={<HomePage />} />
       <Route path="/lodging" element={<LodgingPage />} />
       <Route path="/loging/room-rental" element={<RoomRental />} />
+      <Route path="/lodging/room-whole" element={<RoomWhole/>}/>
       <Route path="/loging/room-rental/room-detail/:id" element={<RoomDetail />} />
       <Route path="/verify-account/:id" element={<VerifyUserPage/>} />
     </Route>

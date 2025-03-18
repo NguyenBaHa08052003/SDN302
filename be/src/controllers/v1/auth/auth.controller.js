@@ -241,6 +241,8 @@ module.exports = {
   changePassword: async (req, res) => {
     try {
       const { email, oldPassword, newPassword } = req.body;
+      console.log(email, oldPassword, newPassword);
+      
 
       // Validate dữ liệu nhập vào
       const userSchema = object({

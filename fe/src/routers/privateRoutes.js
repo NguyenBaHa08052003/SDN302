@@ -8,6 +8,7 @@ import ProfilePage from "../pages/dasboard/ProfilePage";
 import LodgingManagement from "../pages/dasboard/LodgingManagement";
 import LodgingChart from "../pages/dasboard/LogingChart";
 import WishListPage from "../pages/Home/WishList/WishListPage";
+import ChangePassword from "../pages/dasboard/ChangePassword";
 export const privateRoutes = (
   <>
     <Route element={<DefaultLayout />}>
@@ -19,6 +20,7 @@ export const privateRoutes = (
           <Route path="dang-tin" element={<CreateLodgingPage />} />
           <Route path="danh-sach" element={<LodgingManagement />} />
           <Route path="phan-tich" element={<LodgingChart />} />
+          <Route path="doi-mat-khau" element={<ChangePassword />} />
         </Route>
         <Route path="yeu-thich" element={<WishListPage />} />
       </Route>

@@ -26,6 +26,7 @@ const Sidebarr = () => {
   useEffect(() => {
     const baseMenuItems = [
       { icon: <UserOutlined className="mr-3" />, text: "Thông tin cá nhân" },
+      { icon: <RightOutlined className="mr-3" />, text: "Đổi mật khẩu" },
     ];
 
     if (userRole === "Landlord") {
@@ -37,6 +38,7 @@ const Sidebarr = () => {
           { icon: <PlusOutlined className="mr-3" />, text: "Đăng tin" },
           { icon: <UnorderedListOutlined className="mr-3" />, text: "Danh sách" },
           { icon: <BarChartOutlined className="mr-3" />, text: "Phân tích" },
+          
         ],
       });
     }
@@ -89,7 +91,16 @@ const Sidebarr = () => {
                     {item.text}
                   </Link>
                 ) : (
-                  `${item.text}`
+                  <Link
+                    to={`/quan-ly/doi-mat-khau`}
+                    style={
+                      lastSegment === "doi-mat-khau"
+                        ? { color: "red" }
+                        : { color: "black" }
+                    }
+                  >
+                    {item.text}
+                  </Link>
                 )}
                 {item.isDropdown && (
                   <span className="ml-auto">
@@ -136,7 +147,8 @@ const Sidebarr = () => {
                         >
                           {child.text}
                         </Link>
-                      )}
+                      )
+                      }
                     </div>
                   ))}
                 </div>

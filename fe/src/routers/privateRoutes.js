@@ -8,6 +8,7 @@ import ProfilePage from "../pages/dasboard/ProfilePage";
 import LodgingManagement from "../pages/dasboard/LodgingManagement";
 import LodgingChart from "../pages/dasboard/LogingChart";
 import WishListPage from "../pages/Home/WishList/WishListPage";
+import PaymentZalo from "../pages/Payment/Payment_Zalo";
 import ChangePassword from "../pages/dasboard/ChangePassword";
 export const privateRoutes = (
   <>
@@ -19,7 +20,8 @@ export const privateRoutes = (
           <Route path="tai-khoan" element={<ProfilePage />} index />
           <Route path="dang-tin" element={<CreateLodgingPage />} />
           <Route path="danh-sach" element={<LodgingManagement />} />
-          <Route path="phan-tich" element={<LodgingChart />} />
+          <Route path="phan-tich" element={<LodgingChart/>} />
+          <Route path="nap-tien" element={<PaymentZalo/>} />
           <Route path="doi-mat-khau" element={<ChangePassword />} />
         </Route>
         <Route path="yeu-thich" element={<WishListPage />} />

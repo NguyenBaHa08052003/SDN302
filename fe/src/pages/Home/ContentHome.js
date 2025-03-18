@@ -20,8 +20,9 @@ function ContentHome(props) {
             try {
                 const getListLodging = await lodgingService.getAllLodging({ limit: itemsPerPage, page });
                 const getFavorite = await getFavoriteLodging(userId, token);
-                if (getListLodging) {
-                    setListingsContent(getListLodging.listings.filter((lodging) => lodging.status == 0));
+                if (getListLodging?.listings) {
+                    console.log("Hello");
+                    setListingsContent(getListLodging.listings);
                     setTotalPages(getListLodging.totalPages); // Cập nhật tổng số trang
                 }
                 if (getFavorite) {
@@ -33,7 +34,6 @@ function ContentHome(props) {
         };
         fetchData();
     }, [page]); // Gọi lại API khi page thay đổi
-    console.log(listingsContent);
 
     const toggleFavorite = async (idLodging) => {
         try {

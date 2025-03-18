@@ -13,7 +13,6 @@ router.get("/logout", authMiddleware, authController.logout);
 router.get("/google", passport.authenticate("google"));
 router.get("/google/callback", passport.authenticate("google", {failureRedirect: `${process.env.FRONTEND_URL}/dang-nhap`}),async (req, res) => {
   try {
-    console.log(req.user);
     if (!req.user) {
       return res.redirect(`${process.env.FRONTEND_URL}/dang-nhap?error=Login failed`);
     }
@@ -22,7 +21,6 @@ router.get("/google/callback", passport.authenticate("google", {failureRedirect:
     });
     
     const refreshToken = await refreshAccessToken();
-    console.log("Google", accessToken);
     res.cookie("authToken", accessToken, {
       sameSite: "Strict",
       secure: process.env.NODE_ENV === "production"

@@ -47,7 +47,6 @@ module.exports = {
     try {
       // Giả sử limit mặc định là 5, bạn có thể thay đổi giá trị này thành 8 nếu cần
       const { price, address, area, page = 1, limit = null } = req.query;  // limit mặc định là 5
-      console.log(req.query.address);
 
       const filter = { status: 0 };
 
@@ -149,9 +148,7 @@ module.exports = {
   deleteLodging: async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(id);
       let lodging = await Lodging.findById(id);
-      console.log(lodging);
 
       if (!lodging)
         return res.status(404).json({ message: "Lodging không tồn tại" });
@@ -195,7 +192,6 @@ module.exports = {
 
       const { id } = req.params;
       const { status, userId } = req.body;
-      console.log(status, userId);
 
       // Validate input
       if (status !== 0 && status !== 1) {

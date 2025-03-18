@@ -154,7 +154,6 @@ module.exports = {
     try {
       const { email } = req.body;
       
-
       // Kiểm tra email có tồn tại không
       const user = await User.findOne({ email }).populate("provider");
       if (!user) {

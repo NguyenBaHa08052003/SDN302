@@ -26,7 +26,7 @@ const areaRanges = {
   "70 - 90 m²": [70, 90],
   "Trên 90 m²": [90, Infinity],
 };
-const RoomRental = () => {
+const RoomWhole = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { lodgings, status } = useSelector((state) => state.lodgingRedux);
   console.log(lodgings);
@@ -211,4 +211,4 @@ const RoomRental = () => {
   );
 };
 
-export default withAuth(RoomRental);
+export default withAuth(RoomWhole);

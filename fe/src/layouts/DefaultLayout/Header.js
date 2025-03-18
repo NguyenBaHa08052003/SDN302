@@ -74,7 +74,7 @@ const Header = () => {
             <Link to={"/loging/room-rental"} className="text-black mr-5 text-sm font-bold">
               Phòng trọ
             </Link>
-            <a href="#" className="text-black mr-5 text-sm font-bold">
+            <a href={"/loging/room-whole"} className="text-black mr-5 text-sm font-bold">
               Nguyên căn
             </a>
             <a href="#" className="text-black mr-5 text-sm font-bold">

@@ -11,6 +11,7 @@ import RoomRental from "../pages/Home/Details/RoomRental"
 import RoomDetail from "../pages/Home/Details/RoomDetail";
 import VerifyUserPage from "../pages/admin/VerifyUserPage";
 import ForgotPassword from "../pages/auth/ForgotPassword";
+import SignUp from "../pages/auth/SignUp";
 export const publicRoutes = (
   <>
     <Route path="*" element={<NotFound />} />
@@ -20,13 +21,14 @@ export const publicRoutes = (
       <Route path="/loging/room-rental" element={<RoomRental />} />
       <Route path="/loging/nguyen-can" element={<RoomRental />} />
       <Route path="/loging/room-rental/room-detail/:id" element={<RoomDetail />} />
-      <Route path="/verify-account/:id" element={<VerifyUserPage/>} />
+      <Route path="/verify-account/:id" element={<VerifyUserPage />} />
     </Route>
 
     <Route element={<AuthLayout />}>
       <Route element={<GuestMiddleware />}>
         <Route path="/dang-nhap" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/signup" element={<SignUp />} />
       </Route>
     </Route>
   </>

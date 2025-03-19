@@ -6,6 +6,21 @@ const { deleteImagesFromCloudinary } = require("../../utils/cloudinaryUtils");
 const { errorResponse, successResponse } = require("../../utils/response");
 
 module.exports = {
+  getLodginById: async (req, res) => {
+    try {
+      const { id } = req.params
+      console.log(id);
+
+      const findLodging = await Lodging.findById(id).populate({ path: "type", select: "name -_id" }).populate({ path: "user", select: "fullname email phoneNumber -_id" });
+      if (!findLodging) {
+        return errorResponse(res, {}, 404, "Không tìm thấy phòng trọ");
+      }
+      return successResponse(res, findLodging, {}, 200, "Lấy dữ liệu thông");
+    } catch (error) {
+      console.log("Error get lodging by id", error.message);
+
+    }
+  },
   createLodging: async (req, res) => {
     try {
       const {
@@ -199,7 +214,7 @@ module.exports = {
       } = req.body;
       const filteredImages = existingImages.filter((img) => img !== "undefined");
       console.log("dang filter", filteredImages);
-      
+
       const address = req.body.location || req.body.address;
       const newImageFiles = req.files || [];
       const newImageUrls = [];

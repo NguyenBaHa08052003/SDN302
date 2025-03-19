@@ -55,4 +55,13 @@ const addFavoriteLodging = async (id, lodgingId, token) => {
         return error.response;
     }
 }
-export { updateUserr, getInforUser, addFavoriteLodging, getFavoriteLodging }
+
+const getUserByEmail = async (email) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/api/users/check/${email}`)
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+export { updateUserr, getInforUser, addFavoriteLodging, getFavoriteLodging, getUserByEmail }

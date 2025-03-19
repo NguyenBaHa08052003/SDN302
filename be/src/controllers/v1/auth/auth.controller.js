@@ -29,7 +29,7 @@ module.exports = {
         abortEarly: false,
       });
       body.password = await hashMake(body.password);
-      const user = await User.create(body);
+      const user = await User.create({ ...body, status: true });
       return res.json({
         message: "Đăng ký thành công",
         data: user,

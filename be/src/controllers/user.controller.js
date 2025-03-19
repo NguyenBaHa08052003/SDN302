@@ -56,7 +56,7 @@ module.exports = {
     getFavoriteLodging: async (req, res) => {
         const id = req.params.id;
         console.log(id);
-        
+
         const { page, limit } = req.query;
         try {
             const user = await User.findById(id).populate('favLodging')
@@ -95,6 +95,19 @@ module.exports = {
             return successResponse(res, new UserTransform(user), {}, 201, index !== -1 ? "Xóa phòng trọ khỏi danh sách yêu thích" : "Thêm phòng trọ vào danh sách yêu thích");
 
 
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    getUserByEmail: async (req, res) => {
+        const { email } = req.params;
+        try {
+            const user = await User.findOne({ email, status: true });
+
+            if (!user) {
+                return errorResponse(res, {}, 404, "Không tìm thấy người dùng");
+            }
+            return successResponse(res, new UserTransform(user), {}, 201, "Lấy dữ liệu người dùng");
         } catch (error) {
             console.log(error);
         }

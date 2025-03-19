@@ -3,7 +3,7 @@ import authTokenControl from "../../utils/authToken";
 
 const getAllLodging = async (params = null) => {
   console.log(params);
-  
+
   try {
     const response = await axios.get("http://localhost:3000/api/lodgings", {
       params: params || {},
@@ -57,9 +57,22 @@ const updateLodging = async (id, data) => {
     return error.response;
   }
 }
+
+const getLodgingByIdRoom = async (id) => {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/lodgings/${id}`);
+    if (response.data.success == true) {
+      return response.data;
+    }
+    return response?.error;
+  } catch (error) {
+    return error.response;
+  }
+}
 const lodgingService = {
   getAllLodging,
   createLodging,
-  updateLodging
+  updateLodging,
+  getLodgingByIdRoom
 };
 export default lodgingService;

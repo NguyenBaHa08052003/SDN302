@@ -19,11 +19,11 @@ function ContentHome(props) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const getListLodging = await lodgingService.getAllLodging({ limit: itemsPerPage, page });
+                const getListLodging = await lodgingService.getAllForPage();
                 if (getListLodging) {
                     console.log("Hello");
                     setListingsContent(getListLodging.listings);
-                    setTotalPages(getListLodging.totalPages); // Cập nhật tổng số trang
+                    setTotalPages(Math.ceil(getListLodging.listings.length / itemsPerPage)); // Cập nhật tổng số trang
                 }
                 const getFavorite = await getFavoriteLodging(userId, token);
                 if (getFavorite) {
@@ -54,13 +54,15 @@ function ContentHome(props) {
     const prevPage = () => {
         if (page > 1) setPage((prev) => prev - 1);
     };
-    console.log(listingsContent);
+    // Cắt danh sách sản phẩm theo trang
+    const displayedListings = listingsContent.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
 
     return (
         <div className="max-w-6xl mx-auto p-4">
             <h1 className="text-center text-2xl font-bold mb-4">Cho Thuê Phòng Trọ</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {listingsContent?.map(({ _id, title, price, size, location, date, images }) => (
+                {displayedListings?.map(({ _id, title, price, size, location, date, images }) => (
                     <div key={_id} className="fade-in bg-white rounded-lg shadow-md overflow-hidden">
                         <Link to={`/loging/room-rental/room-detail/${_id}`}><img style={{ cursor: "pointer" }} src={images[0]} alt={title} className="w-full h-48 object-cover" /></Link>
                         <div className="p-4">
@@ -90,6 +92,9 @@ function ContentHome(props) {
                 <button onClick={nextPage} disabled={page === totalPages} className="p-2 border border-gray-300 rounded hover:bg-gray-200 disabled:opacity-50">
                     <FaChevronRight />
                 </button>
+            </div>
+            <div className="flex justify-center mt-6 space-x-4">
+                <button onClick={() => navigate("/loging/room-rental")} className="p-2 border border-blue-300 rounded hover:bg-blue-200">Xem thêm</button>
             </div>
         </div>
     );

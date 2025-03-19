@@ -155,7 +155,7 @@ const RoomRental = () => {
                   <Rate
                     allowHalf
                     value={listing.rating}
-                    // onChange={(value) => handleVote(listing._id, value)}
+                  // onChange={(value) => handleVote(listing._id, value)}
                   />
                   <span className="text-sm">({listing.rating || 0})</span>
                 </div>
@@ -190,6 +190,8 @@ const RoomRental = () => {
             <h3 className="font-semibold mb-3">Lọc nhanh</h3>
             <div className="mb-4">
               <h4 className="text-sm font-medium mb-2">Khoảng giá</h4>
+
+
               <select
                 value={selectedPrice}
                 onChange={(e) => setSelectedPrice(e.target.value)}

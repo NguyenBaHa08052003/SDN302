@@ -5,7 +5,10 @@ const authMiddleware = require("../../middlewares/auth/v1/auth.middleware");
 const router = express.Router();
 
 router.get("/", lodgingController.getAllLodgings);
+router.get("/ranking", lodgingController.getRankingLodging);
 router.post("/", authMiddleware, uploadCloud.array("images", 5), lodgingController.createLodging);
+// Vote Lodging
+router.post("/:lodgingId/vote", authMiddleware, lodgingController.voteLodging);
 router.get("/lodging-types", lodgingController.getAllLodgingTypes);
 router.get('/:id', lodgingController.getLodginById);
 router.get("/:userId/users", lodgingController.getLodgingByUserId);

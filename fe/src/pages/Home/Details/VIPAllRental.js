@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import withAuth from "../../../stores/hoc/withAuth";
 import LocationPro from "../../../components/LocationPro";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchLodgings, voteLodging } from "../../../stores/redux/slices/lodgingSlice";
+import { fetchLodgings } from "../../../stores/redux/slices/lodgingSlice";
 import ClientPagination from "../../../components/Pagination";
 import { Link } from "react-router-dom";
 import { formatDate } from "../../../utils/convert";
 import VIPRental from "./VIPRental";
-import { Rate } from "antd";
 
 const priceRanges = {
   "Dưới 1 triệu": [0, 1000000],
@@ -28,29 +27,29 @@ const areaRanges = {
   "70 - 90 m²": [70, 90],
   "Trên 90 m²": [90, Infinity],
 };
-const RoomRental = () => {
+const VIPAllRental = () => {
+      const [vipRooms, setVipRooms] = useState([]);
+    
   const [searchQuery, setSearchQuery] = useState("");
-  const { lodgings, status } = useSelector((state) => state.lodgingRedux);
-  const [rating, setRating] = useState(0);
   const dispatch = useDispatch();
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
-  useEffect(() => {
-    const pathSegments = window.location.pathname.split("/");
-    const type = pathSegments[pathSegments.length - 1];
-    const fetchListings = async () => {
-      try {
-        dispatch(fetchLodgings({ limit: 8, type }));
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách phòng:", error);
-      }
-    };
-    fetchListings();
-  }, [dispatch]);
-  const handleVote = (id, value) => {
-    dispatch(voteLodging({ id, rating: value }));
-  };
-  const filteredListings = lodgings?.listings?.filter((listing) => {
+ useEffect(() => {
+     async function fetchVIPRooms() {
+       try {
+         const res = await fetch("http://localhost:3000/api/lodgings/ranking");
+         if (!res.ok) throw new Error("Lỗi khi tải dữ liệu");
+ 
+         const data = await res.json(); // Đọc JSON từ response
+         console.log("Dữ liệu phòng VIP:", data);
+         setVipRooms(data.listings); // Gán dữ liệu vào state
+       } catch (error) {
+         console.error("Lỗi khi tải phòng VIP:", error);
+       }
+     }
+     fetchVIPRooms();
+   }, []);
+  const filteredListings = vipRooms?.filter((listing) => {
     const listingPrice = listing.price;
     const listingArea = listing.area;
     const matchesPrice =
@@ -63,8 +62,10 @@ const RoomRental = () => {
         listingArea <= areaRanges[selectedArea][1]);
     return matchesPrice && matchesArea;
   });
-  console.log("RoomRental", lodgings);
+  console.log("RoomRental", vipRooms);
 
+
+  
   const priceOptions = [
     "",
     "Dưới 1 triệu",
@@ -91,7 +92,7 @@ const RoomRental = () => {
     <div className="container mx-auto max-w-7xl px-4 py-6">
       {/* Search Bar */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <LocationPro />
+        {/* <LocationPro type={"vippro"}/> */}
       </div>
       {/* Main Content */}
       <div className="flex gap-6">
@@ -99,9 +100,9 @@ const RoomRental = () => {
         <div className="flex-1">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-xl font-bold">Phòng Trọ Cho Thuê</h1>
+              <h1 className="text-xl font-bold">Phòng Trọ Siêu Cấp Vip</h1>
               <span className="text-sm text-gray-500">
-                Tìm thấy {lodgings?.total} kết quả
+                Tìm thấy {vipRooms?.length} kết quả
               </span>
             </div>
             <select className="p-2 border rounded-lg">
@@ -111,76 +112,66 @@ const RoomRental = () => {
               <option>Diện tích lớn đến nhỏ</option>
             </select>
           </div>
-          <VIPRental />
           {filteredListings?.map((listing) => (
-            <div className="bg-white rounded-lg shadow-md mb-4 overflow-hidden hover:shadow-lg transition-shadow flex">
-              <div className="w-1/4">
-                <img
-                  alt={listing.title}
-                  className="w-full h-48 object-cover"
-                  src={listing.images[0]}
-                />
-              </div>
-              <div className="flex-1 p-4">
-                <div className="flex justify-between items-start">
-                  <Link
-                    to={`/loging/room-rental/room-detail/${listing._id}`}
-                    key={listing._id}
-                  >
+            <Link to={`/loging/room-rental/room-detail/${listing._id}`}>
+              <div
+                key={listing._id}
+                className="bg-white rounded-lg shadow-md mb-4 overflow-hidden hover:shadow-lg transition-shadow flex"
+              >
+                <div className="w-1/4">
+                  <img
+                    alt={listing.title}
+                    className="w-full h-48 object-cover"
+                    src={listing.images[0]}
+                  />
+                </div>
+                <div className="flex-1 p-4">
+                  <div className="flex justify-between items-start">
                     <h2 className="text-lg font-semibold hover:text-red-500 cursor-pointer">
                       {listing.title}
                     </h2>
-                  </Link>
-                  <span className="text-red-500 text-xl font-bold whitespace-nowrap">
-                    {listing.price.toLocaleString()} VNĐ
-                  </span>
-                </div>
-                <div className="flex gap-2 text-sm text-gray-600 mt-1">
-                  <span>{listing.area}</span>
-                  <span>•</span>
-                  {listing.type && (
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                      {listing.type.name}
-                    </span>
-                  )}
-                </div>
-                <p className="text-gray-600 text-sm mt-1">{listing.address}</p>
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                  {listing.description}
-                </p>
-
-                {/* Voting Sao */}
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-sm">Đánh giá:</span>
-                  <Rate
-                    allowHalf
-                    value={listing.rating}
-                    // onChange={(value) => handleVote(listing._id, value)}
-                  />
-                  <span className="text-sm">({listing.rating || 0})</span>
-                </div>
-
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-2">
-                    <img
-                      alt={`Profile picture of ${listing.user.name}`}
-                      className="w-8 h-8 rounded-full"
-                      src={
-                        listing.user.avatar || "https://picsum.photos/200/300"
-                      }
-                    />
-                    <span className="text-sm text-gray-600">
-                      {listing.user.fullname}
+                    <h2 className="text-lg font-semibold hover:text-red-500 cursor-pointer">
+                      {listing?.name}
+                    </h2>
+                    <span className="text-red-500 text-xl font-bold whitespace-nowrap">
+                      {listing.price.toLocaleString()} VNĐ
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {listing.posted
-                      ? formatDate(listing.posted)
-                      : formatDate(listing.createdAt)}
-                  </span>
+                  <div className="flex gap-2 text-sm text-gray-600 mt-1">
+                    <span>{listing.area}</span>
+                    <span>•</span>
+                    {listing.type && (
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                        {listing.type.name}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {listing.address}
+                  </p>
+                  <p className="text-gray-500 text-sm mt-2 line-clamp-2">
+                    {listing.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-2">
+                      <img
+                        alt={`Profile picture of ${listing.user.name}`}
+                        className="w-8 h-8 rounded-full"
+                        src={
+                          listing.user.avatar || "https://picsum.photos/200/300"
+                        }
+                      />
+                      <span className="text-sm text-gray-600">
+                        {listing.user.fullname}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {listing.posted ? formatDate(listing.posted) : formatDate(listing.createdAt)}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -228,4 +219,4 @@ const RoomRental = () => {
   );
 };
 
-export default withAuth(RoomRental);
+export default withAuth(VIPAllRental);

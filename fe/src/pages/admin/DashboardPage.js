@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Users, Settings } from "lucide-react";
+import { DatePicker } from "antd";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend, LineChart, Line } from "recharts";
+import dayjs from "dayjs";
 import {
   addUser,
   getAllRole,
@@ -9,14 +12,15 @@ import {
 import Cookies from "js-cookie";
 import Modal from "react-modal";
 import { toast, ToastContainer } from "react-toastify";
-import { Button } from "antd";
+import { Button, Table } from "antd";
 import { useDispatch } from "react-redux";
 import { fetchUser } from "../../stores/redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
+import { getAllOrders } from "../../services/orderService/order.ssevice";
 
 const Sidebar = ({ setActivePage }) => {
   return (
-    <div className="w-64 bg-gray-900 text-white h-screen p-5">
+    <div className="w-64 bg-gray-900 text-white  p-5">
       <h2 className="text-xl font-bold mb-6">Admin Dashboard</h2>
       <ul>
         <li
@@ -25,9 +29,9 @@ const Sidebar = ({ setActivePage }) => {
         >
           <Users className="mr-2" /> Users
         </li>
-        {/* <li className="mb-4 cursor-pointer flex items-center" onClick={() => setActivePage("settings")}>
-                    <Settings className="mr-2" /> Settings
-                </li> */}
+        <li className="mb-4 cursor-pointer flex items-center" onClick={() => setActivePage("settings")}>
+          <Settings className="mr-2" /> Settings
+        </li>
       </ul>
     </div>
   );
@@ -186,6 +190,8 @@ export default function AdminDashboard() {
   const [roles, setRoles] = useState([]);
   const token = Cookies.get("authToken");
   const [loading, setLoading] = useState(false);
+  const { RangePicker } = DatePicker;
+  const [orders, setOrders] = useState([]);
   const [newUser, setNewUser] = useState({
     fullname: "",
     email: "",
@@ -205,6 +211,8 @@ export default function AdminDashboard() {
           return;
         }
         setRoles(responseRole?.data);
+        const responseOrder = await getAllOrders(token);
+        setOrders(responseOrder?.data);
       } catch (error) {
         console.log(error);
       }
@@ -279,6 +287,134 @@ export default function AdminDashboard() {
     setNewUser({ ...newUser, [name]: value });
   };
 
+  //ANTD
+  const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'ID',
+    },
+    {
+      title: 'Full Name',
+      dataIndex: 'FullName',
+      sorter: (a, b) => a.FullName.localeCompare(b.FullName),
+    },
+    {
+      title: 'Email',
+      dataIndex: 'Email',
+      sorter: (a, b) => a.Email.localeCompare(b.Email),
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'Amount',
+      sorter: (a, b) => a.Amount - b.Amount,
+    },
+    {
+      title: 'Rank',
+      dataIndex: 'Rank',
+      sorter: (a, b) => a.Rank - b.Rank,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'Status',
+      sorter: (a, b) => a.Status.localeCompare(b.Status),
+      render: (status) => {
+        let color = 'gray-500'; // Mặc định
+        if (status == 'success') color = 'green-500';
+        else if (status == 'pending') color = 'yellow';
+        else if (status == 'cancel') color = 'red';
+
+        return <span className={`text-${color} font-semibold`}>{status}</span>;
+      }
+    },
+    {
+      title: 'Description',
+      dataIndex: 'Description',
+      sorter: (a, b) => a.Description.localeCompare(b.Description),
+    },
+  ];
+
+  const dataa = orders.map((order) => {
+    return {
+      key: order._id,
+      ID: order?.app_trans_id,
+      FullName: order?.user?.fullname,
+      Email: order?.user?.email,
+      Amount: order?.amount,
+      Rank: order?.rank,
+      Status: order?.status,
+      Description: order?.description
+    }
+  })
+
+
+  const data = [
+    {
+      key: '1',
+      name: 'John Brown',
+      chinese: 98,
+      math: 60,
+      english: 70,
+    },
+    {
+      key: '2',
+      name: 'Jim Green',
+      chinese: 98,
+      math: 66,
+      english: 89,
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      chinese: 98,
+      math: 90,
+      english: 70,
+    },
+    {
+      key: '4',
+      name: 'Jim Red',
+      chinese: 88,
+      math: 99,
+      english: 89,
+    },
+  ];
+  const onChange = (pagination, filters, sorter, extra) => {
+    console.log('params', pagination, filters, sorter, extra);
+  };
+  // chart tron
+  const statusData = [
+    { name: "Pending", value: dataa.filter(item => item.Status === "pending").length, color: "#FFA500" },
+    { name: "Success", value: dataa.filter(item => item.Status === "success").length, color: "#00C49F" },
+    { name: "Cancel", value: dataa.filter(item => item.Status === "cancel").length, color: "#FF4444" }
+  ];
+
+  //char bieu do 
+
+  const [dateRange, setDateRange] = useState([
+    dayjs().subtract(6, "day"),
+    dayjs()
+  ]);
+
+  const handleDateChange = (dates) => {
+    if (dates) {
+      setDateRange(dates);
+    }
+  };
+
+  const filteredOrders = orders.filter(order => {
+    const orderDate = dayjs(order.createdAt);
+    return orderDate.isAfter(dateRange[0].startOf('day')) && orderDate.isBefore(dateRange[1].endOf('day'));
+  });
+
+  const revenueByDate = filteredOrders.reduce((acc, order) => {
+    const date = dayjs(order.createdAt).format("YYYY-MM-DD");
+    acc[date] = (acc[date] || 0) + order.amount;
+    return acc;
+  }, {});
+
+  const chartData = Object.entries(revenueByDate)
+    .map(([date, amount]) => ({ date, amount }))
+    .sort((a, b) => dayjs(a.date).isAfter(dayjs(b.date)) ? 1 : -1);
+
   //update role
 
   return (
@@ -290,34 +426,91 @@ export default function AdminDashboard() {
           {activePage === "users" ? "User Management" : "Settings"}
         </h1>
 
-        <div className="flex justify-between mb-4">
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value.trim())}
-            className="w-1/2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            onClick={() => setModalIsOpen(true)}
-          >
-            Add User
-          </button>
-        </div>
+
 
         {activePage === "users" ? (
-          <UserTable
-            token={token}
-            users={users}
-            setUsers={setUsers}
-            roles={roles}
-            setRoles={setRoles}
-            search={search}
-            setSearch={setSearch}
-          />
+          <>
+            <div className="flex justify-between mb-4">
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value.trim())}
+                className="w-1/2 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setModalIsOpen(true)}
+              >
+                Add User
+              </button>
+            </div>
+            <UserTable
+              token={token}
+              users={users}
+              setUsers={setUsers}
+              roles={roles}
+              setRoles={setRoles}
+              search={search}
+              setSearch={setSearch}
+            />
+          </>
         ) : (
-          <p>Settings Page</p>
+          //Table and chart
+          <div  >
+            <div className="grid grid-cols-5 grid-rows-[auto] gap-4 p-4">
+              {/* Bảng dữ liệu */}
+              <div className="col-span-4 row-span-3 bg-white shadow-md rounded-lg p-4">
+                <Table columns={columns} dataSource={dataa} onChange={onChange} />
+              </div>
+
+              {/* Biểu đồ tròn */}
+              <div className="col-span-1 row-span-3 flex flex-col items-center justify-center bg-white shadow-md rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-2">Transaction Status</h3>
+                <div className="w-full h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        innerRadius={50}
+                        fill="#8884d8"
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {statusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend verticalAlign="bottom" height={36} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Doanh thu theo ngày */}
+              <div className="col-span-5 row-span-2 bg-white shadow-md rounded-lg p-4 text-center">
+                <h3 className="text-lg font-semibold mb-2">Revenue by Date</h3>
+                <DatePicker.RangePicker
+                  value={dateRange}
+                  onChange={handleDateChange}
+                  format="YYYY-MM-DD"
+                />
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={chartData}>
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="amount" stroke="#8884d8" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
         )}
 
         {/* Modal */}

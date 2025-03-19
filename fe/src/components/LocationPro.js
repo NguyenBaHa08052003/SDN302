@@ -13,7 +13,7 @@ const findNameById = (list, id) => {
   const item = list.find((item) => item.id === id);
   return item ? item.full_name : "";
 };
-const LocationSelector = () => {
+const LocationSelector = ({type}) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -115,7 +115,8 @@ const LocationSelector = () => {
     "70 - 90 m²",
     "Trên 90 m²",
   ];
-
+  console.log(type);
+  
   const renderMenu = (options, selectedValue, handleChange) => (
     <Menu>
       {options.map((option) => (
@@ -154,7 +155,7 @@ const LocationSelector = () => {
     ]
       .filter(Boolean) // Loại bỏ chuỗi rỗng
       .join("&"); // Nối chuỗi đúng định dạng URL
-    navigate(`/loging/room-rental?${queryParams}`);
+      navigate(`/loging/room-rental?${queryParams}`);
     dispatch(
       fetchLodgings({
         address: provinceName

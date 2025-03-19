@@ -12,6 +12,8 @@ import RoomDetail from "../pages/Home/Details/RoomDetail";
 import VerifyUserPage from "../pages/admin/VerifyUserPage";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import SignUp from "../pages/auth/SignUp";
+import VIPAllRental from "../pages/Home/Details/VIPAllRental";
+import SupportSystem from "../pages/Home/support/SupportSystem";
 export const publicRoutes = (
   <>
     <Route path="*" element={<NotFound />} />
@@ -22,6 +24,8 @@ export const publicRoutes = (
       <Route path="/loging/nguyen-can" element={<RoomRental />} />
       <Route path="/loging/room-rental/room-detail/:id" element={<RoomDetail />} />
       <Route path="/verify-account/:id" element={<VerifyUserPage />} />
+      <Route path="/loging/vip-all-rental" element={<VIPAllRental />} />
+      <Route path="/support-system" element={<SupportSystem />} />
     </Route>
 
     <Route element={<AuthLayout />}>

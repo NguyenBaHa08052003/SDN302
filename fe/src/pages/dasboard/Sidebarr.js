@@ -91,7 +91,7 @@ const Sidebarr = () => {
               <button
                 onClick={() => {
                   toast.dismiss(toastId);
-                  navigate("/quan-ly/nap-tien");
+                  navigate("/support-system");
                 }}
                 className="bg-red-500 text-white px-3 py-1 rounded-md mr-2 hover:bg-red-600 "
               >

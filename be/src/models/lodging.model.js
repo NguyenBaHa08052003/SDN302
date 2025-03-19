@@ -18,6 +18,13 @@ const LodgingSchema = new mongoose.Schema(
     detail_address: {
       type: String,
     },
+    rating: { type: Number, default: 0 },
+    votes: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        rating: { type: Number, required: true },
+      },
+    ],
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     type: { type: mongoose.Schema.Types.ObjectId, ref: "Lodgingtype" },
   },

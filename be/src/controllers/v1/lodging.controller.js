@@ -6,6 +6,22 @@ const { deleteImagesFromCloudinary } = require("../../utils/cloudinaryUtils");
 const { errorResponse, successResponse } = require("../../utils/response");
 const Order = require("../../models/order.model");
 module.exports = {
+  getLodginById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(id);
+
+      const findLodging = await Lodging.findById(id)
+        .populate({ path: "type", select: "name -_id" })
+        .populate({ path: "user", select: "fullname email phoneNumber -_id" });
+      if (!findLodging) {
+        return errorResponse(res, {}, 404, "Không tìm thấy phòng trọ");
+      }
+      return successResponse(res, findLodging, {}, 200, "Lấy dữ liệu thông");
+    } catch (error) {
+      console.log("Error get lodging by id", error.message);
+    }
+  },
   createLodging: async (req, res) => {
     try {
       const {
@@ -117,7 +133,7 @@ module.exports = {
       }
       // Lấy danh sách user đã có order
       const orders = await Order.find().select("user");
-      
+
       const orderedUsers = new Set(
         orders.map((order) => order.user._id.toString())
       );
@@ -146,21 +162,21 @@ module.exports = {
 
   getRankingLodging: async (req, res) => {
     try {
-       // Lấy danh sách user đã có order
-       const orders = await Order.find().select("user");
-       const orderedUsers = new Set(
-         orders.map((order) => order.user._id.toString())
-       );
-       console.log(orderedUsers);
-       // Lọc listings để chỉ giữ lại những cái không có trong Order
-       const listings = await Lodging.find()
-         .populate({ path: "type", select: "name -_id" })
-         .populate({ path: "user", select: "_id fullname email phoneNumber" });
- 
-       const filteredListings = listings.filter(
-         (listing) =>
-           listing.user._id && orderedUsers.has(listing.user._id.toString())
-       );
+      // Lấy danh sách user đã có order
+      const orders = await Order.find().select("user");
+      const orderedUsers = new Set(
+        orders.map((order) => order.user._id.toString())
+      );
+      console.log(orderedUsers);
+      // Lọc listings để chỉ giữ lại những cái không có trong Order
+      const listings = await Lodging.find()
+        .populate({ path: "type", select: "name -_id" })
+        .populate({ path: "user", select: "_id fullname email phoneNumber" });
+
+      const filteredListings = listings.filter(
+        (listing) =>
+          listing.user._id && orderedUsers.has(listing.user._id.toString())
+      );
       res.json({
         listings: filteredListings,
       });
@@ -297,6 +313,37 @@ module.exports = {
         message: "Failed to update lodging",
         error: error.message,
       });
+    }
+  },
+  voteLodging: async (req, res) => {
+    try {
+      const { lodgingId } = req.params;
+      const { rating } = req.body;
+      const userId = req.user.UID; // Lấy user từ token
+      if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ message: "Invalid rating value (1-5)" });
+      }
+      const lodging = await Lodging.findById(lodgingId);
+      if (!lodging) {
+        return res.status(404).json({ message: "Lodging not found" });
+      }
+      const existingVote = lodging.votes.find(
+        (v) => v.userId.toString() === userId
+      );
+      if (existingVote) {
+        existingVote.rating = rating;
+      } else {
+        lodging.votes.push({ userId, rating });
+      }
+
+      // Tính điểm rating trung bình
+      const totalRating = lodging.votes.reduce((sum, v) => sum + v.rating, 0);
+      lodging.rating = totalRating / lodging.votes.length;
+
+      await lodging.save();
+      res.status(200).json(lodging);
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error", error });
     }
   },
 };

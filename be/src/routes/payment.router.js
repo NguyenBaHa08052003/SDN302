@@ -55,8 +55,7 @@ router.post("/payment", async (req, res) => {
       item: JSON.stringify([]),
       embed_data: JSON.stringify(embed_data),
       amount,
-      callback_url:
-        "https://f5dc-14-232-91-251.ngrok-free.app/api/zalo/callback",
+      callback_url:"https://d216-14-232-91-251.ngrok-free.app/api/zalo/callback",
       description,
       bank_code: "",
     };

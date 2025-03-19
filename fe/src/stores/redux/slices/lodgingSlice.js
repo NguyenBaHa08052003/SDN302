@@ -5,16 +5,29 @@ const initialState = {
   lodgings: [],
   status: "idle",
   error: null,
-  isSearching: false, //Kiểm soát trạng thái tìm kiếm
+  isSearching: false, // Kiểm soát trạng thái tìm kiếm
 };
 
-//Fetch tất cả hoặc tìm kiếm theo params
+// Fetch tất cả hoặc tìm kiếm theo params
 export const fetchLodgings = createAsyncThunk(
   "lodging/fetchLodgings",
   async (params = null, { rejectWithValue }) => {
     try {
       const response = await lodgingService.getAllLodging(params);
       return response;
+    } catch (error) {
+      return rejectWithValue(error.response);
+    }
+  }
+);
+
+// Vote cho một lodging
+export const voteLodging = createAsyncThunk(
+  "lodging/voteLodging",
+  async ({ lodgingId, rating }, { rejectWithValue }) => {
+    try {
+      const response = await lodgingService.voteLodging(lodgingId, rating);
+      return { lodgingId, rating, updatedLodging: response };
     } catch (error) {
       return rejectWithValue(error.response);
     }
@@ -41,6 +54,16 @@ const lodgingSlice = createSlice({
       })
       .addCase(fetchLodgings.rejected, (state, action) => {
         state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(voteLodging.fulfilled, (state, action) => {
+        const { lodgingId, rating, updatedLodging } = action.payload;
+        const lodgingIndex = state?.lodgings?.findIndex((lodging) => lodging._id === lodgingId);
+        if (lodgingIndex !== -1) {
+          state.lodgings[lodgingIndex] = updatedLodging;
+        }
+      })
+      .addCase(voteLodging.rejected, (state, action) => {
         state.error = action.payload;
       });
   },

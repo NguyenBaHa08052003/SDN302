@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Carousel, Card, Button } from "antd";
 import { StarFilled } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function VIPRental() {
   const [vipRooms, setVipRooms] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     async function fetchVIPRooms() {
       try {
@@ -21,9 +21,11 @@ export default function VIPRental() {
     }
     fetchVIPRooms();
   }, []);
-
+  const handleNavidate = () => {
+    navigate("/loging/vip-all-rental");
+  };
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4 bg-gray-100 shadow-lg rounded-lg">
+    <div onClick={handleNavidate} className="max-w-4xl mx-auto mt-10 p-4 bg-gray-100 shadow-lg rounded-lg">
       <h2 className="text-2xl font-bold text-center text-gray-800 italic">
         Phòng Siêu Hot
       </h2>

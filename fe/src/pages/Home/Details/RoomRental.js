@@ -4,10 +4,13 @@ import LocationPro from "../../../components/LocationPro";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLodgings, voteLodging } from "../../../stores/redux/slices/lodgingSlice";
 import ClientPagination from "../../../components/Pagination";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "../../../utils/convert";
 import VIPRental from "./VIPRental";
 import { Rate } from "antd";
+import { FaHeart } from "react-icons/fa";
+import { addFavoriteLodging, getFavoriteLodging } from "../../../services/customerService/customer.service";
+import Cookies from "js-cookie";
 
 const priceRanges = {
   "Dưới 1 triệu": [0, 1000000],
@@ -35,12 +38,21 @@ const RoomRental = () => {
   const dispatch = useDispatch();
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
+  const [favoriteArray, setFavoriteArray] = useState([]);
+  const token = Cookies.get("authToken");
+  const userId = sessionStorage.getItem("UserId");
+
+  const navigate = useNavigate()
   useEffect(() => {
     const pathSegments = window.location.pathname.split("/");
     const type = pathSegments[pathSegments.length - 1];
     const fetchListings = async () => {
       try {
         dispatch(fetchLodgings({ limit: 8, type }));
+        const getFavorite = await getFavoriteLodging(userId, token);
+        if (getFavorite) {
+          setFavoriteArray(getFavorite?.data?.map((id) => id._id));
+        }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách phòng:", error);
       }
@@ -86,6 +98,18 @@ const RoomRental = () => {
     "70 - 90 m²",
     "Trên 90 m²",
   ];
+
+  const toggleFavorite = async (idLodging) => {
+    try {
+      const resDataAddLodging = await addFavoriteLodging(userId, idLodging, token);
+      if (resDataAddLodging) {
+        setFavoriteArray(resDataAddLodging.data.favoriteLodging.map((id) => id._id));
+      }
+    } catch (error) {
+      console.log(error);
+      navigate('/dang-nhap')
+    }
+  };
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6">
@@ -173,11 +197,22 @@ const RoomRental = () => {
                       {listing.user.fullname}
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {listing.posted
-                      ? formatDate(listing.posted)
-                      : formatDate(listing.createdAt)}
-                  </span>
+                  <div className="text-sm text-gray-500 flex items-center justify-between">
+
+                    <span>
+                      {listing.posted
+                        ? formatDate(listing.posted)
+                        : formatDate(listing.createdAt)}
+                    </span>
+
+                    <span className="cursor-pointer ml-3">
+                      <FaHeart
+                        className={`cursor-pointer ${favoriteArray?.includes(listing?._id) ? "text-red-500" : "text-gray-400"}`}
+                        onClick={() => toggleFavorite(listing?._id)}
+                      />
+                    </span>
+                  </div>
+
                 </div>
               </div>
             </div>

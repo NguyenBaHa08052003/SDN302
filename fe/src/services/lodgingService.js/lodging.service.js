@@ -89,11 +89,22 @@ const voteLodging = async (lodgingId, rating) => {
     return error.response;
   }
 };
+
+const getAllForPage = async () => {
+  try {
+    const response = await axios.get(`http://localhost:3000/api/lodgings/getAll`);
+    return response.data
+  } catch (error) {
+    console.log(error);
+
+  }
+};
 const lodgingService = {
   getAllLodging,
   createLodging,
   updateLodging,
   getLodgingByIdRoom,
   voteLodging,
+  getAllForPage
 };
 export default lodgingService;

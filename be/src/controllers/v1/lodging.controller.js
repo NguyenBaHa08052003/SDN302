@@ -235,9 +235,8 @@ module.exports = {
       lodging.status = status;
       await lodging.save();
       return res.status(200).json({
-        message: `Đã ${
-          status === 1 ? "mở" : "đóng"
-        } trạng thái phòng thành công.`,
+        message: `Đã ${status === 1 ? "mở" : "đóng"
+          } trạng thái phòng thành công.`,
         status,
       });
     } catch (error) {
@@ -344,6 +343,18 @@ module.exports = {
       res.status(200).json(lodging);
     } catch (error) {
       res.status(500).json({ message: "Internal server error", error });
+    }
+  },
+  getAllLodgingsForPage: async (req, res) => {
+    try {
+      // const { page, limit } = req.query;
+      // const skip = (page - 1) * limit;
+      const lodgings = await Lodging.find()
+      res.status(200).json({
+        listings: lodgings
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Lỗi server", error });
     }
   },
 };

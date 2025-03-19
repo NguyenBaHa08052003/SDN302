@@ -12,7 +12,6 @@ const getAllUsers = async (req, res) => {
         const formatUsers = users.map(user => {
             return { ...user._doc, password: undefined }
         });
-        console.log(formatUsers);
         return successResponse(res, formatUsers, {}, 201, "Danh sách nguoi dung thanh cong");
     } catch (error) {
         console.log(error);

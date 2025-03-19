@@ -84,7 +84,6 @@ const UserTable = (props) => {
       ) {
         const updateU = await updateUser(idUser, { status: !data.status }, token)
         if (updateU) {
-          console.log(updateU);
           // hien thi ra toast
           setTimeout(() => {
             toast.success(updateU?.message, {

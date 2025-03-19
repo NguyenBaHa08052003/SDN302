@@ -54,7 +54,6 @@ const Header = () => {
       <Menu.Item key="logout" onClick={handleLogout} icon={<LogoutOutlined />}>
         Đăng xuất
       </Menu.Item>
-
     </Menu>
   );
 
@@ -74,10 +73,10 @@ const Header = () => {
             <Link to={"/loging/room-rental"} className="text-black mr-5 text-sm font-bold">
               Phòng trọ
             </Link>
-            <a href="#" className="text-black mr-5 text-sm font-bold">
+            <Link to={"/loging/nguyen-can"} className="text-black mr-5 text-sm font-bold">
               Nguyên căn
-            </a>
-            <a href="#" className="text-black mr-5 text-sm font-bold">
+            </Link>
+            {/* <a href="#" className="text-black mr-5 text-sm font-bold">
               Căn hộ
             </a>
             <a href="#" className="text-black mr-5 text-sm font-bold">
@@ -88,7 +87,7 @@ const Header = () => {
             </a>
             <a href="#" className="text-black mr-5 text-sm font-bold">
               Tin tức
-            </a>
+            </a> */}
           </>
         )}
 

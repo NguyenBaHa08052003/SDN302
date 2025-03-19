@@ -69,10 +69,31 @@ const getLodgingByIdRoom = async (id) => {
     return error.response;
   }
 }
+const voteLodging = async (lodgingId, rating) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:3000/api/lodgings/${lodgingId}/vote`,
+      { rating },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authTokenControl.getToken()}`,
+        },
+      }
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+    return response?.error;
+  } catch (error) {
+    return error.response;
+  }
+};
 const lodgingService = {
   getAllLodging,
   createLodging,
   updateLodging,
-  getLodgingByIdRoom
+  getLodgingByIdRoom,
+  voteLodging,
 };
 export default lodgingService;

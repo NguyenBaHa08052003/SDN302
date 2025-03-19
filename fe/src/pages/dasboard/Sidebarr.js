@@ -6,6 +6,7 @@ import {
   DownOutlined,
   RightOutlined,
   BarChartOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../utils/customHook";
@@ -18,7 +19,6 @@ const Sidebarr = () => {
   const navigate = useNavigate();
   const lastSegment = location?.pathname?.split("/")?.pop() || "";
   const userRole = userCurren?.data?.role;
-
   // Trạng thái mở của từng dropdown
   const [openDropdowns, setOpenDropdowns] = useState({});
 
@@ -72,7 +72,12 @@ const Sidebarr = () => {
 
   // Điều hướng có kiểm tra quyền
   const handleNavigation = (path) => {
-    if (userRole !== "Landlord" && path !== "/quan-ly/tai-khoan"  && path !== "/quan-ly/tai-khoan" && path !== "/quan-ly/doi-mat-khau") {
+    if (
+      userRole !== "Landlord" &&
+      path !== "/quan-ly/tai-khoan" &&
+      path !== "/quan-ly/tai-khoan" &&
+      path !== "/quan-ly/doi-mat-khau"
+    ) {
       const toastId = "custom-toast";
       if (!toast.isActive(toastId)) {
         toast.error(
@@ -86,7 +91,7 @@ const Sidebarr = () => {
               <button
                 onClick={() => {
                   toast.dismiss(toastId);
-                  navigate("/quan-ly/nap-tien");
+                  navigate("/support-system");
                 }}
                 className="bg-red-500 text-white px-3 py-1 rounded-md mr-2 hover:bg-red-600 "
               >
@@ -116,7 +121,15 @@ const Sidebarr = () => {
   return (
     <div className="w-64 bg-white border-r border-gray-200 p-5">
       <ToastContainer />
-      <div className="flex flex-col items-center">
+      <div className="relative flex flex-col items-center">
+        {/* Hiển thị ngôi sao nếu có ranking */}
+        {userCurren?.data?.ranking === "Vàng" && (
+          <StarFilled className="absolute -top-2 -right-2 text-yellow-400 text-3xl shadow-lg" />
+        )}
+        {userCurren?.data?.ranking === "Bạc" && (
+          <StarFilled className="absolute -top-2 -right-2 text-gray-400 text-3xl shadow-lg" />
+        )}
+        {/* Avatar */}
         <img
           className="w-12 h-12 rounded-full"
           src={
@@ -124,12 +137,22 @@ const Sidebarr = () => {
           }
           alt="Profile"
         />
+
+        {/* Tên user */}
         <h2 className="text-lg font-semibold mt-2">{userCurren?.data?.name}</h2>
-        <p className="text-sm text-gray-500" style={{ color: "red" }}>
+
+        {/* Vai trò */}
+        <p className="text-sm text-red-500">
           Tài khoản {userCurren?.data?.role}
         </p>
-      </div>
 
+        {/* Ranking */}
+        {userCurren?.data?.ranking && (
+          <p className="text-sm text-yellow-500 font-semibold">
+            Ranking: {userCurren?.data?.ranking}
+          </p>
+        )}
+      </div>
       <div className="mt-5">
         <button className="w-full bg-red-500 text-white py-2 rounded-lg mb-2">
           Tạo tin

@@ -19,7 +19,8 @@ module.exports = {
             if (!user) {
                 return errorResponse(res, {}, 404, "Không tìm thấy người dùng");
             }
-            return successResponse(res, { ...user._doc, password: undefined }, {}, 201, "Chi tiết người dùng");
+            
+            return successResponse(res, { ...user._doc, password: undefined}, {}, 201, "Chi tiết người dùng");
         } catch (error) {
             console.log(error);
 

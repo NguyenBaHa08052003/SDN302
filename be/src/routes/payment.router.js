@@ -1,106 +1,119 @@
 const express = require("express");
 const router = express.Router();
-const moment = require('moment'); 
-const qs = require('qs');
-const CryptoJS = require('crypto-js'); 
+const moment = require("moment");
+const qs = require("qs");
+const CryptoJS = require("crypto-js");
 const axios = require("axios");
+const Order = require("../models/order.model");
 // APP INFO, STK TEST: 4111 1111 1111 1111
 const config = {
-  app_id: '2553',
-  key1: 'PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL',
-  key2: 'kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz',
-  endpoint: 'https://sb-openapi.zalopay.vn/v2/create',
+  app_id: "2553",
+  key1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL",
+  key2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz",
+  endpoint: "https://sb-openapi.zalopay.vn/v2/create",
 };
 
+// API Tạo Đơn Hàng và Gửi Thanh Toán
+router.post("/payment", async (req, res) => {
+  const { user_id, amount, description, method, rank } = req.body; // Nhận đầy đủ dữ liệu từ FE
 
-router.post('/payment', async (req, res) => {
-  const embed_data = {
-    //sau khi hoàn tất thanh toán sẽ đi vào link này (thường là link web thanh toán thành công của mình)
-    redirecturl: 'http://localhost:3001/quan-ly/nap-tien',
-  };
-
-  const items = [];
-  const transID = Math.floor(Math.random() * 1000000);
-
-  const order = {
-    app_id: config.app_id,
-    app_trans_id: `${moment().format('YYMMDD')}_${transID}`, // translation missing: vi.docs.shared.sample_code.comments.app_trans_id
-    app_user: 'user123',
-    app_time: Date.now(), // miliseconds
-    item: JSON.stringify(items),
-    embed_data: JSON.stringify(embed_data),
-    amount: 50000,
-    //khi thanh toán xong, zalopay server sẽ POST đến url này để thông báo cho server của mình
-    callback_url: 'https://abcb-14-232-91-251.ngrok-free.app/callback',
-    description: `Lazada - Payment for the order #${transID}`,
-    bank_code: '',
-  };
-
-  // appid|app_trans_id|appuser|amount|apptime|embeddata|item
-  const data =
-    config.app_id +
-    '|' +
-    order.app_trans_id +
-    '|' +
-    order.app_user +
-    '|' +
-    order.amount +
-    '|' +
-    order.app_time +
-    '|' +
-    order.embed_data +
-    '|' +
-    order.item;
-  order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+  if (!user_id || !amount || !description || !method || !rank) {
+    return res.status(400).json({ message: "Thiếu dữ liệu đầu vào" });
+  }
 
   try {
-    const result = await axios.post(config.endpoint, null, { params: order });
+    const transID = Math.floor(Math.random() * 1000000);
+    const app_trans_id = `${moment().format("YYMMDD")}_${transID}`;
+
+    let order = await Order.findOne({ user_id });
+
+    if (order) {
+      order.amount = amount;
+      order.description = description;
+      order.method = method;
+      order.rank = rank;
+      order.status = "pending";
+      order.app_trans_id = app_trans_id;
+    } else {
+      order = new Order({
+        app_trans_id,
+        user_id,
+        amount,
+        description,
+        method,
+        rank,
+        status: "pending",
+      });
+    }
+
+    await order.save(); 
+    const embed_data = {
+      redirecturl: "http://localhost:3001/quan-ly/nap-tien-thanh-cong",
+    };
+    const orderData = {
+      app_id: config.app_id,
+      app_trans_id,
+      app_user: user_id,
+      app_time: Date.now(),
+      item: JSON.stringify([]),
+      embed_data: JSON.stringify(embed_data),
+      amount,
+      callback_url: "https://f5dc-14-232-91-251.ngrok-free.app/api/zalo/callback",
+      description,
+      bank_code: "",
+    };
+    const data =
+      `${config.app_id}|${orderData.app_trans_id}|${orderData.app_user}|${orderData.amount}|${orderData.app_time}|${orderData.embed_data}|${orderData.item}`;
+    orderData.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
+    const result = await axios.post(config.endpoint, null, { params: orderData });
+
     return res.status(200).json(result.data);
   } catch (error) {
-    console.log(error);
+    console.error("Lỗi thanh toán:", error);
+    return res.status(500).json({ message: "Lỗi khi tạo đơn hàng" });
   }
 });
-
 /**
  * method: POST
  * description: callback để Zalopay Server call đến khi thanh toán thành công.
  * Khi và chỉ khi ZaloPay đã thu tiền khách hàng thành công thì mới gọi API này để thông báo kết quả.
  */
-router.post('/callback', (req, res) => {
+// API Xác Nhận Thanh Toán từ ZaloPay
+router.post("/callback", async (req, res) => {
   let result = {};
-  console.log(req.body);
   try {
-    let dataStr = req.body.data;
-    let reqMac = req.body.mac;
+    const { data, mac } = req.body;
 
-    let mac = CryptoJS.HmacSHA256(dataStr, config.key2).toString();
-    console.log('mac =', mac);
-
-    // kiểm tra callback hợp lệ (đến từ ZaloPay server)
-    if (reqMac !== mac) {
-      // callback không hợp lệ
-      result.return_code = -1;
-      result.return_message = 'mac not equal';
-    } else {
-      // thanh toán thành công
-      // merchant cập nhật trạng thái cho đơn hàng ở đây
-      let dataJson = JSON.parse(dataStr, config.key2);
-      console.log(
-        "update order's status = success where app_trans_id =",
-        dataJson['app_trans_id'],
-      );
-
-      result.return_code = 1;
-      result.return_message = 'success';
+    // Tạo chữ ký xác minh
+    const expectedMac = CryptoJS.HmacSHA256(data, config.key2).toString();
+    if (mac !== expectedMac) {
+      return res.json({ return_code: -1, return_message: "Invalid MAC" });
     }
-  } catch (ex) {
-    console.log('lỗi:::' + ex.message);
-    result.return_code = 0; // ZaloPay server sẽ callback lại (tối đa 3 lần)
-    result.return_message = ex.message;
+
+    // Parse dữ liệu từ ZaloPay
+    const paymentData = JSON.parse(data);
+    const { app_trans_id } = paymentData;
+
+    // Cập nhật trạng thái đơn hàng
+    const order = await Order.findOne({ app_trans_id });
+    if (!order) {
+      return res.json({ return_code: 0, return_message: "Order not found" });
+    }
+
+    order.status = "success";
+    await order.save();
+
+    console.log(`Order ${app_trans_id} đã thanh toán thành công!`);
+
+    result.return_code = 1;
+    result.return_message = "Success";
+  } catch (error) {
+    console.error("Lỗi callback:", error);
+    result.return_code = 0;
+    result.return_message = "Callback error";
   }
 
-  // thông báo kết quả cho ZaloPay server
-  res.json(result);
+  return res.json(result);
 });
 
 /**
@@ -115,7 +128,7 @@ router.post('/callback', (req, res) => {
  * nên Merchant cần hiện thực việc chủ động gọi API truy vấn trạng thái đơn hàng.
  */
 
-router.post('/check-status-order', async (req, res) => {
+router.post("/check-status-order", async (req, res) => {
   const { app_trans_id } = req.body;
 
   let postData = {
@@ -123,14 +136,14 @@ router.post('/check-status-order', async (req, res) => {
     app_trans_id, // Input your app_trans_id
   };
 
-  let data = postData.app_id + '|' + postData.app_trans_id + '|' + config.key1; // appid|app_trans_id|key1
+  let data = postData.app_id + "|" + postData.app_trans_id + "|" + config.key1; // appid|app_trans_id|key1
   postData.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
 
   let postConfig = {
-    method: 'post',
-    url: 'https://sb-openapi.zalopay.vn/v2/query',
+    method: "post",
+    url: "https://sb-openapi.zalopay.vn/v2/query",
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     data: qs.stringify(postData),
   };
@@ -154,7 +167,7 @@ router.post('/check-status-order', async (req, res) => {
       }
     */
   } catch (error) {
-    console.log('lỗi');
+    console.log("lỗi");
     console.log(error);
   }
 });

@@ -52,7 +52,7 @@ const CartPayment = () => {
       const response = await axios.post(`http://localhost:3000/api/${method}/payment`, {
         user_id: userId, // ⚠️ Đảm bảo `user_id` là string
         amount: selectedRank.price,
-        description: `Đăng ký ${selectedRank.rank} - ${selectedRank.price} VND`,
+        description: `Đăng ký gói ${selectedRank.rank} - ${selectedRank.price} VND`,
         method: method,
         rank: selectedRank.rank,
       });

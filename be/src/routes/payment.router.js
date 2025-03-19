@@ -5,6 +5,7 @@ const qs = require("qs");
 const CryptoJS = require("crypto-js");
 const axios = require("axios");
 const Order = require("../models/order.model");
+const User = require("../models/user.model");
 // APP INFO, STK TEST: 4111 1111 1111 1111
 const config = {
   app_id: "2553",
@@ -15,18 +16,26 @@ const config = {
 
 // API Tạo Đơn Hàng và Gửi Thanh Toán
 router.post("/payment", async (req, res) => {
-  const { user_id, amount, description, method, rank } = req.body; // Nhận đầy đủ dữ liệu từ FE
+  const { user_id, amount, description, method, rank } = req.body;
 
+  // Kiểm tra dữ liệu đầu vào
   if (!user_id || !amount || !description || !method || !rank) {
     return res.status(400).json({ message: "Thiếu dữ liệu đầu vào" });
   }
 
   try {
+    // Kiểm tra user có tồn tại không
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
+    }
+
+    // Tạo mã giao dịch
     const transID = Math.floor(Math.random() * 1000000);
     const app_trans_id = `${moment().format("YYMMDD")}_${transID}`;
 
-    let order = await Order.findOne({ user_id });
-
+    // Kiểm tra xem user đã có đơn hàng chưa
+    let order = await Order.findOne({ user: user._id });
     if (order) {
       order.amount = amount;
       order.description = description;
@@ -37,7 +46,7 @@ router.post("/payment", async (req, res) => {
     } else {
       order = new Order({
         app_trans_id,
-        user_id,
+        user: user._id, // Đảm bảo dùng ObjectId
         amount,
         description,
         method,
@@ -46,31 +55,43 @@ router.post("/payment", async (req, res) => {
       });
     }
 
-    await order.save(); 
+    await order.save();
+
+    // Dữ liệu embed (chứa URL chuyển hướng sau khi thanh toán)
     const embed_data = {
       redirecturl: "http://localhost:3001/quan-ly/nap-tien-thanh-cong",
     };
+
+    // Chuẩn bị dữ liệu gửi đến cổng thanh toán
     const orderData = {
       app_id: config.app_id,
       app_trans_id,
-      app_user: user_id,
+      app_user: user._id.toString(), // Chuyển ObjectId thành string
       app_time: Date.now(),
       item: JSON.stringify([]),
       embed_data: JSON.stringify(embed_data),
       amount,
-      callback_url: "https://f5dc-14-232-91-251.ngrok-free.app/api/zalo/callback",
+      callback_url:
+        "https://f5dc-14-232-91-251.ngrok-free.app/api/zalo/callback",
       description,
       bank_code: "",
     };
-    const data =
-      `${config.app_id}|${orderData.app_trans_id}|${orderData.app_user}|${orderData.amount}|${orderData.app_time}|${orderData.embed_data}|${orderData.item}`;
+
+    // Tạo MAC (mã bảo mật)
+    const data = `${config.app_id}|${orderData.app_trans_id}|${orderData.app_user}|${orderData.amount}|${orderData.app_time}|${orderData.embed_data}|${orderData.item}`;
     orderData.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
-    const result = await axios.post(config.endpoint, null, { params: orderData });
+
+    // Gửi request đến cổng thanh toán
+    const result = await axios.post(config.endpoint, null, {
+      params: orderData,
+    });
 
     return res.status(200).json(result.data);
   } catch (error) {
     console.error("Lỗi thanh toán:", error);
-    return res.status(500).json({ message: "Lỗi khi tạo đơn hàng" });
+    return res
+      .status(500)
+      .json({ message: "Lỗi khi tạo đơn hàng", error: error.message });
   }
 });
 /**
@@ -99,12 +120,9 @@ router.post("/callback", async (req, res) => {
     if (!order) {
       return res.json({ return_code: 0, return_message: "Order not found" });
     }
-
     order.status = "success";
     await order.save();
-
     console.log(`Order ${app_trans_id} đã thanh toán thành công!`);
-
     result.return_code = 1;
     result.return_message = "Success";
   } catch (error) {

@@ -20,9 +20,7 @@ export default function PaymentSuccess() {
           <Title level={4}>Chi tiết giao dịch</Title>
           <Text><strong>Số tiền:</strong> {searchParams.get("amount")} VND</Text><br />
           <Text><strong>Mã giao dịch:</strong> {searchParams.get("apptransid")}</Text><br />
-          <Text><strong>Phương thức thanh toán:</strong> {searchParams.get("bankcode")}</Text><br />
-          <Text><strong>Gói đăng ký:</strong> {searchParams.get("rank")}</Text><br />
-          <Text><strong>Mô tả:</strong> {searchParams.get("description")}</Text><br />
+          <Text><strong>Phương thức thanh toán:</strong><span style={{ color: "red", fontWeight: "bold" }}> ZaloPay</span></Text><br />
           <Text><strong>Trạng thái:</strong> <span style={{ color: "#52c41a", fontWeight: "bold" }}>Thành công</span></Text>
         </div>
         <div className="mt-6 flex flex-col gap-4">

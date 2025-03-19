@@ -12,7 +12,8 @@ const Header = () => {
   const user = useUser();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const pathSegments = window.location.pathname.split("/");
+  const type = pathSegments[pathSegments.length - 1];
   // Xử lý profile
   const handleProfile = () => {
     if (!user?.success) {
@@ -71,7 +72,7 @@ const Header = () => {
         {user?.data?.role !== "Admin" && (
           <>
             <Link to={"/loging/room-rental"} className="text-black mr-5 text-sm font-bold">
-              Phòng trọ
+              {type === "room-rental" ? <span className="text-red-500">Phòng trọ</span> : "Phòng trọ"}
             </Link>
             <Link to={"/loging/nguyen-can"} className="text-black mr-5 text-sm font-bold">
               Nguyên căn

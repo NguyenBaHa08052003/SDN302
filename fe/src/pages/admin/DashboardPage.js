@@ -457,7 +457,7 @@ export default function AdminDashboard() {
           </>
         ) : (
           //Table and chart
-          <div  >
+          <div className="flex flex-col h-full ">
             <div className="grid grid-cols-5 grid-rows-[auto] gap-4 p-4">
               {/* Bảng dữ liệu */}
               <div className="col-span-4 row-span-3 bg-white shadow-md rounded-lg p-4">
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Doanh thu theo ngày */}
-              <div className="col-span-5 row-span-2 bg-white shadow-md rounded-lg p-4 text-center">
+              <div className="max-w-full h-full col-span-5 row-span-2 bg-white shadow-md rounded-lg p-4 text-center">
                 <h3 className="text-lg font-semibold mb-2">Revenue by Date</h3>
                 <DatePicker.RangePicker
                   value={dateRange}

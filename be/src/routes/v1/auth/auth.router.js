@@ -13,27 +13,26 @@ router.get("/logout", authMiddleware, authController.logout);
 router.get("/google", passport.authenticate("google"));
 router.get("/google/callback", passport.authenticate("google", {failureRedirect: `${process.env.FRONTEND_URL}/dang-nhap`}),async (req, res) => {
   try {
-    console.log(req.user);
     if (!req.user) {
       return res.redirect(`${process.env.FRONTEND_URL}/dang-nhap?error=Login failed`);
     }
     const accessToken = await createAccessToken({
       userId: req.user._id,
     });
+    
     const refreshToken = await refreshAccessToken();
-    console.log("Google", accessToken);
     res.cookie("authToken", accessToken, {
       sameSite: "Strict",
       secure: process.env.NODE_ENV === "production"
     });
-    // res.cookie("refreshToken", refreshToken, {
-    //   sameSite: "Strict",
-    //   secure: process.env.NODE_ENV === "production"
-    // });
     return res.redirect(process.env.FRONTEND_URL);
   } catch (error) {
     console.error("Google Callback Error:", error);
     return res.redirect(`${process.env.FRONTEND_URL}/dang-nhap?error=Server Error`);
   }
 });
+
+router.post("/forgot-password", authController.forgotPassword);
+router.post("/reset-password", authController.resetPassword);
+router.post("/change-password", authMiddleware, authController.changePassword);
 module.exports = router;

@@ -10,3 +10,7 @@ export function useError() {
 export function useLoading() {
     return useSelector((state) => state.userRedux.loading);
 }
+
+export function useLodging() {
+    return useSelector((state) => state.lodgingRedux.lodgings);
+}

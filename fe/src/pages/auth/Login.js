@@ -1,7 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../../services/authService/auth.service";
 import { ToastContainer, toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import C from "js-cookie"
+import authTokenControl from "../../utils/authToken";
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -11,10 +13,9 @@ export default function Login() {
       const form = Object.fromEntries(new FormData(e.target));
       setLoading(true);
       const response = await authService.login(form);
-      console.log(response);
-      
       setLoading(false);
       if (response.data) {
+        authTokenControl.saveToken(response.data.accessToken)
         toast.success("Chờ một chút!!!");
         setTimeout(() => {
           navigate("/", { replace: true });
@@ -23,22 +24,29 @@ export default function Login() {
       }
       if (response.message) {
         toast.error(response.message);
-        console.log("hello");
       }
       if (response.message.password) {
-        console.log("hello");
         toast.error(response.message.password);
       }
       if (response.message.email) {
         toast.error(response.message.email);
-        console.log("hello");
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again later.");
       setLoading(false);
     }
   };
-  
+
+  useEffect(() => {
+    const messVerify = localStorage.getItem("message verify");
+    if (messVerify) {
+      toast.success(messVerify, {
+        position: "top-center"
+      });
+      localStorage.removeItem("message verify");
+    }
+  })
+
   return (
     <div
       tabIndex="-1"

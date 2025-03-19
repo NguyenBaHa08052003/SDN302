@@ -11,9 +11,6 @@ const transporter = nodemailer.createTransport({
     pass: SMTP_PASSWORD,
   },
 });
-
-// console.log(transporter);
-
 module.exports = async (to, subject, message) => {
   const info = await transporter.sendMail({
     from: `"${SMTP_FROMNAME}👻" <${SMTP_FROMEMAIL}>`, 

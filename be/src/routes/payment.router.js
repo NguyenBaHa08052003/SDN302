@@ -22,46 +22,30 @@ router.post("/payment", async (req, res) => {
   if (!user_id || !amount || !description || !method || !rank) {
     return res.status(400).json({ message: "Thiếu dữ liệu đầu vào" });
   }
-
   try {
     // Kiểm tra user có tồn tại không
     const user = await User.findById(user_id);
     if (!user) {
       return res.status(404).json({ message: "Người dùng không tồn tại" });
     }
-
     // Tạo mã giao dịch
     const transID = Math.floor(Math.random() * 1000000);
     const app_trans_id = `${moment().format("YYMMDD")}_${transID}`;
-
     // Kiểm tra xem user đã có đơn hàng chưa
-    let order = await Order.findOne({ user: user._id });
-    if (order) {
-      order.amount = amount;
-      order.description = description;
-      order.method = method;
-      order.rank = rank;
-      order.status = "pending";
-      order.app_trans_id = app_trans_id;
-    } else {
-      order = new Order({
-        app_trans_id,
-        user: user._id, // Đảm bảo dùng ObjectId
-        amount,
-        description,
-        method,
-        rank,
-        status: "pending",
-      });
-    }
-
+    let order = new Order({
+      app_trans_id,
+      user: user._id, // Đảm bảo dùng ObjectId
+      amount,
+      description,
+      method,
+      rank,
+      status: "pending",
+    });
     await order.save();
-
     // Dữ liệu embed (chứa URL chuyển hướng sau khi thanh toán)
     const embed_data = {
       redirecturl: "http://localhost:3001/quan-ly/nap-tien-thanh-cong",
     };
-
     // Chuẩn bị dữ liệu gửi đến cổng thanh toán
     const orderData = {
       app_id: config.app_id,

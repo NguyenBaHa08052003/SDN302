@@ -135,13 +135,14 @@ module.exports = {
   profile: async (req, res) => {
     try {
       const user = req.user;
+      const ranking = req.ranking;
       return res.json({
         success: true,
         message: "Đăng nhập thành công. Chào mừng bạn trở lại!!!",
-        data: user,
+        data: ranking ? { ...user, ranking } : user,
       });
     } catch (error) {
-      return res.json.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "Server chết",
       });
@@ -163,11 +164,9 @@ module.exports = {
         !user.provider ||
         user.provider._id.toString() !== emailProvider._id.toString()
       ) {
-        return res
-          .status(403)
-          .json({
-            message: "Tài khoản này không thể đặt lại mật khẩu bằng email",
-          });
+        return res.status(403).json({
+          message: "Tài khoản này không thể đặt lại mật khẩu bằng email",
+        });
       }
 
       // Tạo OTP ngẫu nhiên (6 chữ số)
@@ -221,11 +220,9 @@ module.exports = {
         !user.provider ||
         user.provider._id.toString() !== emailProvider._id.toString()
       ) {
-        return res
-          .status(403)
-          .json({
-            message: "Tài khoản này không thể đặt lại mật khẩu bằng email",
-          });
+        return res.status(403).json({
+          message: "Tài khoản này không thể đặt lại mật khẩu bằng email",
+        });
       }
 
       // Kiểm tra OTP hợp lệ không

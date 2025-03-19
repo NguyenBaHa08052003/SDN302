@@ -6,6 +6,7 @@ import { fetchLodgings } from "../../../stores/redux/slices/lodgingSlice";
 import ClientPagination from "../../../components/Pagination";
 import { Link } from "react-router-dom";
 import { formatDate } from "../../../utils/convert";
+import VIPRental from "./VIPRental";
 
 const priceRanges = {
   "Dưới 1 triệu": [0, 1000000],
@@ -29,15 +30,16 @@ const areaRanges = {
 const RoomRental = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { lodgings, status } = useSelector((state) => state.lodgingRedux);
-  console.log(lodgings);
-  
+    
   const dispatch = useDispatch();
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
   useEffect(() => {
+    const pathSegments = window.location.pathname.split("/");
+    const type = pathSegments[pathSegments.length - 1];
     const fetchListings = async () => {
       try {
-        dispatch(fetchLodgings({limit: 8}));
+        dispatch(fetchLodgings({limit: 8, type}));
       } catch (error) {
         console.error("Lỗi khi lấy danh sách phòng:", error);
       }
@@ -58,6 +60,7 @@ const RoomRental = () => {
     return matchesPrice && matchesArea;
   });
 
+  
   const priceOptions = [
     "",
     "Dưới 1 triệu",
@@ -104,6 +107,7 @@ const RoomRental = () => {
               <option>Diện tích lớn đến nhỏ</option>
             </select>
           </div>
+            <VIPRental/>
           {filteredListings?.map((listing) => (
             <Link to={`/loging/room-rental/room-detail/${listing._id}`} state={listing}>
               <div

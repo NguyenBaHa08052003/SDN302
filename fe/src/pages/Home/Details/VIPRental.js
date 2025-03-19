@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Carousel, Card, Button } from "antd";
 import { StarFilled } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 
 export default function VIPRental() {
   const [vipRooms, setVipRooms] = useState([]);
@@ -33,8 +34,8 @@ export default function VIPRental() {
           dots
           className="shadow-lg rounded-lg overflow-hidden"
         >
-          {vipRooms.map((room) => (
-            <div key={room._id} className="p-4 relative">
+          {vipRooms.map((listing) => (
+            <div key={listing._id} className="p-4 relative">
               <div className="absolute top-4 left-4 bg-yellow-400 text-white p-2 rounded-full shadow-md z-10">
                 <StarFilled style={{ fontSize: "24px" }} />
               </div>
@@ -42,23 +43,27 @@ export default function VIPRental() {
                 hoverable
                 cover={
                   <img
-                    alt={room.title}
-                    src={room.images[0]}
+                    alt={listing.title}
+                    src={listing.images[0]}
                     className="h-60 w-full object-cover"
                   />
                 }
                 className="rounded-lg"
               >
-                <h3 className="text-lg font-semibold">{room.name}</h3>
+                <h3 className="text-lg font-semibold">{listing.name}</h3>
                 <p className="text-gray-600">
-                  {room.detail_address}, {room.address}
+                  {listing.detail_address}, {listing.address}
                 </p>
                 <p className="text-red-500 font-bold">
-                  {room.price.toLocaleString()} VND
+                  {listing.price.toLocaleString()} VND
                 </p>
-                <Button type="primary" className="mt-2 w-full">
+                <Link
+                to={`/loging/room-rental/room-detail/${listing._id}`} state={listing}
+                  type="primary"
+                  className="mt-2 w-full text-center bg-blue-500  text-white py-2 rounded block"
+                >
                   Xem chi tiết
-                </Button>
+                </Link>
               </Card>
             </div>
           ))}

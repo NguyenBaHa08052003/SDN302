@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { Carousel } from "antd";
 import withAuth from "../../../stores/hoc/withAuth";
 import { formatDate } from "../../../utils/convert";
+import lodgingService from "../../../services/lodgingService.js/lodging.service";
+
 const properties = [
   {
     img: "j4nI71HkO0g7aKNw2PLq-1y1QbPQ6i4vTIWwAWpFKXw.jpg",
@@ -32,8 +34,22 @@ const properties = [
 
 const RoomDetail = () => {
   const location = useLocation();
-  const listing = location.state || {};
+  const [listing, setListing] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
+  const { id } = useParams();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const getData = await lodgingService.getLodgingByIdRoom(id)
+        console.log(getData);
+
+        setListing(getData.data)
+      } catch (error) {
+
+      }
+    }
+    fetchData()
+  }, [id])
   console.log(listing);
 
   // State cho bộ lọc
@@ -78,7 +94,7 @@ const RoomDetail = () => {
                   swipeToSlide // Cho phép vuốt trượt trên thiết bị cảm ứng
                   className="rounded-lg overflow-hidden"
                 >
-                  {listing.images.map((image, index) => (
+                  {listing?.images?.map((image, index) => (
                     <div key={index}>
                       <img
                         src={image}
@@ -126,7 +142,7 @@ const RoomDetail = () => {
               <div className="flex space-x-4">
                 <div className="border border-gray-300 p-4 rounded-lg bg-white shadow-md">
                   <p className="text-red-500 text-xl font-bold">
-                    {listing.price.toLocaleString()} VND
+                    {listing?.price?.toLocaleString()} VND
                   </p>
                 </div>
                 <div className="border border-gray-300 p-4 rounded-lg bg-white shadow-md">
@@ -191,7 +207,7 @@ const RoomDetail = () => {
                     {listing?.user?.fullname}
                   </p>
                   <a
-                    href={`https://zalo.me/${listing?.user.phoneNumber}`}
+                    href={`https://zalo.me/${listing?.user?.phoneNumber}`}
                     className="bg-blue-500 text-white px-4 py-1 rounded mt-2"
                   >
                     Chat qua Zalo
@@ -233,11 +249,10 @@ const RoomDetail = () => {
                 {propertyTypes.map((item, index) => (
                   <li
                     key={index}
-                    className={`text-gray-700 cursor-pointer ${
-                      propertyTypeFilter === item
-                        ? "font-bold text-blue-500"
-                        : ""
-                    }`}
+                    className={`text-gray-700 cursor-pointer ${propertyTypeFilter === item
+                      ? "font-bold text-blue-500"
+                      : ""
+                      }`}
                     onClick={() => setPropertyTypeFilter(item)}
                   >
                     {item}
@@ -249,9 +264,8 @@ const RoomDetail = () => {
                 {areas.map((item, index) => (
                   <li
                     key={index}
-                    className={`text-gray-700 cursor-pointer ${
-                      areaFilter === item ? "font-bold text-blue-500" : ""
-                    }`}
+                    className={`text-gray-700 cursor-pointer ${areaFilter === item ? "font-bold text-blue-500" : ""
+                      }`}
                     onClick={() => setAreaFilter(item)}
                   >
                     {item}

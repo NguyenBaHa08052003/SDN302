@@ -30,14 +30,14 @@ const RoomRental = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { lodgings, status } = useSelector((state) => state.lodgingRedux);
   console.log(lodgings);
-  
+
   const dispatch = useDispatch();
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedArea, setSelectedArea] = useState("");
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        dispatch(fetchLodgings({limit: 8}));
+        dispatch(fetchLodgings({ limit: 8 }));
       } catch (error) {
         console.error("Lỗi khi lấy danh sách phòng:", error);
       }
@@ -57,6 +57,8 @@ const RoomRental = () => {
         listingArea <= areaRanges[selectedArea][1]);
     return matchesPrice && matchesArea;
   });
+  console.log("RoomRental", lodgings);
+
 
   const priceOptions = [
     "",
@@ -105,7 +107,7 @@ const RoomRental = () => {
             </select>
           </div>
           {filteredListings?.map((listing) => (
-            <Link to={`/loging/room-rental/room-detail/${listing._id}`} state={listing}>
+            <Link to={`/loging/room-rental/room-detail/${listing._id}`}>
               <div
                 key={listing._id}
                 className="bg-white rounded-lg shadow-md mb-4 overflow-hidden hover:shadow-lg transition-shadow flex"

@@ -3,6 +3,7 @@ import { addFavoriteLodging, getFavoriteLodging } from "../../../services/custom
 import axios from "axios";
 import { FaHeart, FaChevronLeft, FaChevronRight, FaRegTimesCircle } from "react-icons/fa";
 import Cookies from "js-cookie";
+import { Link } from "react-router-dom";
 const PropertyList = () => {
     const [listFavorites, setListFavorites] = useState([]);
     const [lodgingType, setLodgingType] = useState([]);
@@ -64,7 +65,7 @@ const PropertyList = () => {
                 {/* Hiển thị danh sách nhà trọ */}
                 {displayedFavorites.map((property, index) => (
                     <div key={index} className="bg-white p-4 rounded-lg shadow mb-4 flex">
-                        <img alt="House" className="w-1/4 rounded-lg" src={property.images[0]} />
+                        <Link className="w-1/4 rounded-lg" to={`/loging/room-rental/room-detail/${property._id}`} ><img alt="House" src={property.images[0]} /></Link>
                         <div className="ml-4 w-2/3">
                             <div className="flex items-center mb-1">
                                 <span className="bg-red-500 text-white px-2 py-1 rounded">

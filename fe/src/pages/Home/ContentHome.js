@@ -44,6 +44,7 @@ function ContentHome(props) {
             }
         } catch (error) {
             console.log(error);
+            navigate('/dang-nhap')
         }
     };
     const nextPage = () => {

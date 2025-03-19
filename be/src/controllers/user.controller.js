@@ -95,6 +95,19 @@ module.exports = {
         } catch (error) {
             console.log(error);
         }
+    },
+    getUserByEmail: async (req, res) => {
+        const { email } = req.params;
+        try {
+            const user = await User.findOne({ email, status: true });
+
+            if (!user) {
+                return errorResponse(res, {}, 404, "Không tìm thấy người dùng");
+            }
+            return successResponse(res, new UserTransform(user), {}, 201, "Lấy dữ liệu người dùng");
+        } catch (error) {
+            console.log(error);
+        }
     }
 
 

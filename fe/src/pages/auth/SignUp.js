@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getUserByEmail } from "../../services/customerService/customer.service";
 
 export default function SignUp() {
     const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -15,11 +16,27 @@ export default function SignUp() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const check = await getUserByEmail(form.email)
+        console.log(check);
+
+        if (check.success == true) {
+            toast.error("Tài Khoản đã tồn tại");
+            return;
+        }
+        if (!form.name) {
+            toast.error("Vui lý nhập tên!");
+            return;
+        }
+
+        if (form.password.length < 8) {
+            toast.error("Mật khẩu phải nhất 8 ký tự!");
+            return;
+        }
+
         if (form.password !== form.confirmPassword) {
             toast.error("Mật khẩu không khớp!");
             return;
         }
-
         setLoading(true);
         try {
             const response = await fetch("http://localhost:3000/api/auth/register", {
@@ -28,7 +45,7 @@ export default function SignUp() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    fullName: form.name, // Đổi fullname thành fullName nếu backend yêu cầu
+                    fullname: form.name, // Đổi fullname thành fullName nếu backend yêu cầu
                     email: form.email,
                     password: form.password,
                 }),
@@ -48,6 +65,7 @@ export default function SignUp() {
             setLoading(false);
         }
     };
+    console.log(form);
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -56,7 +74,7 @@ export default function SignUp() {
                 <h2 className="text-2xl font-bold text-center mb-4">Sign Up</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input type="text" name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required className="w-full p-2 border rounded" />
-                    <input type="email" name="email" placeholder="Email Address" value={form.email} onChange={handleChange} required className="w-full p-2 border rounded" />
+<input type="email" name="email" placeholder="Email Address" value={form.email} onChange={handleChange} required className="w-full p-2 border rounded" />
                     <input type="password" name="password" placeholder="Password" value={form.password} onChange={handleChange} required className="w-full p-2 border rounded" />
                     <input type="password" name="confirmPassword" placeholder="Confirm Password" value={form.confirmPassword} onChange={handleChange} required className="w-full p-2 border rounded" />
                     <button type="submit" disabled={loading} className="w-full bg-black text-white p-2 rounded hover:bg-gray-800 disabled:bg-gray-400">

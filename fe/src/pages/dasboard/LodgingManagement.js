@@ -10,6 +10,7 @@ import {
   Typography,
   Space,
   Tag,
+  Input,
 } from "antd";
 import axios from "axios";
 import {
@@ -22,7 +23,8 @@ import {
 import { Header, Stats } from "./LayoutLodgingManagement/Layout";
 import RoomDetailModal from "./LayoutLodgingManagement/room-detail-modal";
 import "./lodging-management.css";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import UpdateLodgingModal from "./LayoutLodgingManagement/update-lodging-modal";
 
 const { Title } = Typography;
 
@@ -33,7 +35,12 @@ const LodgingManagement = () => {
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [selectedRecordUpdate, setSelectedRecordUpdate] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [filteredStatus, setFilteredStatus] = useState(null);
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+  };
   useEffect(() => {
     const userId = sessionStorage.getItem("UserId");
     if (!userId) {
@@ -44,7 +51,7 @@ const LodgingManagement = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:3000/api/lodgings/${JSON.parse(userId)}/users`
+          `http://localhost:3000/api/lodgings/${userId}/users`
         );
         setLodgings(res.data);
         setFilteredLodgings(res?.data?.data || []);
@@ -84,11 +91,13 @@ const LodgingManagement = () => {
     setIsDetailModalVisible(true);
   };
 
-  const handleEditRoom = (record) => {
-    console.log("Chỉnh sửa phòng:", record);
-    // Implement edit functionality
-  };
 
+  // Update your handleEditRoom function
+  const handleEditRoom = (record) => {
+    setSelectedRecordUpdate(record)
+    setIsUpdateModalVisible(true)
+  }
+  
   const handleToggleRoomStatus = async (record) => {
      if(window.confirm("Bạn có chắc muốn thay đổi trạng thái?")){
       try {
@@ -129,10 +138,23 @@ const LodgingManagement = () => {
   // Cột table
   const columns = [
     {
-      title: "Tên phòng",
+      title: (
+        <div>
+          <span style={{ marginRight: 8 }}>Tên phòng</span>
+          <Input
+            placeholder="Tìm kiếm..."
+            value={searchText}
+            onChange={handleSearch}
+            style={{ width: 150 }}
+            size="small"
+          />
+        </div>
+      ),
       dataIndex: "name",
       key: "name",
-      className: "w-50",
+      onFilter: (value, record) =>
+        record.name.toLowerCase().includes(value.toLowerCase()),
+      filteredValue: searchText ? [searchText] : [],
       render: (text) => <span className="font-bold text-blue-500">{text}</span>,
     },
     {
@@ -217,11 +239,14 @@ const LodgingManagement = () => {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
+      filters: [
+        { text: "Chưa ai thuê", value: 1 },
+        { text: "Đã cho thuê", value: 0 },
+      ],
+      onFilter: (value, record) => Number(record.status) === value,
+      filteredValue: filteredStatus !== null ? [filteredStatus] : null,
       render: (status) => (
-        <Tag
-          color={status === 1 ? "green" : "red"}
-          className="text-sm py-1 px-2"
-        >
+        <Tag color={status === 1 ? "green" : "red"} className="text-sm py-1 px-2">
           {status === 1 ? "Chưa ai thuê" : "Đã cho thuê"}
         </Tag>
       ),
@@ -262,6 +287,7 @@ const LodgingManagement = () => {
   ];
   return (
     <div className="container mx-auto p-4">
+    <ToastContainer position="top-center"/>
       <Header />
       <Stats lodgings={lodgings.data} />
       <Card className="lodging-table-card">
@@ -276,6 +302,9 @@ const LodgingManagement = () => {
           loading={loading}
           className="lodging-table"
           rowClassName="lodging-table-row"
+          onChange={(pagination, filters) => {
+            setFilteredStatus(filters.status?.[0] ?? null);
+          }}
         />
       </Card>
       {/* Room Detail Modal Component */}
@@ -284,6 +313,32 @@ const LodgingManagement = () => {
         handleCloseModal={handleCloseModal}
         selectedRecord={selectedRecord}
       />
+      {selectedRecordUpdate && (
+        <UpdateLodgingModal
+          isVisible={isUpdateModalVisible}
+          onClose={() => setIsUpdateModalVisible(false)}
+          selectedRecordUpdate={selectedRecordUpdate}
+          onUpdateSuccess={() => {
+            // Refresh your data
+            const userId = sessionStorage.getItem("UserId")
+            if (userId) {
+              setLoading(true)
+              axios
+                .get(`http://localhost:3000/api/lodgings/${userId}/users`)
+                .then((res) => {
+                  setLodgings(res.data)
+                  setFilteredLodgings(res?.data?.data || [])
+                })
+                .catch((error) => {
+                  console.error("Lỗi khi lấy dữ liệu:", error)
+                })
+                .finally(() => {
+                  setLoading(false)
+                })
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

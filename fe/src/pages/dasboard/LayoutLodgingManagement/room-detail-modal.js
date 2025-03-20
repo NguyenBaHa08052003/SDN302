@@ -48,12 +48,12 @@ const RoomDetailModal = ({ isDetailModalVisible, handleCloseModal, selectedRecor
             Chi tiết phòng
           </Title>
         }
-        visible={isDetailModalVisible}
+        open={isDetailModalVisible}
         onCancel={handleCloseModal}
         footer={null}
         width={800}
         className="room-detail-modal"
-        bodyStyle={{ padding: 0 }}
+        styles={{ padding: 0 }}
       >
         {selectedRecord ? (
           <div>
@@ -195,13 +195,13 @@ const RoomDetailModal = ({ isDetailModalVisible, handleCloseModal, selectedRecor
 
       {/* Modal Xem Ảnh Full */}
       <Modal
-        visible={isImageModalVisible}
+        open={isImageModalVisible}
         onCancel={handleCloseImageModal}
         footer={null}
         width="80%"
         centered
         closeIcon={<CloseOutlined className="close-icon" />}
-        bodyStyle={{ padding: 0, background: "black", height: "80vh" }}
+        styles={{ padding: 0, background: "black", height: "80vh" }}
         style={{ top: 20 }}
         className="image-preview-modal"
       >

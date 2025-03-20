@@ -20,7 +20,11 @@ export const publicRoutes = (
       <Route index path="/" element={<HomePage />} />
       <Route path="/lodging" element={<LodgingPage />} />
       <Route path="/loging/room-rental" element={<RoomRental />} />
+
       <Route path="/loging/room-whole" element={<RoomWhole/>}/>
+
+      <Route path="/loging/nguyen-can" element={<RoomRental />} />
+
       <Route path="/loging/room-rental/room-detail/:id" element={<RoomDetail />} />
       <Route path="/verify-account/:id" element={<VerifyUserPage/>} />
     </Route>

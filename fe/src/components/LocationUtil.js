@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Select } from "antd";
 
 const { Option } = Select;
 
-// Hàm tìm tên theo ID từ danh sách
-const findNameById = (list, id) => {
-  const item = list.find((item) => item.id === id);
-  return item ? item.full_name : "";
+// Hàm tìm ID theo tên từ danh sách
+const findIdByName = (list, name) => {
+  const item = list.find((item) => item.full_name === name);
+  return item ? item.id : null;
 };
 
-const LocationUtil = ({ setLocation }) => {
+const LocationUtil = ({ setLocation, defaultAddress }) => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -35,6 +35,17 @@ const LocationUtil = ({ setLocation }) => {
     fetchProvinces();
   }, []);
 
+  // Cập nhật giá trị ban đầu từ `defaultAddress`
+  useEffect(() => {
+    if (defaultAddress && provinces.length > 0) {
+      const [wardName, districtName, provinceName] = defaultAddress.split(", ");
+      
+      // Tìm ID tương ứng
+      const provinceId = findIdByName(provinces, provinceName);
+      setSelectedProvince(provinceId);
+    }
+  }, [defaultAddress, provinces]);
+
   // Fetch danh sách quận/huyện khi chọn tỉnh
   useEffect(() => {
     if (!selectedProvince) {
@@ -52,13 +63,20 @@ const LocationUtil = ({ setLocation }) => {
         );
         if (response.data.error === 0) {
           setDistricts(response.data.data);
+
+          // Nếu có defaultAddress, chọn quận tương ứng
+          if (defaultAddress) {
+            const [, districtName] = defaultAddress.split(", ");
+            const districtId = findIdByName(response.data.data, districtName);
+            setSelectedDistrict(districtId);
+          }
         }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách quận/huyện:", error.message);
       }
     };
     fetchDistricts();
-  }, [selectedProvince]);
+  }, [selectedProvince, defaultAddress]);
 
   // Fetch danh sách phường/xã khi chọn quận
   useEffect(() => {
@@ -75,31 +93,30 @@ const LocationUtil = ({ setLocation }) => {
         );
         if (response.data.error === 0) {
           setWards(response.data.data);
+
+          // Nếu có defaultAddress, chọn phường tương ứng
+          if (defaultAddress) {
+            const [wardName] = defaultAddress.split(", ");
+            const wardId = findIdByName(response.data.data, wardName);
+            setSelectedWard(wardId);
+          }
         }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách phường/xã:", error.message);
       }
     };
     fetchWards();
-  }, [selectedDistrict]);
+  }, [selectedDistrict, defaultAddress]);
 
-  // Chuyển ID thành tên và cập nhật `setLocation`
+  // Cập nhật `setLocation`
   useEffect(() => {
     if (setLocation) {
-      const provinceName = findNameById(provinces, selectedProvince);
-      const districtName = findNameById(districts, selectedDistrict);
-      const wardName = findNameById(wards, selectedWard);
+      const provinceName = provinces.find((p) => p.id === selectedProvince)?.full_name || "";
+      const districtName = districts.find((d) => d.id === selectedDistrict)?.full_name || "";
+      const wardName = wards.find((w) => w.id === selectedWard)?.full_name || "";
       setLocation(`${wardName}, ${districtName}, ${provinceName}`);
     }
-  }, [
-    selectedProvince,
-    selectedDistrict,
-    selectedWard,
-    provinces,
-    districts,
-    wards,
-    setLocation,
-  ]);
+  }, [selectedProvince, selectedDistrict, selectedWard, provinces, districts, wards, setLocation]);
 
   return (
     <div className="flex flex-col space-y-4">

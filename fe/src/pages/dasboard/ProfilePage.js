@@ -18,11 +18,7 @@ const ProfilePage = () => {
     phoneNumber: "",
   });
   const [previewImage, setPreviewImage] = useState("");
-  useEffect(() => {
-    if (Cookies.get("authToken") && currentUser?.success) {
-      toast.success(`Chào mừng bạn trở lại ${currentUser.data.name}`);
-    }
-  }, []);
+
   useEffect(() => {
     if (currentUser?.data) {
       setUpdateUser({

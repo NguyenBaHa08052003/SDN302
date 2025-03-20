@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/", lodgingController.getAllLodgings);
 router.post("/", authMiddleware, uploadCloud.array("images", 5), lodgingController.createLodging);
 router.get("/lodging-types", lodgingController.getAllLodgingTypes);
+router.get('/:id', lodgingController.getLodginById);
 router.get("/:userId/users", lodgingController.getLodgingByUserId);
 router.put("/:id/lodging", uploadCloud.array("images", 5),lodgingController.updateLodging);
 router.put("/:id/toggle-status", lodgingController.updateStatusLoding);

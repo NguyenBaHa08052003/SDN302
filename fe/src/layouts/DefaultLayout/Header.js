@@ -74,7 +74,7 @@ const Header = () => {
             <Link to={"/loging/room-rental"} className="text-black mr-5 text-sm font-bold">
               Phòng trọ
             </Link>
-            <a href="#" className="text-black mr-5 text-sm font-bold">
+            <a href={"/loging/room-whole"} className="text-black mr-5 text-sm font-bold">
               Nguyên căn
             </a>
             <a href="#" className="text-black mr-5 text-sm font-bold">
@@ -111,7 +111,7 @@ const Header = () => {
                 Đăng nhập
               </Link>
               <Link
-                to={"/register"}
+                to={"/signup"}
                 className="ml-3 inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50"
               >
                 Đăng ký
